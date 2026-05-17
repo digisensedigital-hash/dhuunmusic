@@ -26,11 +26,9 @@ serializeTrack(track) {
         : '',
 
     streamUrl:
-      track.hlsMasterUrl
-        ? getPublicFileUrl(
-            track.hlsMasterUrl
-          )
-        : '',
+      getPublicFileUrl(
+        track.hlsMasterUrl
+      ),
 
     artist:
       track.primaryArtist
