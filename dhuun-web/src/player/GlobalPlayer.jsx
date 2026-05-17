@@ -32,15 +32,14 @@ GlobalPlayer() {
   useEffect(() => {
     if (
       !currentTrack ||
-      !audioRef.current
+      !audioRef.current ||
+      !currentTrack.streamUrl
     ) {
       return;
     }
 
     const audio =
       audioRef.current;
-
-    setAudioRef(audio);
 
     const streamUrl =
       currentTrack.streamUrl;
@@ -50,22 +49,24 @@ GlobalPlayer() {
       streamUrl
     );
 
+    setAudioRef(audio);
+
     // -----------------------------------
-    // Full Runtime Cleanup
+    // Full Cleanup
     // -----------------------------------
 
     audio.pause();
+
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
 
     audio.removeAttribute(
       'src'
     );
 
     audio.load();
-
-    if (hlsRef.current) {
-      hlsRef.current.destroy();
-      hlsRef.current = null;
-    }
 
     // -----------------------------------
     // Native Safari HLS
@@ -76,6 +77,10 @@ GlobalPlayer() {
         'application/vnd.apple.mpegurl'
       )
     ) {
+      console.log(
+        'Using native HLS'
+      );
+
       audio.src =
         streamUrl;
 
@@ -89,60 +94,44 @@ GlobalPlayer() {
     }
 
     // -----------------------------------
-    // HLS.js Runtime
+    // HLS.js
     // -----------------------------------
 
     else if (
       Hls.isSupported()
     ) {
+      console.log(
+        'Using HLS.js'
+      );
+
       const hls =
         new Hls({
           enableWorker: true,
-          lowLatencyMode: false,
         });
 
       hlsRef.current =
         hls;
+
+      hls.loadSource(
+        streamUrl
+      );
 
       hls.attachMedia(
         audio
       );
 
       hls.on(
-        Hls.Events.MEDIA_ATTACHED,
-        () => {
-          console.log(
-            'HLS media attached'
-          );
-
-          hls.loadSource(
-            streamUrl
-          );
-        }
-      );
-
-      hls.on(
         Hls.Events.MANIFEST_PARSED,
         () => {
           console.log(
-            'HLS manifest parsed'
+            'Manifest parsed'
           );
 
           if (isPlaying) {
             audio
               .play()
-              .then(() => {
-                console.log(
-                  'Playback started'
-                );
-              })
               .catch(
-                (err) => {
-                  console.error(
-                    'Playback failed:',
-                    err
-                  );
-                }
+                console.error
               );
           }
         }
@@ -182,10 +171,6 @@ GlobalPlayer() {
 
     const handleEnded =
       () => {
-        console.log(
-          'Track ended'
-        );
-
         playNextTrack();
       };
 
@@ -220,6 +205,8 @@ GlobalPlayer() {
         handleEnded
       );
 
+      audio.pause();
+
       if (hlsRef.current) {
         hlsRef.current.destroy();
         hlsRef.current = null;
@@ -242,17 +229,9 @@ GlobalPlayer() {
     if (isPlaying) {
       audio
         .play()
-        .then(() => {
-          console.log(
-            'Playback resumed'
-          );
-        })
-        .catch((err) => {
-          console.error(
-            'Playback failed:',
-            err
-          );
-        });
+        .catch(
+          console.error
+        );
     } else {
       audio.pause();
     }
