@@ -15,7 +15,7 @@ dotenv.config();
 // -----------------------------------
 
 const TRACKS_DIR =
-  '/Users/arshadmalik/DHUUN/Dhuun Originals';
+  '/var/www/dhuunmusic/music';
 
 const OUTPUT_DIR =
   '/Users/arshadmalik/DHUUN/dhuun-api/uploads/tracks';
