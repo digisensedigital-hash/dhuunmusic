@@ -10,12 +10,14 @@ export const getPlaybackQueue =
       const { trackId } =
         req.params;
 
+      const userId =
+        req.user?.id || null;
+
       const queue =
         await generateQueue({
           trackId,
 
-          userId:
-            req.user.id
+          userId
         });
 
       if (!queue) {
