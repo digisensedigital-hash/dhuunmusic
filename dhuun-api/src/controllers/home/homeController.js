@@ -34,7 +34,8 @@ import serializePlaylist
 export const getHomeFeed =
   async (req, res) => {
     try {
-      const userId = req.user.id;
+      const userId =
+  req.user?.id || null;
 
       // -----------------------------------
       // Trending Runtime
@@ -116,73 +117,80 @@ export const getHomeFeed =
       // -----------------------------------
 
       const recommended =
-        await getRecommendations(
-          userId
-        );
+        userId
+            ? await getRecommendations(
+                userId
+            )
+            : [];
 
       // -----------------------------------
-      // Recently Played
-      // -----------------------------------
+        // Recently Played
+        // -----------------------------------
 
-      const recentlyPlayed =
-        await RecentlyPlayed.find({
-          userId
-        })
-          .sort({
-            playedAt: -1
-          })
-          .limit(10)
-          .populate({
-            path: 'trackId',
-            populate: {
-              path: 'primaryArtist',
-              select:
-                'stageName profileImage'
-            }
-          });
+        const recentlyPlayed =
+        userId
+            ? await RecentlyPlayed.find({
+                userId
+            })
+                .sort({
+                playedAt: -1
+                })
+                .limit(10)
+                .populate({
+                path: 'trackId',
+                populate: {
+                    path: 'primaryArtist',
+                    select:
+                    'stageName profileImage'
+                }
+                })
+            : [];
 
-      // -----------------------------------
-      // Saved Tracks
-      // -----------------------------------
+        // -----------------------------------
+        // Saved Tracks
+        // -----------------------------------
 
-      const savedTracks =
-        await SavedTrack.find({
-          userId
-        })
-          .sort({
-            savedAt: -1
-          })
-          .limit(10)
-          .populate({
-            path: 'trackId',
-            populate: {
-              path: 'primaryArtist',
-              select:
-                'stageName profileImage'
-            }
-          });
+        const savedTracks =
+        userId
+            ? await SavedTrack.find({
+                userId
+            })
+                .sort({
+                savedAt: -1
+                })
+                .limit(10)
+                .populate({
+                path: 'trackId',
+                populate: {
+                    path: 'primaryArtist',
+                    select:
+                    'stageName profileImage'
+                }
+                })
+            : [];
 
-      // -----------------------------------
-      // Playlists
-      // -----------------------------------
+        // -----------------------------------
+        // Playlists
+        // -----------------------------------
 
-      const playlists =
-        await Playlist.find({
-          ownerId: userId
-        })
-          .sort({
-            updatedAt: -1
-          })
-          .limit(10)
-          .populate({
-            path: 'tracks.trackId',
-            populate: {
-              path: 'primaryArtist',
-              select:
-                'stageName profileImage'
-            }
-          });
-
+        const playlists =
+        userId
+            ? await Playlist.find({
+                ownerId: userId
+            })
+                .sort({
+                updatedAt: -1
+                })
+                .limit(10)
+                .populate({
+                path: 'tracks.trackId',
+                populate: {
+                    path: 'primaryArtist',
+                    select:
+                    'stageName profileImage'
+                }
+                })
+            : [];
       // -----------------------------------
       // Response
       // -----------------------------------
