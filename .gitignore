@@ -1,0 +1,29 @@
+
+Dhuun Originals
+
+# Dependencies
+
+node_modules
+
+# Environment
+.env
+.env.*
+
+# Builds
+dist
+build
+
+# Runtime Storage
+uploads
+storage
+
+# Logs
+logs
+*.log
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode
+.idea
