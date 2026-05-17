@@ -7,17 +7,21 @@ export async function
 loadPlaybackQueue(
   trackId
 ) {
+  const token =
+    localStorage.getItem(
+      'token'
+    );
+
   const response =
     await axios.get(
-      `${API_BASE}/player/queue/${trackId}`,
+      `${API_URL}/player/queue/${trackId}`,
       {
-        headers: {
-          Authorization: `Bearer ${
-            localStorage.getItem(
-              'token'
-            )
-          }`,
-        },
+        headers: token
+          ? {
+              Authorization:
+                `Bearer ${token}`,
+            }
+          : {},
       }
     );
 
