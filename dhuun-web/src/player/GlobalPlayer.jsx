@@ -128,6 +128,7 @@ GlobalPlayer() {
       }
     })();
 
+    
     // -----------------------------------
     // Full Cleanup
     // -----------------------------------
@@ -141,11 +142,19 @@ GlobalPlayer() {
         null;
     }
 
-    audio.removeAttribute(
-      'src'
-    );
+    // IMPORTANT:
+    // Avoid fully resetting the audio
+    // element on mobile browsers.
+    //
+    // removeAttribute('src') + load()
+    // can aggressively unload media
+    // pipeline while app is backgrounded,
+    // which may break next-track autoplay.
+    //
+    // Keep the audio element alive
+    // and only replace source when
+    // next track initializes.
 
-    audio.load();
 
     // -----------------------------------
     // Native Safari HLS
@@ -262,24 +271,23 @@ GlobalPlayer() {
         );
       };
 
-    const handleEnded =
-      async () => {
-        if (
-          sessionRef.current
-        ) {
-          await completeListenSession(
-            {
-              sessionId:
-                sessionRef.current,
-            }
-          );
+    const handleEnded = () => {
+      const sessionId =
+        sessionRef.current;
 
-          sessionRef.current =
-            null;
-        }
+      sessionRef.current =
+        null;
 
-        playNextTrack();
-      };
+      // ADVANCE IMMEDIATELY
+      playNextTrack();
+
+      // Fire-and-forget telemetry
+      if (sessionId) {
+        completeListenSession({
+          sessionId,
+        }).catch(console.error);
+      }
+    };
 
     // -----------------------------------
     // Interruption Handling
