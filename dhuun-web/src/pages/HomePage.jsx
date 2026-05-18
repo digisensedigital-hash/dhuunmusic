@@ -6,6 +6,8 @@ import HeroFeaturedCard from '../components/discovery/HeroFeaturedCard';
 
 import PlaylistRail from '../components/playlists/PlaylistRail';
 
+import usePlayerStore from '../store/playerStore';
+
 export default function
 HomePage() {
   const {
@@ -13,6 +15,11 @@ HomePage() {
     loading,
     error,
   } = useHomeFeed();
+
+  const {
+  recentlyPlayed,
+  continueListening,
+  } = usePlayerStore();
 
   if (loading) {
     return (
@@ -230,6 +237,39 @@ HomePage() {
             queue={trending}
           />
         </div>
+
+        {/* -------------------------------- */}
+        {/* Continue Listening */}
+        {/* -------------------------------- */}
+
+        {continueListening.length >
+          0 && (
+          <HorizontalTrackRail
+            title="Continue Listening"
+            items={continueListening.map(
+              (item) => ({
+                track:
+                  item.track,
+              })
+            )}
+          />
+        )}
+
+        {/* -------------------------------- */}
+        {/* Recently Played */}
+        {/* -------------------------------- */}
+
+        {recentlyPlayed.length >
+          0 && (
+          <HorizontalTrackRail
+            title="Recently Played"
+            items={recentlyPlayed.map(
+              (track) => ({
+                track,
+              })
+            )}
+          />
+        )}
 
         {/* -------------------------------- */}
         {/* Trending */}

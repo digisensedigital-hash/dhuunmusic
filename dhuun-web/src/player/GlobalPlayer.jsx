@@ -24,6 +24,7 @@ GlobalPlayer() {
     setDuration,
     setAudioRef,
     playNextTrack,
+    updateContinueListening,
   } = usePlayerStore();
 
   // -----------------------------------
@@ -159,11 +160,25 @@ GlobalPlayer() {
     // -----------------------------------
 
     const handleTimeUpdate =
-      () => {
-        setCurrentTime(
-          audio.currentTime
-        );
-      };
+    () => {
+      setCurrentTime(
+        audio.currentTime
+      );
+
+      updateContinueListening(
+        {
+          track:
+            currentTrack,
+
+          currentTime:
+            audio.currentTime,
+
+          duration:
+            audio.duration ||
+            0,
+        }
+      );
+    };
 
     const handleLoadedMetadata =
       () => {

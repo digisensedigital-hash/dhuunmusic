@@ -29,6 +29,10 @@ const usePlayerStore =
 
     savedTracks: [],
 
+    recentlyPlayed: [],
+
+    continueListening: [],
+
     // -----------------------------------
     // UI State
     // -----------------------------------
@@ -56,18 +60,33 @@ const usePlayerStore =
         queue = [],
         startIndex = 0,
       }) => {
-        set({
-          currentTrack: track,
+        const recent =
+  get().recentlyPlayed;
 
-          queue,
+    const deduped =
+      recent.filter(
+        (item) =>
+          item.id !==
+          track.id
+      );
 
-          currentIndex:
-            startIndex,
+    set({
+      currentTrack: track,
 
-          isPlaying: true,
+      queue,
 
-          currentTime: 0,
-        });
+      currentIndex:
+        startIndex,
+
+      isPlaying: true,
+
+      currentTime: 0,
+
+      recentlyPlayed: [
+        track,
+        ...deduped,
+      ].slice(0, 30),
+    });
       },
 
     playNextTrack:
@@ -426,10 +445,80 @@ const usePlayerStore =
             trackId
         );
       },
+    
+    // -----------------------------------
+    // Continue Listening
+    // -----------------------------------
+
+    updateContinueListening:
+      ({
+        track,
+        currentTime,
+        duration,
+      }) => {
+        if (
+          !track ||
+          !duration
+        ) {
+          return;
+        }
+
+        // Ignore near-complete tracks
+
+        const progress =
+          currentTime /
+          duration;
+
+        if (progress > 0.95) {
+          set({
+            continueListening:
+              get()
+                .continueListening
+                .filter(
+                  (
+                    item
+                  ) =>
+                    item.track
+                      .id !==
+                    track.id
+                ),
+          });
+
+          return;
+        }
+
+        const existing =
+          get()
+            .continueListening;
+
+        const deduped =
+          existing.filter(
+            (item) =>
+              item.track.id !==
+              track.id
+          );
+
+        set({
+          continueListening:
+            [
+              {
+                track,
+                currentTime,
+                duration,
+                updatedAt:
+                  Date.now(),
+              },
+
+              ...deduped,
+            ].slice(0, 20),
+        });
+      },  
+    
         }),
       {
-  name:
-    'dhuun-player-store',
+      name:
+      'dhuun-player-store',
+      
 
   partialize:
     (state) => ({
@@ -452,6 +541,13 @@ const usePlayerStore =
 
       savedTracks:
         state.savedTracks,
+
+      recentlyPlayed:
+      state.recentlyPlayed,
+
+      continueListening:
+      state.continueListening,
+
     }),
   }
     )
