@@ -82,14 +82,20 @@ getRecommendations(userId) {
 
     let score = 0;
 
+    let reason =
+    'Trending for listeners like you';
+
     score += trending.score || 0;
 
     if (
-      preferredGenres.has(
-        track.genre
-      )
+    preferredGenres.has(
+      track.genre
+    )
     ) {
       score += 25;
+
+      reason =
+        `Because you enjoy ${track.genre}`;
     }
 
     if (
@@ -98,11 +104,15 @@ getRecommendations(userId) {
       )
     ) {
       score += 40;
+
+      reason =
+        `Similar to ${track.primaryArtist?.stageName}`;
     }
 
     trackScores.push({
       track,
-      score
+      score,
+      reason,
     });
   }
 

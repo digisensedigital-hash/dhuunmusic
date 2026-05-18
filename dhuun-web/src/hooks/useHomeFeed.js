@@ -1,8 +1,11 @@
-import { useEffect, useState }
-  from 'react';
+import {
+  useEffect,
+  useState,
+  useCallback,
+} from 'react';
 
 import {
-  getHomeFeed
+  getHomeFeed,
 } from '../api/home';
 
 export default function
@@ -16,26 +19,56 @@ useHomeFeed() {
   const [error, setError] =
     useState(null);
 
+  // -----------------------------------
+  // Load Feed
+  // -----------------------------------
+
+  const loadFeed =
+    useCallback(
+      async (
+        silent = false
+      ) => {
+        try {
+          if (!silent) {
+            setLoading(
+              true
+            );
+          }
+
+          const response =
+            await getHomeFeed();
+
+          setData(
+            response
+          );
+
+          setError(null);
+        } catch (err) {
+          setError(err);
+        } finally {
+          if (!silent) {
+            setLoading(
+              false
+            );
+          }
+        }
+      },
+      []
+    );
+
+  // -----------------------------------
+  // Initial Load
+  // -----------------------------------
+
   useEffect(() => {
-    async function load() {
-      try {
-        const response =
-          await getHomeFeed();
-
-        setData(response);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    load();
-  }, []);
+    loadFeed();
+  }, [loadFeed]);
 
   return {
     data,
     loading,
     error,
+    refreshFeed:
+      loadFeed,
   };
 }

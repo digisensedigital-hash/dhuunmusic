@@ -268,22 +268,28 @@ PlaylistPage() {
         {/* -------------------------------- */}
 
         <div className="mt-10 flex flex-col gap-2">
-        {playlist.tracks.map(
-            (
-            track,
-            index
-            ) => (
-            <PlaylistTrackRow
-                key={track.id}
-                track={track}
-                index={index}
-                queue={
-                playlist.tracks
-                }
-            />
-            )
-        )}
-        </div>
+            {playlist.tracks
+              ?.filter(
+                (track) => track
+              )
+              .map(
+                (
+                  track,
+                  index
+                ) => (
+                  <PlaylistTrackRow
+                    key={
+                      track?.id
+                    }
+                    track={track}
+                    index={index}
+                    queue={playlist.tracks.filter(
+                      Boolean
+                    )}
+                  />
+                )
+              )}
+          </div>
       </div>
     </div>
   );

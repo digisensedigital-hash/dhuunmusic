@@ -59,6 +59,9 @@ HorizontalTrackRail({
                 track={
                   item.track
                 }
+                recommendationReason={
+                  item.reason
+                }
               />
             </div>
           )

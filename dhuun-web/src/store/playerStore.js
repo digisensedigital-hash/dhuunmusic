@@ -60,33 +60,48 @@ const usePlayerStore =
         queue = [],
         startIndex = 0,
       }) => {
+        // -----------------------------------
+        // Sanitize Queue
+        // -----------------------------------
+
+        queue =
+          queue?.filter(
+            Boolean
+          ) || [];
+
+        if (!track) {
+          return;
+        }
+
         const recent =
-  get().recentlyPlayed;
+          get()
+            .recentlyPlayed;
 
-    const deduped =
-      recent.filter(
-        (item) =>
-          item.id !==
-          track.id
-      );
+        const deduped =
+          recent.filter(
+            (item) =>
+              item?.id !==
+              track?.id
+          );
 
-    set({
-      currentTrack: track,
+        set({
+          currentTrack:
+            track,
 
-      queue,
+          queue,
 
-      currentIndex:
-        startIndex,
+          currentIndex:
+            startIndex,
 
-      isPlaying: true,
+          isPlaying: true,
 
-      currentTime: 0,
+          currentTime: 0,
 
-      recentlyPlayed: [
-        track,
-        ...deduped,
-      ].slice(0, 30),
-    });
+          recentlyPlayed: [
+            track,
+            ...deduped,
+          ].slice(0, 30),
+        });
       },
 
     playNextTrack:

@@ -8,12 +8,24 @@ import Hls from 'hls.js';
 import usePlayerStore
   from '../store/playerStore';
 
+import {
+  startListenSession,
+  sendListenHeartbeat,
+  completeListenSession,
+} from '../lib/listenSession';
+
 export default function
 GlobalPlayer() {
   const audioRef =
     useRef(null);
 
   const hlsRef =
+    useRef(null);
+
+  const sessionRef =
+    useRef(null);
+
+  const heartbeatRef =
     useRef(null);
 
   const {
@@ -52,6 +64,69 @@ GlobalPlayer() {
     );
 
     setAudioRef(audio);
+
+    // -----------------------------------
+    // Cleanup Previous Session
+    // -----------------------------------
+
+    if (
+      heartbeatRef.current
+    ) {
+      clearInterval(
+        heartbeatRef.current
+      );
+
+      heartbeatRef.current =
+        null;
+    }
+
+    if (
+      sessionRef.current
+    ) {
+      completeListenSession({
+        sessionId:
+          sessionRef.current,
+      });
+
+      sessionRef.current =
+        null;
+    }
+
+    // -----------------------------------
+    // Start Listen Session
+    // -----------------------------------
+
+    (async () => {
+      const response =
+        await startListenSession(
+          currentTrack.id
+        );
+
+      if (
+        response?.sessionId
+      ) {
+        sessionRef.current =
+          response.sessionId;
+
+        // -----------------------------------
+        // Heartbeat Loop
+        // -----------------------------------
+
+        heartbeatRef.current =
+          setInterval(() => {
+            if (
+              sessionRef.current
+            ) {
+              sendListenHeartbeat(
+                {
+                  sessionId:
+                    sessionRef.current,
+                }
+              );
+            }
+          }, 15000);
+      }
+    })();
 
     // -----------------------------------
     // Full Cleanup
@@ -160,25 +235,25 @@ GlobalPlayer() {
     // -----------------------------------
 
     const handleTimeUpdate =
-    () => {
-      setCurrentTime(
-        audio.currentTime
-      );
+      () => {
+        setCurrentTime(
+          audio.currentTime
+        );
 
-      updateContinueListening(
-        {
-          track:
-            currentTrack,
+        updateContinueListening(
+          {
+            track:
+              currentTrack,
 
-          currentTime:
-            audio.currentTime,
+            currentTime:
+              audio.currentTime,
 
-          duration:
-            audio.duration ||
-            0,
-        }
-      );
-    };
+            duration:
+              audio.duration ||
+              0,
+          }
+        );
+      };
 
     const handleLoadedMetadata =
       () => {
@@ -188,7 +263,21 @@ GlobalPlayer() {
       };
 
     const handleEnded =
-      () => {
+      async () => {
+        if (
+          sessionRef.current
+        ) {
+          await completeListenSession(
+            {
+              sessionId:
+                sessionRef.current,
+            }
+          );
+
+          sessionRef.current =
+            null;
+        }
+
         playNextTrack();
       };
 
@@ -294,6 +383,33 @@ GlobalPlayer() {
         'play',
         handlePlay
       );
+
+      // -----------------------------------
+      // Session Cleanup
+      // -----------------------------------
+
+      if (
+        heartbeatRef.current
+      ) {
+        clearInterval(
+          heartbeatRef.current
+        );
+
+        heartbeatRef.current =
+          null;
+      }
+
+      if (
+        sessionRef.current
+      ) {
+        completeListenSession({
+          sessionId:
+            sessionRef.current,
+        });
+
+        sessionRef.current =
+          null;
+      }
 
       audio.pause();
 

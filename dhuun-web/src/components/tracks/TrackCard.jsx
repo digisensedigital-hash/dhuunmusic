@@ -22,6 +22,7 @@ import {
 export default function
 TrackCard({
   track,
+  recommendationReason,
 }) {
   const {
   playTrack,
@@ -236,14 +237,24 @@ TrackCard({
             {/* Meta */}
 
             <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <p className="text-sm text-white/70 truncate transition-colors group-hover/artist:text-white">
-                  {track.artist
-                    ?.stageName ||
-                    'Unknown Artist'}
-                </p>
+              <div className="mt-1">
+                <div className="flex items-center gap-1.5">
+                  <p className="text-sm text-white/70 truncate transition-colors group-hover/artist:text-white">
+                    {track.artist
+                      ?.stageName ||
+                      'Unknown Artist'}
+                  </p>
 
-                <div className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+                </div>
+
+                {recommendationReason && (
+                  <p className="text-[11px] text-fuchsia-300/80 mt-2 line-clamp-2 leading-relaxed">
+                    {
+                      recommendationReason
+                    }
+                  </p>
+                )}
               </div>
 
               <p className="text-[11px] text-white/35 uppercase tracking-[0.18em] mt-0.5">

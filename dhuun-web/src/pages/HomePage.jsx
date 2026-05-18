@@ -8,18 +8,33 @@ import PlaylistRail from '../components/playlists/PlaylistRail';
 
 import usePlayerStore from '../store/playerStore';
 
+import { useEffect, } from 'react';
+
 export default function
 HomePage() {
   const {
-    data,
-    loading,
-    error,
+  data,
+  loading,
+  error,
+  refreshFeed,
   } = useHomeFeed();
 
   const {
   recentlyPlayed,
   continueListening,
   } = usePlayerStore();
+
+  useEffect(() => {
+  if (
+    recentlyPlayed.length >
+    0
+  ) {
+    refreshFeed(true);
+  }
+  }, [
+    recentlyPlayed,
+    refreshFeed,
+  ]);
 
   if (loading) {
     return (
@@ -41,7 +56,13 @@ HomePage() {
     data?.home?.trending || [];
 
   const recommended =
-    data?.home?.recommended || [];
+  (
+    data?.home
+      ?.recommended || []
+  ).map((item) => ({
+    track:
+      item.track,
+  }));
   
   const featuredTrack =
     trending[0] || null;
@@ -259,15 +280,28 @@ HomePage() {
         {/* Recently Played */}
         {/* -------------------------------- */}
 
-        {recentlyPlayed.length >
-          0 && (
+        {(
+          data?.home
+            ?.recentlyPlayed
+            ?.length > 0 ||
+          recentlyPlayed.length >
+            0
+        ) && (
           <HorizontalTrackRail
             title="Recently Played"
-            items={recentlyPlayed.map(
-              (track) => ({
-                track,
-              })
-            )}
+            items={
+              data?.home
+                ?.recentlyPlayed
+                ?.length > 0
+                ? data.home.recentlyPlayed
+                : recentlyPlayed.map(
+                    (
+                      track
+                    ) => ({
+                      track,
+                    })
+                  )
+            }
           />
         )}
 
@@ -284,10 +318,13 @@ HomePage() {
         {/* Recommended */}
         {/* -------------------------------- */}
 
-        <HorizontalTrackRail
-          title="Recommended"
-          items={recommended}
-        />
+        {recommended.length >
+          0 && (
+          <HorizontalTrackRail
+            title="Recommended For You"
+            items={recommended}
+          />
+        )}
 
         <HorizontalTrackRail
           title="New Releases"
