@@ -1,7 +1,7 @@
 import {
   BrowserRouter,
   Routes,
-  Route
+  Route,
 } from 'react-router-dom';
 
 import MainLayout
@@ -10,14 +10,27 @@ import MainLayout
 import HomePage
   from '../pages/HomePage';
 
-export default function AppRoutes() {
+import PlaylistPage
+  from '../pages/PlaylistPage';
+
+export default function
+AppRoutes() {
   return (
     <BrowserRouter>
       <MainLayout>
         <Routes>
           <Route
             path="/"
-            element={<HomePage />}
+            element={
+              <HomePage />
+            }
+          />
+
+          <Route
+            path="/playlist/:id"
+            element={
+              <PlaylistPage />
+            }
           />
         </Routes>
       </MainLayout>

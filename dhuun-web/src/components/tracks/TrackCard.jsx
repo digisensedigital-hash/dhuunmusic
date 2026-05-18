@@ -2,6 +2,10 @@ import {
   Play,
 } from 'lucide-react';
 
+import {
+  motion,
+} from 'framer-motion';
+
 import usePlayerStore
   from '../../store/playerStore';
 
@@ -61,15 +65,27 @@ TrackCard({
     };
 
   return (
-    <div className="relative overflow-hidden rounded-[32px] border border-white/5 bg-[#15151D] shadow-2xl">
+    <motion.div
+      whileTap={{
+        scale: 0.97,
+      }}
+      className="group relative overflow-hidden rounded-[34px] border border-white/10 bg-[#15151D] shadow-2xl"
+    >
       {/* -------------------------------- */}
       {/* Artwork */}
       {/* -------------------------------- */}
 
       <div className="relative aspect-square overflow-hidden">
         {/* Real Artwork */}
+
         {track.coverImage ? (
-          <img
+          <motion.img
+            whileHover={{
+              scale: 1.06,
+            }}
+            transition={{
+              duration: 0.4,
+            }}
             src={track.coverImage}
             alt={track.title}
             className="w-full h-full object-cover"
@@ -78,37 +94,101 @@ TrackCard({
           <div className="w-full h-full bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500" />
         )}
 
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+        {/* Ambient Overlay */}
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
+
+        {/* Top Glow */}
+
+        <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
 
         {/* Floating Play Button */}
-        <button
+
+        <motion.button
+          whileTap={{
+            scale: 0.92,
+          }}
           onClick={handlePlay}
-          className="absolute bottom-4 right-4 w-14 h-14 rounded-full bg-white text-black flex items-center justify-center shadow-xl"
+          className="absolute bottom-4 right-4 w-14 h-14 rounded-full bg-white text-black flex items-center justify-center shadow-2xl backdrop-blur transition-all duration-300 group-hover:scale-110"
         >
           <Play
             size={22}
             fill="currentColor"
+            className="ml-1"
           />
-        </button>
+        </motion.button>
+
+        {/* Floating Genre Pill */}
+
+        {track.genre && (
+          <div className="absolute top-4 left-4 rounded-full border border-white/10 bg-black/40 backdrop-blur-xl px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-white/70">
+            {track.genre}
+          </div>
+        )}
       </div>
 
       {/* -------------------------------- */}
-      {/* Track Content */}
+      {/* Content */}
       {/* -------------------------------- */}
 
-      <div className="p-4">
-        <h3 className="text-base font-semibold truncate">
-          {track.title}
-        </h3>
+      <div className="relative p-5">
+        {/* Ambient Blur */}
 
-        <p className="text-sm text-white/60 truncate mt-1">
-          {
-            track.artist
-              ?.stageName
-          }
-        </p>
+        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
+
+        <div className="relative">
+          <h3 className="text-[17px] font-bold truncate">
+            {track.title}
+          </h3>
+
+          <button className="flex items-center gap-3 mt-3 group/artist">
+            {/* Avatar */}
+
+            {track.artist
+              ?.profileImage ? (
+              <img
+                src={
+                  track.artist
+                    .profileImage
+                }
+                alt={
+                  track.artist
+                    ?.stageName
+                }
+                className="w-8 h-8 rounded-full object-cover border border-white/10"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-[10px] font-bold text-white">
+                {(
+                  track.artist
+                    ?.stageName ||
+                  'U'
+                )
+                  .charAt(0)
+                  .toUpperCase()}
+              </div>
+            )}
+
+            {/* Meta */}
+
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <p className="text-sm text-white/70 truncate transition-colors group-hover/artist:text-white">
+                  {track.artist
+                    ?.stageName ||
+                    'Unknown Artist'}
+                </p>
+
+                <div className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+              </div>
+
+              <p className="text-[11px] text-white/35 uppercase tracking-[0.18em] mt-0.5">
+                Featured Artist
+              </p>
+            </div>
+          </button>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
