@@ -14,7 +14,7 @@ HomePage() {
 
   if (loading) {
     return (
-      <div className="p-6">
+      <div className="p-6 text-white">
         Loading...
       </div>
     );
@@ -35,34 +35,48 @@ HomePage() {
     data?.home?.recommended || [];
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-[#07010F] text-white">
       {/* -------------------------------- */}
       {/* Ambient Background */}
       {/* -------------------------------- */}
 
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-purple-600/20 blur-[140px] rounded-full pointer-events-none" />
+      <div className="absolute top-[-120px] left-1/2 -translate-x-1/2 w-[520px] h-[520px] bg-purple-600/20 blur-[140px] rounded-full pointer-events-none" />
+
+      <div className="absolute bottom-[-180px] right-[-100px] w-[420px] h-[420px] bg-fuchsia-500/10 blur-[140px] rounded-full pointer-events-none" />
 
       {/* -------------------------------- */}
       {/* Content */}
       {/* -------------------------------- */}
 
-      <div className="relative z-10 px-6 pt-10">
+      <div className="relative z-10 px-6 pt-[max(56px,env(safe-area-inset-top))] pb-40">
         {/* -------------------------------- */}
         {/* Header */}
         {/* -------------------------------- */}
 
-        <div className="mb-12">
-          <p className="text-sm uppercase tracking-[0.3em] text-white/40 mb-3">
-            Welcome Back
-          </p>
+        <div className="flex items-center gap-4 mb-12">
+          {/* Logo */}
 
-          <h1 className="text-5xl font-black tracking-tight leading-none">
-            Dhuun
-          </h1>
+          <img
+            src="/Dhuun.png"
+            alt="Dhuun Music"
+            className="w-16 h-16 object-contain drop-shadow-2xl"
+          />
 
-          <p className="text-white/60 mt-4 text-base">
-            Feel the music.
-          </p>
+          {/* Title */}
+
+          <div>
+            <p className="text-xs uppercase tracking-[0.35em] text-white/40 mb-2">
+              Welcome Back
+            </p>
+
+            <h1 className="text-4xl font-black tracking-tight leading-none">
+              Dhuun Music
+            </h1>
+
+            <p className="text-white/60 mt-2 text-sm">
+              Feel the music.
+            </p>
+          </div>
         </div>
 
         {/* -------------------------------- */}
