@@ -13,6 +13,12 @@ import HomePage
 import PlaylistPage
   from '../pages/PlaylistPage';
 
+import SearchPage
+  from '../pages/SearchPage';
+
+import ArtistPage
+  from '../pages/ArtistPage';
+
 export default function
 AppRoutes() {
   return (
@@ -32,6 +38,21 @@ AppRoutes() {
               <PlaylistPage />
             }
           />
+
+          <Route
+            path="/search"
+            element={
+              <SearchPage />
+            }
+          />
+
+          <Route
+            path="/artist/:id"
+            element={
+              <ArtistPage />
+            }
+          />
+
         </Routes>
       </MainLayout>
     </BrowserRouter>

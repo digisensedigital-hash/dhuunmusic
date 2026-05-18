@@ -13,6 +13,10 @@ import {
   loadPlaybackQueue,
 } from '../../lib/player';
 
+import {
+  Link,
+} from 'react-router-dom';
+
 export default function
 TrackCard({
   track,
@@ -141,7 +145,10 @@ TrackCard({
             {track.title}
           </h3>
 
-          <button className="flex items-center gap-3 mt-3 group/artist">
+          <Link
+            to={`/artist/${track.artist?.id}`}
+            className="flex items-center gap-3 mt-3 group/artist"
+            >
             {/* Avatar */}
 
             {track.artist
@@ -186,7 +193,7 @@ TrackCard({
                 Featured Artist
               </p>
             </div>
-          </button>
+          </Link>
         </div>
       </div>
     </motion.div>
