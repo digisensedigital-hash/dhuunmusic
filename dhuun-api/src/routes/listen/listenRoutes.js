@@ -1,8 +1,5 @@
 import express from 'express';
 
-import authMiddleware
-  from '../../middleware/authMiddleware.js';
-
 import {
   startListenSession,
   heartbeatListenSession,
@@ -13,7 +10,6 @@ const router = express.Router();
 
 router.post(
   '/start',
-  authMiddleware,
   startListenSession
 );
 
