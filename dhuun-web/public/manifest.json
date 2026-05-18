@@ -1,0 +1,24 @@
+{
+  "name": "Dhuun Music",
+  "short_name": "Dhuun",
+  "description": "Dhuun Music Streaming Platform",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07010F",
+  "theme_color": "#07010F",
+  "icons": [
+    {
+      "src": "/Dhuun.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/Dhuun.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
