@@ -19,6 +19,7 @@ GlobalPlayer() {
   const {
     currentTrack,
     isPlaying,
+    setIsPlaying,
     setCurrentTime,
     setDuration,
     setAudioRef,
@@ -59,7 +60,9 @@ GlobalPlayer() {
 
     if (hlsRef.current) {
       hlsRef.current.destroy();
-      hlsRef.current = null;
+
+      hlsRef.current =
+        null;
     }
 
     audio.removeAttribute(
@@ -174,6 +177,24 @@ GlobalPlayer() {
         playNextTrack();
       };
 
+    // -----------------------------------
+    // Interruption Handling
+    // -----------------------------------
+
+    const handlePause =
+      () => {
+        setIsPlaying(
+          false
+        );
+      };
+
+    const handlePlay =
+      () => {
+        setIsPlaying(
+          true
+        );
+      };
+
     audio.addEventListener(
       'timeupdate',
       handleTimeUpdate
@@ -188,6 +209,50 @@ GlobalPlayer() {
       'ended',
       handleEnded
     );
+
+    audio.addEventListener(
+      'pause',
+      handlePause
+    );
+
+    audio.addEventListener(
+      'play',
+      handlePlay
+    );
+
+    // -----------------------------------
+    // Media Session API
+    // -----------------------------------
+
+    if (
+      'mediaSession' in
+      navigator
+    ) {
+      navigator.mediaSession.setActionHandler(
+        'play',
+        () => {
+          audio
+            .play()
+            .catch(
+              console.error
+            );
+        }
+      );
+
+      navigator.mediaSession.setActionHandler(
+        'pause',
+        () => {
+          audio.pause();
+        }
+      );
+
+      navigator.mediaSession.setActionHandler(
+        'nexttrack',
+        () => {
+          playNextTrack();
+        }
+      );
+    }
 
     return () => {
       audio.removeEventListener(
@@ -205,11 +270,23 @@ GlobalPlayer() {
         handleEnded
       );
 
+      audio.removeEventListener(
+        'pause',
+        handlePause
+      );
+
+      audio.removeEventListener(
+        'play',
+        handlePlay
+      );
+
       audio.pause();
 
       if (hlsRef.current) {
         hlsRef.current.destroy();
-        hlsRef.current = null;
+
+        hlsRef.current =
+          null;
       }
     };
   }, [currentTrack]);

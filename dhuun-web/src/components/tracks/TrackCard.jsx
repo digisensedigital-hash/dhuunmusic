@@ -1,9 +1,11 @@
 import {
   Play,
+  Heart,
 } from 'lucide-react';
 
 import {
   motion,
+  AnimatePresence,
 } from 'framer-motion';
 
 import usePlayerStore
@@ -22,12 +24,19 @@ TrackCard({
   track,
 }) {
   const {
-    playTrack,
+  playTrack,
+  toggleSaveTrack,
+  isTrackSaved,
   } = usePlayerStore();
 
   // -----------------------------------
   // Intelligent Playback Startup
   // -----------------------------------
+
+  const isSaved =
+  isTrackSaved(
+    track.id
+  );
 
   const handlePlay =
     async () => {
@@ -121,6 +130,54 @@ TrackCard({
             className="ml-1"
           />
         </motion.button>
+
+
+        {/* Save Button */}
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+
+            toggleSaveTrack(
+              track
+            );
+          }}
+          className="absolute top-4 right-4 w-11 h-11 rounded-full border border-white/10 bg-black/40 backdrop-blur-xl flex items-center justify-center transition-all duration-300 hover:scale-110"
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={
+                isSaved
+                  ? 'saved'
+                  : 'unsaved'
+              }
+              initial={{
+                scale: 0.6,
+                opacity: 0,
+              }}
+              animate={{
+                scale: 1,
+                opacity: 1,
+              }}
+              exit={{
+                scale: 0.6,
+                opacity: 0,
+              }}
+              transition={{
+                duration: 0.18,
+              }}
+            >
+              <Heart
+                size={18}
+                className={
+                  isSaved
+                    ? 'fill-fuchsia-500 text-fuchsia-500'
+                    : 'text-white'
+                }
+              />
+            </motion.div>
+          </AnimatePresence>
+        </button>
 
         {/* Floating Genre Pill */}
 

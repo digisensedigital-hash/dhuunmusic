@@ -1,8 +1,14 @@
 import { create }
   from 'zustand';
 
+import {
+  persist,
+} from 'zustand/middleware';
+
 const usePlayerStore =
-  create((set, get) => ({
+  create(
+    persist(
+      (set, get) => ({
     // -----------------------------------
     // Core Playback State
     // -----------------------------------
@@ -20,6 +26,8 @@ const usePlayerStore =
     duration: 0,
 
     audioRef: null,
+
+    savedTracks: [],
 
     // -----------------------------------
     // UI State
@@ -369,6 +377,84 @@ const usePlayerStore =
         set({
           audioRef: value,
         }),
-  }));
+
+    // -----------------------------------
+    // Saved Tracks
+    // -----------------------------------
+
+    toggleSaveTrack:
+      (track) => {
+        const {
+          savedTracks,
+        } = get();
+
+        const exists =
+          savedTracks.some(
+            (item) =>
+              item.id ===
+              track.id
+          );
+
+        if (exists) {
+          set({
+            savedTracks:
+              savedTracks.filter(
+                (
+                  item
+                ) =>
+                  item.id !==
+                  track.id
+              ),
+          });
+
+          return;
+        }
+
+        set({
+          savedTracks: [
+            track,
+            ...savedTracks,
+          ],
+        });
+      },
+
+    isTrackSaved:
+      (trackId) => {
+        return get().savedTracks.some(
+          (track) =>
+            track.id ===
+            trackId
+        );
+      },
+        }),
+      {
+  name:
+    'dhuun-player-store',
+
+  partialize:
+    (state) => ({
+      currentTrack:
+        state.currentTrack,
+
+      queue:
+        state.queue,
+
+      currentIndex:
+        state.currentIndex,
+
+      isPlaying:
+        false,
+
+      currentTime: 0,
+
+      duration:
+        state.duration,
+
+      savedTracks:
+        state.savedTracks,
+    }),
+  }
+    )
+  );
 
 export default usePlayerStore;

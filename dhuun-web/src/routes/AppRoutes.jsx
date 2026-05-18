@@ -19,6 +19,10 @@ import SearchPage
 import ArtistPage
   from '../pages/ArtistPage';
 
+
+import LibraryPage
+  from '../pages/LibraryPage';
+
 export default function
 AppRoutes() {
   return (
@@ -52,6 +56,14 @@ AppRoutes() {
               <ArtistPage />
             }
           />
+
+          <Route
+            path="/library"
+            element={
+              <LibraryPage />
+            }
+          />  
+
 
         </Routes>
       </MainLayout>
