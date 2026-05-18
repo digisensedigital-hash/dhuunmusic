@@ -41,7 +41,15 @@
         openQueueDrawer,
 
         seekTo,
-    } = usePlayerStore();
+
+        isShuffleEnabled,
+
+        repeatMode,
+
+        toggleShuffle,
+
+        cycleRepeatMode,
+        } = usePlayerStore();
 
     // -----------------------------------
     // Time Formatter
@@ -421,10 +429,19 @@
                     }}
                     className="mt-8 flex items-center justify-between"
                 >
-                    <button className="text-white/60">
-                    <Shuffle
-                        size={24}
-                    />
+                    <button
+                        onClick={
+                            toggleShuffle
+                        }
+                        className={
+                            isShuffleEnabled
+                            ? 'text-fuchsia-400'
+                            : 'text-white/60'
+                        }
+                        >
+                        <Shuffle
+                            size={24}
+                        />
                     </button>
 
                     <button
@@ -468,10 +485,29 @@
                     />
                     </button>
 
-                    <button className="text-white/60">
-                    <Repeat
-                        size={24}
-                    />
+                    <button
+                        onClick={
+                            cycleRepeatMode
+                        }
+                        className={
+                            repeatMode !==
+                            'off'
+                            ? 'text-fuchsia-400'
+                            : 'text-white/60'
+                        }
+                        >
+                        <div className="relative">
+                            <Repeat
+                            size={24}
+                            />
+
+                            {repeatMode ===
+                            'one' && (
+                            <span className="absolute -bottom-2 -right-2 text-[10px] font-bold">
+                                1
+                            </span>
+                            )}
+                        </div>
                     </button>
                 </motion.div>
 

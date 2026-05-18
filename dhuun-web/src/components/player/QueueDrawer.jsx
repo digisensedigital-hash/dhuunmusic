@@ -11,6 +11,8 @@ QueueDrawer() {
   const {
     queue,
 
+    playOrder,
+
     currentIndex,
 
     isQueueDrawerOpen,
@@ -29,6 +31,19 @@ QueueDrawer() {
   ) {
     return null;
   }
+
+  const effectiveOrder =
+    playOrder?.length
+      ? playOrder
+      : queue.map(
+          (_, index) => index
+        );
+
+  const orderedQueue =
+    effectiveOrder.map(
+      (queueIndex) =>
+        queue[queueIndex]
+    );
 
   return (
     <div className="fixed inset-0 z-[300] bg-black/60 backdrop-blur-md flex items-end">
@@ -88,13 +103,13 @@ QueueDrawer() {
 
         <div className="overflow-y-auto px-4 pb-[max(24px,env(safe-area-inset-bottom))]">
           <div className="space-y-2">
-            {queue.map(
+            {orderedQueue.map(
               (
                 track,
-                index
+                playbackIndex
               ) => {
                 const isActive =
-                  index ===
+                  playbackIndex ===
                   currentIndex;
 
                 return (
@@ -104,7 +119,9 @@ QueueDrawer() {
                     }
                     onClick={() =>
                       playQueueTrack(
-                        index
+                        effectiveOrder[
+                          playbackIndex
+                        ]
                       )
                     }
                     className={`w-full flex items-center gap-4 rounded-2xl px-4 py-3 transition-all ${

@@ -124,27 +124,25 @@ PlaylistPage() {
 
   const handlePlayAll =
   () => {
-    if (
-      currentTrack?.id ===
-        playlist.tracks[0]
-          ?.id &&
-      isPlaying
-    ) {
-      togglePlayPause();
+    const validTracks =
+  playlist.tracks.filter(
+    Boolean
+  );
 
+    if (!validTracks.length) {
       return;
     }
 
     playTrack({
       track:
-        playlist.tracks[0],
+        validTracks[0],
 
       queue:
-        playlist.tracks,
+        validTracks,
 
       startIndex: 0,
     });
-  };
+   };
 
   if (!playlist) {
     return (

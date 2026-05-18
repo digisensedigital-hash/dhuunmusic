@@ -17,6 +17,8 @@ const usePlayerStore =
 
     queue: [],
 
+    playOrder: [],
+
     currentIndex: 0,
 
     isPlaying: false,
@@ -73,15 +75,49 @@ const usePlayerStore =
           return;
         }
 
-        const recent =
-          get()
-            .recentlyPlayed;
+        const {
+          recentlyPlayed,
+          isShuffleEnabled,
+        } = get();
 
         const deduped =
-          recent.filter(
+        recentlyPlayed.filter(
             (item) =>
               item?.id !==
               track?.id
+          );
+
+        const playOrder =
+          isShuffleEnabled
+            ? [
+                startIndex,
+
+                ...queue
+                  .map(
+                    (_, index) =>
+                      index
+                  )
+                  .filter(
+                    (index) =>
+                      index !==
+                      startIndex
+                  )
+                  .sort(
+                    () =>
+                      Math.random() -
+                      0.5
+                  ),
+              ]
+            : queue.map(
+                (_, index) =>
+                  index
+              );
+
+        const playbackIndex =
+          playOrder.findIndex(
+            (index) =>
+              index ===
+              startIndex
           );
 
         set({
@@ -90,8 +126,12 @@ const usePlayerStore =
 
           queue,
 
+          playOrder,
+
           currentIndex:
-            startIndex,
+            playbackIndex >= 0
+              ? playbackIndex
+              : 0,
 
           isPlaying: true,
 
@@ -104,13 +144,21 @@ const usePlayerStore =
         });
       },
 
-    playNextTrack:
+      playNextTrack:
       () => {
         const {
           queue,
+          playOrder,
           currentIndex,
           repeatMode,
         } = get();
+
+        const effectiveOrder =
+        playOrder?.length
+          ? playOrder
+          : queue.map(
+              (_, index) => index
+            );
 
         // -----------------------------------
         // Repeat One
@@ -135,8 +183,15 @@ const usePlayerStore =
         const nextIndex =
           currentIndex + 1;
 
+        const nextQueueIndex =
+          effectiveOrder[
+            nextIndex
+          ];
+
         const nextTrack =
-          queue[nextIndex];
+          queue[
+            nextQueueIndex
+          ];
 
         // -----------------------------------
         // Repeat All
@@ -149,7 +204,9 @@ const usePlayerStore =
         ) {
           set({
             currentTrack:
-              queue[0],
+              queue[
+                effectiveOrder[0]
+              ],
 
             currentIndex: 0,
 
@@ -190,18 +247,33 @@ const usePlayerStore =
         });
       },
 
-    playPreviousTrack:
+     playPreviousTrack:
       () => {
         const {
           queue,
+          playOrder,
           currentIndex,
         } = get();
+
+        const effectiveOrder =
+          playOrder?.length
+            ? playOrder
+            : queue.map(
+                (_, index) => index
+              );
 
         const prevIndex =
           currentIndex - 1;
 
+        const prevQueueIndex =
+          effectiveOrder[
+            prevIndex
+          ];
+
         const prevTrack =
-          queue[prevIndex];
+          queue[
+            prevQueueIndex
+          ];
 
         if (!prevTrack) {
           return;
@@ -220,7 +292,7 @@ const usePlayerStore =
         });
       },
 
-    togglePlayPause:
+     togglePlayPause:
       () => {
         const {
           isPlaying,
@@ -232,7 +304,8 @@ const usePlayerStore =
         });
       },
 
-    seekTo:
+    
+      seekTo:
       (time) => {
         const audio =
           get().audioRef;
@@ -254,29 +327,49 @@ const usePlayerStore =
     // -----------------------------------
 
     playQueueTrack:
-      (index) => {
-        const { queue } =
-          get();
+    (index) => {
+      const {
+        queue,
+        playOrder,
+      } = get();
 
-        const track =
-          queue[index];
+      const track =
+        queue[index];
 
-        if (!track) {
-          return;
-        }
+      if (!track) {
+        return;
+      }
 
-        set({
-          currentTrack:
-            track,
+      const effectiveOrder =
+        playOrder?.length
+          ? playOrder
+          : queue.map(
+              (_, i) => i
+            );
 
-          currentIndex:
-            index,
+      const playbackIndex =
+        effectiveOrder.findIndex(
+          (
+            queueIndex
+          ) =>
+            queueIndex ===
+            index
+        );
 
-          isPlaying: true,
+      set({
+        currentTrack:
+          track,
 
-          currentTime: 0,
-        });
-      },
+        currentIndex:
+          playbackIndex >= 0
+            ? playbackIndex
+            : index,
+
+        isPlaying: true,
+
+        currentTime: 0,
+      });
+    },
 
     // -----------------------------------
     // UI Actions
@@ -319,12 +412,109 @@ const usePlayerStore =
     // -----------------------------------
 
     toggleShuffle:
-      () =>
-        set({
-          isShuffleEnabled:
-            !get()
-              .isShuffleEnabled,
-        }),
+  () => {
+    const {
+      isShuffleEnabled,
+      queue,
+      currentTrack,
+    } = get();
+
+    // -----------------------------------
+    // Disable Shuffle
+    // -----------------------------------
+
+    if (
+      isShuffleEnabled
+    ) {
+      const currentIndex =
+        queue.findIndex(
+          (track) =>
+            track?.id ===
+            currentTrack?.id
+        );
+
+      set({
+        isShuffleEnabled:
+          false,
+
+        playOrder:
+          queue.map(
+            (_, index) =>
+              index
+          ),
+
+        currentIndex:
+          currentIndex >= 0
+            ? currentIndex
+            : 0,
+      });
+
+      return;
+    }
+
+    // -----------------------------------
+    // Enable Shuffle
+    // -----------------------------------
+
+    const indices =
+      queue.map(
+        (_, index) =>
+          index
+      );
+
+    const currentQueueIndex =
+      queue.findIndex(
+        (track) =>
+          track?.id ===
+          currentTrack?.id
+      );
+
+    const remaining =
+      indices.filter(
+        (index) =>
+          index !==
+          currentQueueIndex
+      );
+
+    // Fisher-Yates Shuffle
+
+    for (
+      let i =
+        remaining.length - 1;
+      i > 0;
+      i--
+    ) {
+      const j =
+        Math.floor(
+          Math.random() *
+            (i + 1)
+        );
+
+      [
+        remaining[i],
+        remaining[j],
+      ] = [
+        remaining[j],
+        remaining[i],
+      ];
+    }
+
+    const shuffledOrder =
+      [
+        currentQueueIndex,
+        ...remaining,
+      ];
+
+    set({
+      isShuffleEnabled:
+        true,
+
+      playOrder:
+        shuffledOrder,
+
+      currentIndex: 0,
+    });
+    },
 
     cycleRepeatMode:
       () => {
@@ -542,6 +732,9 @@ const usePlayerStore =
 
       queue:
         state.queue,
+
+      playOrder:
+        state.playOrder,
 
       currentIndex:
         state.currentIndex,
