@@ -17,7 +17,12 @@ import libraryRoutes from './routes/library/libraryRoutes.js';
 import homeRoutes from './routes/home/homeRoutes.js';
 import playerRoutes from './routes/player/playerRoutes.js';
 
-dotenv.config();
+dotenv.config({
+  path: new URL(
+    '../.env',
+    import.meta.url
+  ).pathname,
+});
 
 const app = express();
 
