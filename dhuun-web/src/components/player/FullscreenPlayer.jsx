@@ -204,40 +204,39 @@
 
                 <motion.div
                     initial={{
-                        scale: 0.9,
+                        scale: 0.92,
                         opacity: 0,
+                        rotate: -2,
+                        y: 24,
                     }}
                     animate={{
                         scale: 1,
                         opacity: 1,
-                        rotate: isPlaying
-                        ? [0, 0.8, -0.8, 0]
-                        : 0,
+                        rotate: 0,
+                        y: 0,
                     }}
                     transition={{
-                        delay: 0.08,
-
-                        rotate: {
-                        duration: 8,
-                        repeat: Infinity,
-                        ease: 'easeInOut',
-                        },
+                        duration: 0.65,
+                        ease: 'easeOut',
                     }}
                     className="mt-6 flex justify-center"
                     >
                     <motion.div
                         layoutId="player-artwork"
+                        initial={{
+                            y: 18,
+                            opacity: 0,
+                        }}
                         animate={{
-                            y: isPlaying
-                            ? [0, -6, 0]
-                            : 0,
+                            y: 0,
+                            opacity: 1,
                         }}
                         transition={{
-                            duration: 4,
-                            repeat: Infinity,
-                            ease: 'easeInOut',
+                            delay: 0.12,
+                            duration: 0.6,
+                            ease: 'easeOut',
                         }}
-                        className="w-[78vw] max-w-[360px] aspect-square rounded-[32px] overflow-hidden shadow-2xl bg-white/5"
+                        className="w-[68vw] max-w-[300px] aspect-square rounded-[28px] overflow-hidden shadow-2xl bg-white/5"
                         >
                     {currentTrack.coverImage ? (
                         <img
@@ -273,7 +272,7 @@
                     }}
                     className="mt-10"
                 >
-                    <h1 className="text-3xl font-black tracking-tight">
+                    <h1 className="text-2xl font-black tracking-tight">
                     {
                         currentTrack.title
                     }
@@ -420,7 +419,7 @@
                     transition={{
                     delay: 0.2,
                     }}
-                    className="mt-12 flex items-center justify-between"
+                    className="mt-8 flex items-center justify-between"
                 >
                     <button className="text-white/60">
                     <Shuffle
@@ -434,7 +433,7 @@
                     }
                     >
                     <SkipBack
-                        size={38}
+                        size={30}
                     />
                     </button>
 
@@ -445,15 +444,15 @@
                     onClick={
                         togglePlayPause
                     }
-                    className="w-20 h-20 rounded-full bg-white text-black flex items-center justify-center shadow-2xl"
+                    className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center shadow-2xl"
                     >
                     {isPlaying ? (
                         <Pause
-                        size={34}
+                        size={28}
                         />
                     ) : (
                         <Play
-                        size={34}
+                        size={28}
                         className="ml-1"
                         />
                     )}
@@ -465,7 +464,7 @@
                     }
                     >
                     <SkipForward
-                        size={38}
+                        size={30}
                     />
                     </button>
 
@@ -488,7 +487,7 @@
                     transition={{
                     delay: 0.24,
                     }}
-                    className="mt-auto pb-[max(32px,env(safe-area-inset-bottom))] pt-10 flex items-center justify-center"
+                    className="mt-auto pb-[max(18px,env(safe-area-inset-bottom))] pt-6 flex items-center justify-center"
                 >
                     <button
                     onClick={
