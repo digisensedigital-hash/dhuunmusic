@@ -7,21 +7,16 @@ import BottomNav
 import PlayerBar
   from '../components/player/PlayerBar';
 
-import ExpandedPlayer
-  from '../components/player/ExpandedPlayer';
+import FullscreenPlayer
+  from '../components/player/FullscreenPlayer';
 
-import usePlayerStore
-  from '../store/playerStore';
+import QueueDrawer
+  from '../components/player/QueueDrawer';
 
 export default function
 MainLayout({
   children
 }) {
-  const {
-    isExpandedPlayerOpen,
-    setExpandedPlayerOpen,
-  } = usePlayerStore();
-
   return (
     <div className="bg-[#07070B] text-white min-h-screen flex justify-center">
       {/* -------------------------------- */}
@@ -44,19 +39,16 @@ MainLayout({
         <GlobalPlayer />
 
         {/* -------------------------------- */}
-        {/* Expanded Player */}
+        {/* Fullscreen Player */}
         {/* -------------------------------- */}
 
-        <ExpandedPlayer
-          open={
-            isExpandedPlayerOpen
-          }
-          onClose={() =>
-            setExpandedPlayerOpen(
-              false
-            )
-          }
-        />
+        <FullscreenPlayer />
+
+        {/* -------------------------------- */}
+        {/* Queue Drawer */}
+        {/* -------------------------------- */}
+
+        <QueueDrawer />
 
         {/* -------------------------------- */}
         {/* Mini Player */}

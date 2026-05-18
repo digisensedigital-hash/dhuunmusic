@@ -3,6 +3,10 @@ import { create }
 
 const usePlayerStore =
   create((set, get) => ({
+    // -----------------------------------
+    // Core Playback State
+    // -----------------------------------
+
     currentTrack: null,
 
     queue: [],
@@ -11,13 +15,28 @@ const usePlayerStore =
 
     isPlaying: false,
 
-    isExpandedPlayerOpen: false,
-
     currentTime: 0,
 
     duration: 0,
 
     audioRef: null,
+
+    // -----------------------------------
+    // UI State
+    // -----------------------------------
+
+    isExpandedPlayerOpen: false,
+
+    isQueueDrawerOpen: false,
+
+    // -----------------------------------
+    // Playback Modes
+    // -----------------------------------
+
+    isShuffleEnabled: false,
+
+    repeatMode: 'off',
+    // off | one | all
 
     // -----------------------------------
     // Playback Actions
@@ -48,13 +67,61 @@ const usePlayerStore =
         const {
           queue,
           currentIndex,
+          repeatMode,
         } = get();
+
+        // -----------------------------------
+        // Repeat One
+        // -----------------------------------
+
+        if (
+          repeatMode ===
+          'one'
+        ) {
+          const audio =
+            get().audioRef;
+
+          if (audio) {
+            audio.currentTime = 0;
+
+            audio.play();
+          }
+
+          return;
+        }
 
         const nextIndex =
           currentIndex + 1;
 
         const nextTrack =
           queue[nextIndex];
+
+        // -----------------------------------
+        // Repeat All
+        // -----------------------------------
+
+        if (
+          !nextTrack &&
+          repeatMode ===
+            'all'
+        ) {
+          set({
+            currentTrack:
+              queue[0],
+
+            currentIndex: 0,
+
+            isPlaying: true,
+
+            currentTime: 0,
+          });
+
+          return;
+        }
+
+        // -----------------------------------
+        // End Queue
+        // -----------------------------------
 
         if (!nextTrack) {
           set({
@@ -63,6 +130,10 @@ const usePlayerStore =
 
           return;
         }
+
+        // -----------------------------------
+        // Normal Next
+        // -----------------------------------
 
         set({
           currentTrack:
@@ -74,6 +145,175 @@ const usePlayerStore =
           isPlaying: true,
 
           currentTime: 0,
+        });
+      },
+
+    playPreviousTrack:
+      () => {
+        const {
+          queue,
+          currentIndex,
+        } = get();
+
+        const prevIndex =
+          currentIndex - 1;
+
+        const prevTrack =
+          queue[prevIndex];
+
+        if (!prevTrack) {
+          return;
+        }
+
+        set({
+          currentTrack:
+            prevTrack,
+
+          currentIndex:
+            prevIndex,
+
+          isPlaying: true,
+
+          currentTime: 0,
+        });
+      },
+
+    togglePlayPause:
+      () => {
+        const {
+          isPlaying,
+        } = get();
+
+        set({
+          isPlaying:
+            !isPlaying,
+        });
+      },
+
+    seekTo:
+      (time) => {
+        const audio =
+          get().audioRef;
+
+        if (!audio) {
+          return;
+        }
+
+        audio.currentTime =
+          time;
+
+        set({
+          currentTime: time,
+        });
+      },
+
+    // -----------------------------------
+    // Queue Actions
+    // -----------------------------------
+
+    playQueueTrack:
+      (index) => {
+        const { queue } =
+          get();
+
+        const track =
+          queue[index];
+
+        if (!track) {
+          return;
+        }
+
+        set({
+          currentTrack:
+            track,
+
+          currentIndex:
+            index,
+
+          isPlaying: true,
+
+          currentTime: 0,
+        });
+      },
+
+    // -----------------------------------
+    // UI Actions
+    // -----------------------------------
+
+    openExpandedPlayer:
+      () =>
+        set({
+          isExpandedPlayerOpen: true,
+        }),
+
+    closeExpandedPlayer:
+      () =>
+        set({
+          isExpandedPlayerOpen: false,
+        }),
+
+    openQueueDrawer:
+      () =>
+        set({
+          isQueueDrawerOpen: true,
+        }),
+
+    closeQueueDrawer:
+      () =>
+        set({
+          isQueueDrawerOpen: false,
+        }),
+
+    toggleQueueDrawer:
+      () =>
+        set({
+          isQueueDrawerOpen:
+            !get()
+              .isQueueDrawerOpen,
+        }),
+
+    // -----------------------------------
+    // Playback Modes
+    // -----------------------------------
+
+    toggleShuffle:
+      () =>
+        set({
+          isShuffleEnabled:
+            !get()
+              .isShuffleEnabled,
+        }),
+
+    cycleRepeatMode:
+      () => {
+        const current =
+          get().repeatMode;
+
+        if (
+          current === 'off'
+        ) {
+          set({
+            repeatMode:
+              'all',
+          });
+
+          return;
+        }
+
+        if (
+          current === 'all'
+        ) {
+          set({
+            repeatMode:
+              'one',
+          });
+
+          return;
+        }
+
+        set({
+          repeatMode:
+            'off',
         });
       },
 

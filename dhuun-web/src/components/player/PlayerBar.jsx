@@ -3,6 +3,9 @@ import {
   Play,
 } from 'lucide-react';
 
+import { motion }
+  from 'framer-motion';
+
 import usePlayerStore
   from '../../store/playerStore';
 
@@ -10,9 +13,18 @@ export default function
 PlayerBar() {
   const {
     currentTrack,
+
     isPlaying,
-    setIsPlaying,
-    setExpandedPlayerOpen,
+
+    currentTime,
+
+    duration,
+
+    isExpandedPlayerOpen,
+
+    togglePlayPause,
+
+    openExpandedPlayer,
   } = usePlayerStore();
 
   // -----------------------------------
@@ -23,9 +35,33 @@ PlayerBar() {
     return null;
   }
 
+  // -----------------------------------
+  // Hide While Fullscreen Player Open
+  // -----------------------------------
+
+  if (
+    isExpandedPlayerOpen
+  ) {
+    return null;
+  }
+
+  // -----------------------------------
+  // Progress
+  // -----------------------------------
+
+  const progress =
+    duration > 0
+      ? (currentTime /
+          duration) *
+        100
+      : 0;
+
   return (
     <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-40">
-      <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#18181F]/95 backdrop-blur-2xl shadow-2xl">
+      <motion.div
+        layoutId="player-shell"
+        className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#18181F]/95 backdrop-blur-2xl shadow-2xl"
+      >
         {/* -------------------------------- */}
         {/* Ambient Glow */}
         {/* -------------------------------- */}
@@ -37,10 +73,8 @@ PlayerBar() {
         {/* -------------------------------- */}
 
         <div
-          onClick={() =>
-            setExpandedPlayerOpen(
-              true
-            )
+          onClick={
+            openExpandedPlayer
           }
           className="relative flex items-center gap-4 px-4 py-4 cursor-pointer"
         >
@@ -48,7 +82,10 @@ PlayerBar() {
           {/* Artwork */}
           {/* -------------------------------- */}
 
-          <div className="relative w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0">
+          <motion.div
+            layoutId="player-artwork"
+            className="relative w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 bg-white/5"
+          >
             {currentTrack.coverImage ? (
               <img
                 src={
@@ -60,9 +97,11 @@ PlayerBar() {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500" />
+              <div className="w-full h-full flex items-center justify-center text-white/20 text-3xl font-black bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500">
+                ♪
+              </div>
             )}
-          </div>
+          </motion.div>
 
           {/* -------------------------------- */}
           {/* Track Meta */}
@@ -76,10 +115,10 @@ PlayerBar() {
             </h3>
 
             <p className="text-sm text-white/50 truncate mt-1">
-              {
-                currentTrack.artist
-                  ?.stageName
-              }
+              {currentTrack
+                .artist
+                ?.stageName ||
+                'Unknown Artist'}
             </p>
           </div>
 
@@ -91,11 +130,9 @@ PlayerBar() {
             onClick={(e) => {
               e.stopPropagation();
 
-              setIsPlaying(
-                !isPlaying
-              );
+              togglePlayPause();
             }}
-            className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center shadow-xl"
+            className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center shadow-xl transition-transform active:scale-95"
           >
             {isPlaying ? (
               <Pause size={22} />
@@ -103,19 +140,26 @@ PlayerBar() {
               <Play
                 size={22}
                 fill="currentColor"
+                className="ml-1"
               />
             )}
           </button>
         </div>
 
         {/* -------------------------------- */}
-        {/* Progress Accent */}
+        {/* Progress Bar */}
         {/* -------------------------------- */}
 
         <div className="h-[3px] w-full bg-white/5">
-          <div className="h-full w-1/3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" />
+          <motion.div
+            layoutId="player-progress"
+            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-300"
+            style={{
+              width: `${progress}%`,
+            }}
+          />
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
