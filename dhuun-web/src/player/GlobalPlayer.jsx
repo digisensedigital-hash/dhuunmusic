@@ -14,6 +14,10 @@ import {
   completeListenSession,
 } from '../lib/listenSession';
 
+import {
+  getRecommendedTracks,
+} from '../api/recommendations';
+
 export default function
 GlobalPlayer() {
   const audioRef =
@@ -29,14 +33,20 @@ GlobalPlayer() {
     useRef(null);
 
   const {
-    currentTrack,
-    isPlaying,
-    setIsPlaying,
-    setCurrentTime,
-    setDuration,
-    setAudioRef,
-    playNextTrack,
-    updateContinueListening,
+  currentTrack,
+  isPlaying,
+  setIsPlaying,
+  setCurrentTime,
+  setDuration,
+  setAudioRef,
+  playNextTrack,
+  updateContinueListening,
+  queue,
+  currentIndex,
+  smartQueue,
+  enqueueSmartTracks,
+  smartQueuePrefetchedFor,
+  setSmartQueuePrefetchedFor,
   } = usePlayerStore();
 
   // -----------------------------------
@@ -133,7 +143,9 @@ GlobalPlayer() {
     // Full Cleanup
     // -----------------------------------
 
-    audio.pause();
+    if (!audio.paused) {
+      audio.pause();
+    }
 
     if (hlsRef.current) {
       hlsRef.current.destroy();
@@ -307,6 +319,99 @@ GlobalPlayer() {
         );
       };
 
+    // -----------------------------------
+    // Buffer / Stall Recovery
+    // -----------------------------------
+
+    const handleWaiting =
+      () => {
+        console.log(
+          '[AUDIO_WAITING]'
+        );
+      };
+
+    const handleCanPlay =
+      () => {
+        console.log(
+          '[AUDIO_CANPLAY]'
+        );
+    };
+
+    // -----------------------------------
+    // Visibility Recovery
+    // -----------------------------------
+
+      const handleVisibilityChange =
+      () => {
+        if (
+          document.visibilityState !==
+          'visible'
+        ) {
+          return;
+        }
+
+        console.log(
+          '[VISIBILITY_RESUME]'
+        );
+
+        // -----------------------------------
+        // Soft Resume Retry Loop
+        // -----------------------------------
+
+        let attempts = 0;
+
+        const maxAttempts = 5;
+
+        const retryInterval =
+          setInterval(
+            async () => {
+              attempts++;
+
+              // Playback already recovered
+
+              if (
+                !audio.paused
+              ) {
+                clearInterval(
+                  retryInterval
+                );
+
+                return;
+              }
+
+              // Stop retry loop
+
+              if (
+                attempts >=
+                maxAttempts
+              ) {
+                clearInterval(
+                  retryInterval
+                );
+
+                return;
+              }
+
+              // Retry playback
+
+              try {
+                await audio.play();
+
+                console.log(
+                  '[AUDIO_RESUME_RETRY]',
+                  attempts
+                );
+              } catch (error) {
+                console.error(
+                  '[AUDIO_RESUME_FAILED]',
+                  error
+                );
+              }
+            },
+            1500
+          );
+      };
+
     audio.addEventListener(
       'timeupdate',
       handleTimeUpdate
@@ -330,6 +435,21 @@ GlobalPlayer() {
     audio.addEventListener(
       'play',
       handlePlay
+    );
+
+    audio.addEventListener(
+      'waiting',
+      handleWaiting
+    );
+
+    audio.addEventListener(
+      'canplay',
+      handleCanPlay
+    );
+
+    document.addEventListener(
+      'visibilitychange',
+      handleVisibilityChange
     );
 
     // -----------------------------------
@@ -392,6 +512,21 @@ GlobalPlayer() {
         handlePlay
       );
 
+      audio.removeEventListener(
+        'waiting',
+        handleWaiting
+      );
+
+      audio.removeEventListener(
+        'canplay',
+        handleCanPlay
+      );
+
+      document.removeEventListener(
+        'visibilitychange',
+        handleVisibilityChange
+      );
+
       // -----------------------------------
       // Session Cleanup
       // -----------------------------------
@@ -452,6 +587,111 @@ GlobalPlayer() {
       audio.pause();
     }
   }, [isPlaying]);
+
+  // -----------------------------------
+  // Smart Queue Prefetch
+  // -----------------------------------
+
+  useEffect(() => {
+    // -----------------------------------
+    // No Queue
+    // -----------------------------------
+
+    if (!queue?.length) {
+      return;
+    }
+
+    // -----------------------------------
+    // Already Has Smart Queue
+    // -----------------------------------
+
+    if (smartQueue?.length > 0) {
+      return;
+    }
+
+    // -----------------------------------
+    // Near Queue End
+    // -----------------------------------
+
+    const remainingTracks =
+      queue.length -
+      currentIndex -
+      1;
+
+    if (remainingTracks > 1) {
+      return;
+    }
+
+    // -----------------------------------
+    // Prevent Recursive Prefetch
+    // -----------------------------------
+
+    if (
+      smartQueuePrefetchedFor.includes(
+        currentTrack?.id
+      )
+    ) {
+      return;
+    }
+
+    // -----------------------------------
+    // Intelligent Continuation
+    // -----------------------------------
+
+    console.log(
+      '[SMART_QUEUE_PREFETCH]'
+    );
+
+    // -----------------------------------
+    // Fetch Intelligent Recommendations
+    // -----------------------------------
+
+    (async () => {
+      if (
+        !currentTrack?.id
+      ) {
+        return;
+      }
+
+      setSmartQueuePrefetchedFor(
+        [
+          ...smartQueuePrefetchedFor,
+
+          currentTrack.id,
+        ]
+      );
+
+      const recommendations =
+        await getRecommendedTracks(
+          currentTrack.id
+        );
+
+      if (
+        !recommendations?.length
+      ) {
+        return;
+      }
+
+      enqueueSmartTracks(
+        recommendations
+          .map(
+            (item) =>
+              item.track
+          )
+          .filter(Boolean)
+      );
+    })();
+      }, [
+    queue,
+
+    currentIndex,
+
+    smartQueue,
+
+    currentTrack,
+
+    enqueueSmartTracks,
+  ]);
 
   return (
     <audio

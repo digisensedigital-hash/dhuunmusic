@@ -9,16 +9,40 @@ import TrendingTrack
   from '../../models/TrendingTrack.js';
 
 export default async function
-getRecommendations(userId) {
+getRecommendations({
+  userId,
+
+  seedTrackId = null,
+}) {
   const savedTracks =
     await SavedTrack.find({
-      userId
+      userId,
     }).populate('trackId');
 
   const recentlyPlayed =
     await RecentlyPlayed.find({
-      userId
+      userId,
     }).populate('trackId');
+
+  // -----------------------------------
+  // Seed Track
+  // -----------------------------------
+
+  let seedTrack = null;
+
+  if (seedTrackId) {
+    seedTrack =
+      await Track.findById(
+        seedTrackId
+      ).populate(
+        'primaryArtist',
+        'stageName profileImage'
+      );
+  }
+
+  // -----------------------------------
+  // Preference Signals
+  // -----------------------------------
 
   const preferredGenres =
     new Set();
@@ -34,7 +58,8 @@ getRecommendations(userId) {
     }
 
     if (
-      item.trackId?.primaryArtist
+      item.trackId
+        ?.primaryArtist
     ) {
       preferredArtists.add(
         item.trackId.primaryArtist.toString()
@@ -50,7 +75,8 @@ getRecommendations(userId) {
     }
 
     if (
-      item.trackId?.primaryArtist
+      item.trackId
+        ?.primaryArtist
     ) {
       preferredArtists.add(
         item.trackId.primaryArtist.toString()
@@ -58,16 +84,24 @@ getRecommendations(userId) {
     }
   }
 
+  // -----------------------------------
+  // Trending Candidate Pool
+  // -----------------------------------
+
   const trendingTracks =
     await TrendingTrack.find({
-      window: 'DAILY'
+      window: 'DAILY',
     })
       .sort({
-        rank: 1
+        rank: 1,
       })
       .limit(100);
 
   const trackScores = [];
+
+  // -----------------------------------
+  // Score Tracks
+  // -----------------------------------
 
   for (const trending of trendingTracks) {
     const track =
@@ -78,19 +112,40 @@ getRecommendations(userId) {
         'stageName profileImage'
       );
 
-    if (!track) continue;
+    if (!track) {
+      continue;
+    }
+
+    // Avoid recommending
+    // currently playing seed
+    if (
+      seedTrackId &&
+      track._id.toString() ===
+        seedTrackId.toString()
+    ) {
+      continue;
+    }
 
     let score = 0;
 
     let reason =
-    'Trending for listeners like you';
+      'Trending for listeners like you';
 
-    score += trending.score || 0;
+    // -----------------------------------
+    // Trending Base Score
+    // -----------------------------------
+
+    score +=
+      trending.score || 0;
+
+    // -----------------------------------
+    // Genre Affinity
+    // -----------------------------------
 
     if (
-    preferredGenres.has(
-      track.genre
-    )
+      preferredGenres.has(
+        track.genre
+      )
     ) {
       score += 25;
 
@@ -98,9 +153,14 @@ getRecommendations(userId) {
         `Because you enjoy ${track.genre}`;
     }
 
+    // -----------------------------------
+    // Artist Affinity
+    // -----------------------------------
+
     if (
       preferredArtists.has(
-        track.primaryArtist?._id?.toString()
+        track.primaryArtist
+          ?._id?.toString()
       )
     ) {
       score += 40;
@@ -109,16 +169,58 @@ getRecommendations(userId) {
         `Similar to ${track.primaryArtist?.stageName}`;
     }
 
+    // -----------------------------------
+    // Seed Track Genre
+    // -----------------------------------
+
+    if (
+      seedTrack?.genre &&
+      seedTrack.genre ===
+        track.genre
+    ) {
+      score += 60;
+
+      reason =
+        `More ${track.genre} vibes`;
+    }
+
+    // -----------------------------------
+    // Seed Track Artist
+    // -----------------------------------
+
+    if (
+      seedTrack
+        ?.primaryArtist?._id
+          ?.toString() ===
+      track.primaryArtist
+        ?._id?.toString()
+    ) {
+      score += 80;
+
+      reason =
+        `More from ${track.primaryArtist?.stageName}`;
+    }
+
     trackScores.push({
       track,
+
       score,
+
       reason,
     });
   }
 
+  // -----------------------------------
+  // Sort + Limit
+  // -----------------------------------
+
   trackScores.sort(
-    (a, b) => b.score - a.score
+    (a, b) =>
+      b.score - a.score
   );
 
-  return trackScores.slice(0, 25);
+  return trackScores.slice(
+    0,
+    25
+  );
 }

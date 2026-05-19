@@ -17,6 +17,14 @@ const usePlayerStore =
 
     queue: [],
 
+    smartQueue: [],
+
+    playedTrackIds: [],
+
+    smartQueuePrefetchedFor: [],
+
+    queueSource: null,
+
     playOrder: [],
 
     currentIndex: 0,
@@ -59,8 +67,12 @@ const usePlayerStore =
     playTrack:
       ({
         track,
+
         queue = [],
+
         startIndex = 0,
+
+        queueSource = 'manual',
       }) => {
         // -----------------------------------
         // Sanitize Queue
@@ -125,6 +137,8 @@ const usePlayerStore =
             track,
 
           queue,
+
+          queueSource,
 
           playOrder,
 
@@ -223,12 +237,61 @@ const usePlayerStore =
         // -----------------------------------
 
         if (!nextTrack) {
-          set({
-            isPlaying: false,
-          });
+          const {
+            smartQueue,
+          } = get();
 
-          return;
-        }
+          // -----------------------------------
+          // Continue Into Smart Queue
+          // -----------------------------------
+
+          if (
+            smartQueue?.length
+          ) {
+            const nextSmartTrack =
+              smartQueue[0];
+
+            const remainingSmartQueue =
+              smartQueue.slice(1);
+
+            set({
+              currentTrack:
+                nextSmartTrack,
+
+              queue: [
+                ...queue,
+                nextSmartTrack,
+              ],
+
+              smartQueue:
+                remainingSmartQueue,
+
+              playOrder: [
+                ...effectiveOrder,
+                queue.length,
+              ],
+
+              currentIndex:
+                currentIndex + 1,
+
+              isPlaying: true,
+
+              currentTime: 0,
+            });
+
+            return;
+          }
+
+  // -----------------------------------
+  // End Playback
+  // -----------------------------------
+
+  set({
+    isPlaying: false,
+  });
+
+  return;
+}
 
         // -----------------------------------
         // Normal Next
@@ -237,6 +300,15 @@ const usePlayerStore =
         set({
           currentTrack:
             nextTrack,
+
+          playedTrackIds: [
+            ...new Set([
+              ...get()
+                .playedTrackIds,
+
+              nextTrack.id,
+            ]),
+          ],
 
           currentIndex:
             nextIndex,
@@ -370,6 +442,52 @@ const usePlayerStore =
         currentTime: 0,
       });
     },
+
+    enqueueSmartTracks:
+      (tracks = []) => {
+        if (
+          !tracks?.length
+        ) {
+          return;
+        }
+
+        const existingIds =
+          new Set([
+            ...get().queue.map(
+              (track) =>
+                track?.id
+            ),
+
+            ...get().smartQueue.map(
+              (track) =>
+                track?.id
+            ),
+          ]);
+
+        const uniqueTracks =
+          tracks.filter(
+            (track) =>
+              track?.id &&
+              !existingIds.has(
+                track.id
+              )
+          );
+
+        if (
+          !uniqueTracks.length
+        ) {
+          return;
+        }
+
+        set({
+          smartQueue: [
+            ...get()
+              .smartQueue,
+
+            ...uniqueTracks,
+          ],
+        });
+      },
 
     // -----------------------------------
     // UI Actions
@@ -601,6 +719,13 @@ const usePlayerStore =
         set({
           audioRef: value,
         }),
+
+    setSmartQueuePrefetchedFor:
+    (tracks) =>
+      set({
+        smartQueuePrefetchedFor:
+          tracks,
+      }),
 
     // -----------------------------------
     // Saved Tracks

@@ -16,6 +16,7 @@ import playlistRoutes from './routes/playlist/playlistRoutes.js';
 import libraryRoutes from './routes/library/libraryRoutes.js';
 import homeRoutes from './routes/home/homeRoutes.js';
 import playerRoutes from './routes/player/playerRoutes.js';
+import recommendationRoutes from './routes/recommendation/recommendationRoutes.js';
 
 dotenv.config({
   path: new URL(
@@ -70,7 +71,9 @@ app.use('/api/library', libraryRoutes);
 
 app.use('/api/home', homeRoutes);
 
-app.use('/api/player', playerRoutes);                
+app.use('/api/player', playerRoutes);
+
+app.use( '/api/recommendations', recommendationRoutes );
 
 const PORT = process.env.PORT || 8000;
 

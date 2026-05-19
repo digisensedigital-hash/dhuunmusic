@@ -13,28 +13,79 @@ import { useEffect, } from 'react';
 export default function
 HomePage() {
   const {
-  data,
-  loading,
-  error,
-  refreshFeed,
+    data,
+    loading,
+    error,
+    refreshFeed,
   } = useHomeFeed();
 
   const {
-  recentlyPlayed,
-  continueListening,
+    recentlyPlayed,
+
+    continueListening,
+
+    enqueueSmartTracks,
   } = usePlayerStore();
 
+  // -----------------------------------
+  // Refresh Home Feed
+  // -----------------------------------
+
   useEffect(() => {
-  if (
-    recentlyPlayed.length >
-    0
-  ) {
-    refreshFeed(true);
-  }
+    if (
+      recentlyPlayed.length >
+      0
+    ) {
+      refreshFeed(true);
+    }
   }, [
     recentlyPlayed,
     refreshFeed,
   ]);
+
+  // -----------------------------------
+  // Derived Feed Data
+  // -----------------------------------
+
+  const trending =
+    data?.home?.trending || [];
+
+  const recommended =
+    (
+      data?.home
+        ?.recommended || []
+    ).map((item) => ({
+      track:
+        item.track,
+    }));
+
+  // -----------------------------------
+  // Smart Queue Injection
+  // -----------------------------------
+
+  useEffect(() => {
+    if (
+      !recommended.length
+    ) {
+      return;
+    }
+
+    enqueueSmartTracks(
+      recommended
+        .map(
+          (item) =>
+            item.track
+        )
+        .filter(Boolean)
+    );
+  }, [
+    recommended,
+    enqueueSmartTracks,
+  ]);
+
+  // -----------------------------------
+  // Loading
+  // -----------------------------------
 
   if (loading) {
     return (
@@ -44,6 +95,10 @@ HomePage() {
     );
   }
 
+  // -----------------------------------
+  // Error
+  // -----------------------------------
+
   if (error) {
     return (
       <div className="p-6 text-red-500">
@@ -52,18 +107,6 @@ HomePage() {
     );
   }
 
-  const trending =
-    data?.home?.trending || [];
-
-  const recommended =
-  (
-    data?.home
-      ?.recommended || []
-  ).map((item) => ({
-    track:
-      item.track,
-  }));
-  
   const featuredTrack =
     trending[0] || null;
     
