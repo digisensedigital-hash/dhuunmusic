@@ -18,6 +18,8 @@ import homeRoutes from './routes/home/homeRoutes.js';
 import playerRoutes from './routes/player/playerRoutes.js';
 import recommendationRoutes from './routes/recommendation/recommendationRoutes.js';
 
+import path from 'path';
+
 dotenv.config({
   path: new URL(
     '../.env',
@@ -41,6 +43,15 @@ app.use(
 );
 
 app.use(express.json());
+
+app.use(
+  '/uploads',
+  express.static(
+    path.resolve(
+      '../storage/temp'
+    )
+  )
+);
 
 app.use(helmet());
 

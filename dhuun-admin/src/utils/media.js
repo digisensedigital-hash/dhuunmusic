@@ -57,11 +57,37 @@ export function getMediaUrl(
   // -----------------------------------
 
   const normalizedPath =
-    path.startsWith('/')
-      ? path
-      : `/${path}`;
+  path.startsWith('/')
+    ? path
+    : `/${path}`;
+
+/*
+|--------------------------------------------------------------------------
+| Local Uploads
+|--------------------------------------------------------------------------
+*/
+
+if (
+  normalizedPath.startsWith(
+    '/uploads'
+  )
+) {
 
   return encodeURI(
-    `${MEDIA_BASE_URL}/dhuun-media${normalizedPath}`
+    window.location.hostname ===
+      'localhost'
+        ? `http://localhost:8000${normalizedPath}`
+        : `https://api.dhuunmusic.in${normalizedPath}`
   );
+}
+
+/*
+|--------------------------------------------------------------------------
+| MinIO Media
+|--------------------------------------------------------------------------
+*/
+
+return encodeURI(
+  `${MEDIA_BASE_URL}/dhuun-media${normalizedPath}`
+);
 }

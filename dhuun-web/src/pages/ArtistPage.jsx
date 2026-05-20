@@ -19,6 +19,10 @@ import PlaylistTrackRow
 import usePlayerStore
   from '../store/playerStore';
 
+import {
+  getMediaUrl,
+} from '../utils/media';
+
 export default function
 ArtistPage() {
   const { id } =
@@ -154,16 +158,25 @@ ArtistPage() {
     {/* Background Artwork */}
     {/* -------------------------------- */}
 
-    {artist.profileImage && (
-        <img
-        src={
-            artist.profileImage
-        }
+    {artist.coverImage && (
+      <img
+        src={getMediaUrl(
+          artist.coverImage
+        )}
         alt={
-            artist.stageName
+          artist.stageName
         }
-        className="absolute inset-0 w-full h-full object-cover opacity-25 scale-110 blur-[2px]"
-        />
+        className="
+          absolute
+          inset-0
+          w-full
+          h-full
+          object-cover
+          opacity-25
+          scale-110
+          blur-[2px]
+        "
+      />
     )}
 
     {/* -------------------------------- */}
@@ -190,7 +203,9 @@ ArtistPage() {
         {artist.profileImage ? (
         <img
             src={
-            artist.profileImage
+              getMediaUrl(
+                artist.profileImage
+              )
             }
             alt={
             artist.stageName

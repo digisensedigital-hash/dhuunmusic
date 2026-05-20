@@ -2,6 +2,9 @@ import express from 'express';
 
 import authMiddleware from '../../middleware/authMiddleware.js';
 
+import upload
+  from '../../middleware/uploadMiddleware.js';
+
 import {
   createArtist,
   getArtists,
@@ -29,12 +32,14 @@ router.get(
 router.post(
   '/',
   authMiddleware,
+  upload.single('image'),
   createArtist
 );
 
 router.put(
   '/:id',
   authMiddleware,
+  upload.single('image'),
   updateArtist
 );
 

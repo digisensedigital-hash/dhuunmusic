@@ -14,6 +14,10 @@ import {
   updateArtist,
 } from '../../api/updateArtist';
 
+import {
+  getMediaUrl,
+} from '../../utils/media';
+
 export default function ArtistFormModal({
 
   open,
@@ -46,6 +50,16 @@ export default function ArtistFormModal({
     setLoading,
   ] = useState(false);
 
+  const [
+  image,
+  setImage,
+  ] = useState(null);
+
+  const [
+    preview,
+    setPreview,
+  ] = useState('');
+
   /* ----------------------------------- */
   /* Hydrate Edit */
   /* ----------------------------------- */
@@ -75,8 +89,17 @@ export default function ArtistFormModal({
 
       isVerified:
         initialData.isVerified ||
-        false,
+        false,      
+
     });
+
+    setPreview(
+      initialData.profileImage
+        ? getMediaUrl(
+            initialData.profileImage
+          )
+        : ''
+    );
 
   }, [
     mode,
@@ -103,9 +126,40 @@ export default function ArtistFormModal({
 
         setLoading(true);
 
-        const payload = {
-          ...form,
-        };
+        const payload =
+          new FormData();
+
+        payload.append(
+          'stageName',
+          form.stageName
+        );
+
+        payload.append(
+          'realName',
+          form.realName
+        );
+
+        payload.append(
+          'bio',
+          form.bio
+        );
+
+        payload.append(
+          'artistType',
+          form.artistType
+        );
+
+        payload.append(
+          'isVerified',
+          form.isVerified
+        );
+
+        if (image) {
+          payload.append(
+            'image',
+            image
+          );
+        }
 
         const actionPromise =
           mode === 'edit'
@@ -158,9 +212,34 @@ export default function ArtistFormModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+    <div
+      className="
+        fixed
+        inset-0
+        z-50
+        flex
+        items-center
+        justify-center
+        overflow-y-auto
+        bg-black/70
+        p-6
+        backdrop-blur-sm
+      "
+    >
 
-      <div className="w-full max-w-2xl rounded-3xl border border-zinc-800 bg-zinc-950 p-8">
+      <div
+        className="
+          w-full
+          max-w-2xl
+          max-h-[90vh]
+          overflow-y-auto
+          rounded-3xl
+          border
+          border-zinc-800
+          bg-zinc-950
+          p-8
+        "
+      >
 
         {/* Header */}
 
@@ -194,6 +273,126 @@ export default function ArtistFormModal({
         {/* Form */}
 
         <div className="space-y-6">
+
+          {/* Artist Image */}
+
+          <div>
+
+            <label className="mb-2 block text-sm font-medium text-zinc-300">
+              Artist Image
+            </label>
+
+            <input
+              type="file"
+              accept="
+                image/png,
+                image/jpeg,
+                image/webp
+              "
+              onChange={(e) => {
+
+                const file =
+                  e.target.files[0];
+
+                if (!file) {
+                  return;
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | File Size Validation
+                |--------------------------------------------------------------------------
+                */
+
+                const maxSize =
+                  5 * 1024 * 1024;
+
+                if (
+                  file.size > maxSize
+                ) {
+
+                  toast.error(
+                    'Image must be under 5MB'
+                  );
+
+                  return;
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | Preview URL
+                |--------------------------------------------------------------------------
+                */
+
+                const imageUrl =
+                  URL.createObjectURL(file);
+
+                /*
+                |--------------------------------------------------------------------------
+                | Resolution Validation
+                |--------------------------------------------------------------------------
+                */
+
+                const img =
+                  new Image();
+
+                img.onload = () => {
+
+                  if (
+                    img.width < 1000 ||
+                    img.height < 1000
+                  ) {
+
+                    toast.error(
+                      'Use a high resolution image (minimum 1000x1000)'
+                    );
+
+                    return;
+                  }
+
+                  setImage(file);
+
+                  setPreview(imageUrl);
+                };
+
+                img.src = imageUrl;
+              }}
+              className="
+                w-full
+                rounded-2xl
+                border
+                border-zinc-800
+                bg-black
+                px-4
+                py-3
+                text-white
+              "
+            />
+
+            <p className="mt-2 text-sm text-zinc-500">
+              Upload a bright, high-quality square artist image.
+              Recommended size: 2000×2000.
+            </p>
+
+            {preview && (
+
+              <img
+                src={preview}
+                alt="Artist Preview"
+                className="
+                  mt-4
+                  h-32
+                  w-32
+                  rounded-2xl
+                  object-cover
+                  border
+                  border-zinc-800
+                "
+              />
+
+            )}
+
+          </div>
 
           {/* Stage Name */}
 

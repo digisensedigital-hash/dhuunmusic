@@ -37,7 +37,12 @@ export const createArtist =
           stageName,
 
           bio,
-        });
+
+          profileImage:
+          req.file
+            ? `/uploads/${req.file.filename}`
+            : '',
+      });
 
       res.status(201).json({
         success: true,
@@ -136,6 +141,11 @@ export const updateArtist =
       ) {
         artist.isVerified =
           isVerified;
+      }
+
+      if (req.file) {
+        artist.profileImage =
+          `/uploads/${req.file.filename}`;
       }
 
       await artist.save();
