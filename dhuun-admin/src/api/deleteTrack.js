@@ -1,26 +1,13 @@
-import axios from 'axios';
+import client
+  from './client';
 
-const API_BASE =
-  import.meta.env.VITE_API_URL;
+export default async function
+deleteTrack(trackId) {
 
-export default async function deleteTrack(
-  trackId
-) {
-  const token =
-    localStorage.getItem(
-      'token'
+  const response =
+    await client.delete(
+      `/tracks/${trackId}`
     );
 
-  const { data } =
-    await axios.delete(
-      `${API_BASE}/api/tracks/${trackId}`,
-      {
-        headers: {
-          Authorization:
-            `Bearer ${token}`,
-        },
-      }
-    );
-
-  return data;
+  return response.data;
 }
