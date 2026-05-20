@@ -116,7 +116,7 @@ PlayerBar() {
 
             <p className="text-sm text-white/50 truncate mt-1">
               {currentTrack
-                .artist
+                .primaryArtist
                 ?.stageName ||
                 'Unknown Artist'}
             </p>

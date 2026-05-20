@@ -113,7 +113,7 @@ SearchPage() {
               .includes(
                 search
               ) ||
-            track?.artist?.stageName
+            track?.primaryArtist?.stageName
               ?.toLowerCase()
               .includes(
                 search
@@ -141,8 +141,8 @@ SearchPage() {
     trending.forEach(
       (item) => {
         const artist =
-          item.track
-            ?.artist;
+        item.track
+          ?.primaryArtist;
 
         if (
           artist?.id &&
@@ -393,7 +393,7 @@ SearchPage() {
                         </h3>
 
                         <p className="text-white/60 mt-3">
-                            {topResult.artist
+                          {topResult.primaryArtist
                             ?.stageName ||
                             'Unknown Artist'}
                         </p>

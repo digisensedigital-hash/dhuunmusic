@@ -54,7 +54,7 @@ ArtistPage() {
             item.track;
 
           const artist =
-            track?.artist;
+            track?.primaryArtist;
 
           if (
             artist?.id

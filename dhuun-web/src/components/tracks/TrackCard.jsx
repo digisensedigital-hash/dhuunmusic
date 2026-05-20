@@ -25,9 +25,9 @@ TrackCard({
   recommendationReason,
 }) {
   const {
-  playTrack,
-  toggleSaveTrack,
-  isTrackSaved,
+    playTrack,
+    toggleSaveTrack,
+    isTrackSaved,
   } = usePlayerStore();
 
   // -----------------------------------
@@ -35,9 +35,9 @@ TrackCard({
   // -----------------------------------
 
   const isSaved =
-  isTrackSaved(
-    track.id
-  );
+    isTrackSaved(
+      track.id
+    );
 
   const handlePlay =
     async () => {
@@ -60,6 +60,7 @@ TrackCard({
 
           startIndex: 0,
         });
+
       } catch (error) {
         console.error(
           'Failed to load playback queue:',
@@ -85,11 +86,13 @@ TrackCard({
       }}
       className="group relative overflow-hidden rounded-[34px] border border-white/10 bg-[#15151D] shadow-2xl"
     >
+
       {/* -------------------------------- */}
       {/* Artwork */}
       {/* -------------------------------- */}
 
       <div className="relative aspect-square overflow-hidden">
+
         {/* Real Artwork */}
 
         {track.coverImage ? (
@@ -131,7 +134,6 @@ TrackCard({
             className="ml-1"
           />
         </motion.button>
-
 
         {/* Save Button */}
 
@@ -194,72 +196,90 @@ TrackCard({
       {/* -------------------------------- */}
 
       <div className="relative p-5">
+
         {/* Ambient Blur */}
 
         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
 
         <div className="relative">
+
           <h3 className="text-[17px] font-bold truncate">
             {track.title}
           </h3>
 
           <Link
-            to={`/artist/${track.artist?.id}`}
+            to={`/artist/${track.primaryArtist?.id}`}
             className="flex items-center gap-3 mt-3 group/artist"
-            >
+          >
+
             {/* Avatar */}
 
-            {track.artist
+            {track.primaryArtist
               ?.profileImage ? (
+
               <img
                 src={
-                  track.artist
+                  track.primaryArtist
                     .profileImage
                 }
                 alt={
-                  track.artist
+                  track.primaryArtist
                     ?.stageName
                 }
                 className="w-8 h-8 rounded-full object-cover border border-white/10"
               />
+
             ) : (
+
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-[10px] font-bold text-white">
+
                 {(
-                  track.artist
+                  track.primaryArtist
                     ?.stageName ||
                   'U'
                 )
                   .charAt(0)
                   .toUpperCase()}
+
               </div>
             )}
 
             {/* Meta */}
 
             <div className="min-w-0">
+
               <div className="mt-1">
+
                 <div className="flex items-center gap-1.5">
+
                   <p className="text-sm text-white/70 truncate transition-colors group-hover/artist:text-white">
-                    {track.artist
+
+                    {track.primaryArtist
                       ?.stageName ||
                       'Unknown Artist'}
+
                   </p>
 
                   <div className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+
                 </div>
 
                 {recommendationReason && (
                   <p className="text-[11px] text-fuchsia-300/80 mt-2 line-clamp-2 leading-relaxed">
+
                     {
                       recommendationReason
                     }
+
                   </p>
                 )}
+
               </div>
 
               <p className="text-[11px] text-white/35 uppercase tracking-[0.18em] mt-0.5">
                 Featured Artist
               </p>
+
             </div>
           </Link>
         </div>

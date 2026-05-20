@@ -5,7 +5,10 @@ import authMiddleware from '../../middleware/authMiddleware.js';
 import upload from '../../middleware/uploadMiddleware.js';
 
 import {
-  createTrack
+  createTrack,
+  updateTrack,
+  getAllTracks,
+  deleteTrack,
 } from '../../controllers/track/trackController.js';
 
 import {
@@ -19,6 +22,11 @@ import {
 import getRelatedTracksController from '../../controllers/track/getRelatedTracksController.js';
 
 const router = express.Router();
+
+router.get(
+  '/',
+  getAllTracks
+);
 
 router.post(
   '/',
@@ -36,6 +44,30 @@ router.post(
   ]),
 
   createTrack
+);
+
+router.put(
+  '/:id',
+  authMiddleware,
+
+  upload.fields([
+    {
+      name: 'audio',
+      maxCount: 1
+    },
+    {
+      name: 'coverImage',
+      maxCount: 1
+    }
+  ]),
+
+  updateTrack
+);
+
+router.delete(
+  '/:id',
+  authMiddleware,
+  deleteTrack
 );
 
 // Related Tracks Discovery

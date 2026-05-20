@@ -288,7 +288,7 @@
 
                     <p className="mt-2 text-white/60 text-lg">
                     {currentTrack
-                        .artist
+                        .primaryArtist
                         ?.stageName ||
                         'Unknown Artist'}
                     </p>

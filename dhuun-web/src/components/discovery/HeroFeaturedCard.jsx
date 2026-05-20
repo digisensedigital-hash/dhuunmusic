@@ -20,18 +20,23 @@ HeroFeaturedCard({
 
   return (
     <div className="relative overflow-hidden rounded-[36px] h-[420px] bg-[#15151D] border border-white/10">
+
       {/* -------------------------------- */}
       {/* Background Artwork */}
       {/* -------------------------------- */}
 
       {track.coverImage ? (
+
         <img
           src={track.coverImage}
           alt={track.title}
           className="absolute inset-0 w-full h-full object-cover"
         />
+
       ) : (
+
         <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-fuchsia-600 to-pink-500" />
+
       )}
 
       {/* -------------------------------- */}
@@ -51,6 +56,7 @@ HeroFeaturedCard({
       {/* -------------------------------- */}
 
       <div className="relative z-10 h-full flex flex-col justify-end p-7">
+
         {/* Label */}
 
         <div className="mb-4">
@@ -68,14 +74,17 @@ HeroFeaturedCard({
         {/* Artist */}
 
         <p className="mt-3 text-lg text-white/70">
-          {track.artist
+
+          {track.primaryArtist
             ?.stageName ||
             'Unknown Artist'}
+
         </p>
 
         {/* CTA */}
 
         <div className="mt-8 flex items-center gap-4">
+
           <button
             onClick={() =>
               playTrack({
@@ -86,12 +95,14 @@ HeroFeaturedCard({
             }
             className="h-14 px-7 rounded-full bg-white text-black flex items-center gap-3 font-semibold shadow-2xl active:scale-95 transition-transform"
           >
+
             <Play
               size={20}
               fill="currentColor"
             />
 
             Play Now
+
           </button>
 
           <div className="text-sm text-white/50">

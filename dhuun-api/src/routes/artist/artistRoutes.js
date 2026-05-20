@@ -3,20 +3,50 @@ import express from 'express';
 import authMiddleware from '../../middleware/authMiddleware.js';
 
 import {
-  createArtist
+  createArtist,
+  getArtists,
+  updateArtist,
+  deleteArtist,
 } from '../../controllers/artist/artistController.js';
 
 import {
   getPublicArtistProfile
 } from '../../controllers/artist/publicArtistController.js';
 
-const router = express.Router();
+const router =
+  express.Router();
+
+/* -------------------------------------------------------------------------- */
+/* Artist CMS */
+/* -------------------------------------------------------------------------- */
+
+router.get(
+  '/',
+  authMiddleware,
+  getArtists
+);
 
 router.post(
   '/',
   authMiddleware,
   createArtist
 );
+
+router.put(
+  '/:id',
+  authMiddleware,
+  updateArtist
+);
+
+router.delete(
+  '/:id',
+  authMiddleware,
+  deleteArtist
+);
+
+/* -------------------------------------------------------------------------- */
+/* Public Artist */
+/* -------------------------------------------------------------------------- */
 
 router.get(
   '/:id',

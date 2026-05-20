@@ -39,7 +39,8 @@ export default async function getRelatedTracks(
   const sourceTrack =
     await Track.findOne({
       _id: trackId,
-      status: 'READY'
+      processingStatus:
+      'READY'
     })
       .populate(
         'primaryArtist',
@@ -71,7 +72,8 @@ export default async function getRelatedTracks(
         $ne: sourceTrack._id
       },
 
-      status: 'READY'
+      processingStatus:
+      'READY'
     })
       .populate(
         'primaryArtist',
@@ -89,7 +91,8 @@ export default async function getRelatedTracks(
         $ne: sourceTrack._id
       },
 
-      status: 'READY'
+      processingStatus:
+     'READY'
     })
       .populate(
         'primaryArtist',
@@ -108,7 +111,8 @@ export default async function getRelatedTracks(
         path: 'trackId',
 
         match: {
-          status: 'READY'
+          processingStatus:
+           'READY'
         },
 
         populate: {

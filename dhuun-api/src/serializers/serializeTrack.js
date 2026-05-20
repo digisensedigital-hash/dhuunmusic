@@ -30,20 +30,20 @@ serializeTrack(track) {
         track.hlsMasterUrl
       ),
 
-    artist:
-      track.primaryArtist
-        ? {
-            id:
-              track.primaryArtist._id,
+    primaryArtist:
+    track.primaryArtist
+      ? {
+          id:
+            track.primaryArtist._id,
 
-            stageName:
-              track.primaryArtist
-                .stageName,
+          stageName:
+            track.primaryArtist
+              .stageName,
 
-            profileImage:
-              track.primaryArtist
-                .profileImage || ''
-          }
-        : null
+          profileImage:
+            track.primaryArtist
+              .profileImage || ''
+        }
+      : null
   };
 }

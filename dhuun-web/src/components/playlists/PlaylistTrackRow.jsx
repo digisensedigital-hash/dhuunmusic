@@ -66,6 +66,7 @@ PlaylistTrackRow({
 
           startIndex: 0,
         });
+
       } catch (error) {
         console.error(error);
 
@@ -80,6 +81,7 @@ PlaylistTrackRow({
 
   return (
     <div className="group flex items-center gap-4 rounded-2xl px-3 py-3 hover:bg-white/[0.04] transition-colors">
+
       {/* -------------------------------- */}
       {/* Index / Playback */}
       {/* -------------------------------- */}
@@ -90,10 +92,13 @@ PlaylistTrackRow({
       >
         {isActive &&
         isPlaying ? (
+
           <Pause
             size={16}
           />
+
         ) : (
+
           <Play
             size={16}
             fill="currentColor"
@@ -107,7 +112,9 @@ PlaylistTrackRow({
       {/* -------------------------------- */}
 
       <div className="w-14 h-14 rounded-2xl overflow-hidden bg-white/5 flex-shrink-0">
+
         {track.coverImage ? (
+
           <img
             src={
               track.coverImage
@@ -115,8 +122,11 @@ PlaylistTrackRow({
             alt={track.title}
             className="w-full h-full object-cover"
           />
+
         ) : (
+
           <div className="w-full h-full bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500" />
+
         )}
       </div>
 
@@ -125,6 +135,7 @@ PlaylistTrackRow({
       {/* -------------------------------- */}
 
       <div className="min-w-0 flex-1">
+
         <h3
           className={`truncate font-medium ${
             isActive
@@ -136,9 +147,11 @@ PlaylistTrackRow({
         </h3>
 
         <p className="text-sm text-white/45 truncate mt-1">
-          {track.artist
+
+          {track.primaryArtist
             ?.stageName ||
             'Unknown Artist'}
+
         </p>
       </div>
 
@@ -147,6 +160,7 @@ PlaylistTrackRow({
       {/* -------------------------------- */}
 
       <div className="text-sm text-white/35">
+
         {track.duration
           ? `${Math.floor(
               track.duration /
@@ -161,6 +175,7 @@ PlaylistTrackRow({
               '0'
             )}`
           : '--:--'}
+
       </div>
     </div>
   );

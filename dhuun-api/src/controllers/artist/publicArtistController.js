@@ -8,6 +8,9 @@ import ArtistAnalytics
 import TrendingTrack
   from '../../models/TrendingTrack.js';
 
+import serializeTrack
+  from '../../serializers/serializeTrack.js';
+
 export const getPublicArtistProfile =
   async (req, res) => {
     try {
@@ -28,28 +31,51 @@ export const getPublicArtistProfile =
           artistId: artist._id
         });
 
-      const topTracks =
+      const topTracksRaw =
         await Track.find({
           primaryArtist:
-            artist._id
+            artist._id,
+
+          processingStatus:
+            'READY'
         })
+          .populate(
+            'primaryArtist'
+          )
           .sort({
             createdAt: -1
           })
           .limit(10);
 
-      const trendingTracks =
+      const trendingTracksRaw =
         await TrendingTrack.find()
           .sort({ rank: 1 })
-          .populate('trackId');
+          .populate({
+            path: 'trackId',
+            populate: {
+              path: 'primaryArtist'
+            }
+          });
 
       const artistTrendingTracks =
-        trendingTracks.filter(
-          (item) =>
-            item.trackId
-              ?.primaryArtist
-              ?.toString() ===
-            artist._id.toString()
+        trendingTracksRaw
+          .filter(
+            (item) =>
+              item.trackId
+                ?.primaryArtist
+                ?._id
+                ?.toString() ===
+              artist._id.toString()
+          )
+          .map((item) =>
+            serializeTrack(
+              item.trackId
+            )
+          );
+
+      const topTracks =
+        topTracksRaw.map(
+          serializeTrack
         );
 
       res.json({

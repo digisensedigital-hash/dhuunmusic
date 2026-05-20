@@ -47,6 +47,7 @@ QueueDrawer() {
 
   return (
     <div className="fixed inset-0 z-[300] bg-black/60 backdrop-blur-md flex items-end">
+
       {/* -------------------------------- */}
       {/* Backdrop */}
       {/* -------------------------------- */}
@@ -63,6 +64,7 @@ QueueDrawer() {
       {/* -------------------------------- */}
 
       <div className="relative w-full max-w-md mx-auto bg-[#111118] rounded-t-[36px] border-t border-white/10 overflow-hidden max-h-[78vh] flex flex-col">
+
         {/* -------------------------------- */}
         {/* Handle */}
         {/* -------------------------------- */}
@@ -76,7 +78,9 @@ QueueDrawer() {
         {/* -------------------------------- */}
 
         <div className="flex items-center justify-between px-6 pb-5">
+
           <div>
+
             <h2 className="text-xl font-black text-white">
               Up Next
             </h2>
@@ -85,6 +89,7 @@ QueueDrawer() {
               {queue.length}{' '}
               tracks in queue
             </p>
+
           </div>
 
           <button
@@ -102,7 +107,9 @@ QueueDrawer() {
         {/* -------------------------------- */}
 
         <div className="overflow-y-auto px-4 pb-[max(24px,env(safe-area-inset-bottom))]">
+
           <div className="space-y-2">
+
             {orderedQueue.map(
               (
                 track,
@@ -130,10 +137,13 @@ QueueDrawer() {
                         : 'bg-white/[0.03]'
                     }`}
                   >
+
                     {/* Artwork */}
 
                     <div className="w-14 h-14 rounded-xl overflow-hidden bg-white/5 flex-shrink-0">
+
                       {track.coverImage ? (
+
                         <img
                           src={
                             track.coverImage
@@ -143,13 +153,17 @@ QueueDrawer() {
                           }
                           className="w-full h-full object-cover"
                         />
+
                       ) : (
+
                         <div className="w-full h-full flex items-center justify-center text-white/20">
+
                           <Music2
                             size={
                               22
                             }
                           />
+
                         </div>
                       )}
                     </div>
@@ -157,6 +171,7 @@ QueueDrawer() {
                     {/* Meta */}
 
                     <div className="flex-1 min-w-0 text-left">
+
                       <h3
                         className={`truncate font-semibold ${
                           isActive
@@ -170,10 +185,12 @@ QueueDrawer() {
                       </h3>
 
                       <p className="text-sm text-white/40 truncate mt-1">
+
                         {track
-                          .artist
+                          .primaryArtist
                           ?.stageName ||
                           'Unknown Artist'}
+
                       </p>
                     </div>
 

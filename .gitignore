@@ -27,3 +27,5 @@ logs
 # IDE
 .vscode
 .idea
+
+*.patch

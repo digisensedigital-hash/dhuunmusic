@@ -135,7 +135,7 @@ ExpandedPlayer({
 
           <p className="text-lg text-white/50 mt-3">
             {
-              currentTrack.artist
+              currentTrack.primaryArtist
                 ?.stageName
             }
           </p>
