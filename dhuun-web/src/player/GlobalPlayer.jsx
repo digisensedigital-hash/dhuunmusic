@@ -106,37 +106,68 @@ GlobalPlayer() {
     // Start Listen Session
     // -----------------------------------
 
-    (async () => {
-      const response =
-        await startListenSession(
-          currentTrack.id
-        );
+    // -----------------------------------
+    // Prevent Duplicate Session Starts
+    // -----------------------------------
 
-      if (
-        response?.sessionId
-      ) {
-        sessionRef.current =
-          response.sessionId;
+    if (
+      activeTrackSessionRef.current ===
+      currentTrack.id
+    ) {
+      console.log(
+        '[LISTEN_SESSION_ALREADY_ACTIVE]'
+      );
+    } else {
+      activeTrackSessionRef.current =
+        currentTrack.id;
 
-        // -----------------------------------
-        // Heartbeat Loop
-        // -----------------------------------
+      (async () => {
+        try {
+          const response =
+            await startListenSession(
+              currentTrack.id
+            );
 
-        heartbeatRef.current =
-          setInterval(() => {
-            if (
-              sessionRef.current
-            ) {
-              sendListenHeartbeat(
-                {
-                  sessionId:
-                    sessionRef.current,
+          if (
+            response?.sessionId
+          ) {
+            sessionRef.current =
+              response.sessionId;
+
+            console.log(
+              '[LISTEN_SESSION_STARTED]',
+              response.sessionId
+            );
+
+            // -----------------------------------
+            // Heartbeat Loop
+            // -----------------------------------
+
+            heartbeatRef.current =
+              setInterval(() => {
+                if (
+                  sessionRef.current
+                ) {
+                  sendListenHeartbeat(
+                    {
+                      sessionId:
+                        sessionRef.current,
+                    }
+                  );
                 }
-              );
-            }
-          }, 15000);
-      }
-    })();
+              }, 15000);
+          }
+        } catch (error) {
+          console.error(
+            '[LISTEN_SESSION_FAILED]',
+            error
+          );
+
+          activeTrackSessionRef.current =
+            null;
+        }
+      })();
+    }
 
     
     // -----------------------------------
@@ -288,6 +319,9 @@ GlobalPlayer() {
         sessionRef.current;
 
       sessionRef.current =
+        null;
+
+      activeTrackSessionRef.current =
         null;
 
       // ADVANCE IMMEDIATELY
@@ -552,6 +586,10 @@ GlobalPlayer() {
 
         sessionRef.current =
           null;
+        
+        activeTrackSessionRef.current =
+          null;
+          
       }
 
       audio.pause();
