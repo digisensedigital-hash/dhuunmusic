@@ -47,9 +47,12 @@ app.use(express.json());
 app.use(
   '/uploads',
   express.static(
-    path.resolve(
-      '../storage/temp'
-    )
+    process.env.NODE_ENV ===
+      'production'
+        ? '/var/www/dhuunmusic/storage/temp'
+        : path.resolve(
+            '../storage/temp'
+          )
   )
 );
 
