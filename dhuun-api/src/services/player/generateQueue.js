@@ -46,9 +46,9 @@ generateQueue({
   // -----------------------------------
 
   const recommendations =
-    await getRecommendations(
-      userId
-    );
+  await getRecommendations({
+    userId,
+  });
 
   // -----------------------------------
   // Trending Expansion

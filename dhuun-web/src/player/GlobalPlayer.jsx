@@ -32,6 +32,9 @@ GlobalPlayer() {
   const heartbeatRef =
     useRef(null);
 
+  const activeTrackSessionRef =
+  useRef(null);
+
   const {
   currentTrack,
   isPlaying,
@@ -589,7 +592,7 @@ GlobalPlayer() {
         
         activeTrackSessionRef.current =
           null;
-          
+
       }
 
       audio.pause();

@@ -11,18 +11,33 @@ import TrendingTrack
 export default async function
 getRecommendations({
   userId,
-
   seedTrackId = null,
-}) {
+} = {}) {
+
+  // -----------------------------------
+  // Defensive Guard
+  // -----------------------------------
+
+  if (
+    !userId &&
+    !seedTrackId
+  ) {
+    return [];
+  }
+
   const savedTracks =
-    await SavedTrack.find({
-      userId,
-    }).populate('trackId');
+    userId
+      ? await SavedTrack.find({
+          userId,
+        }).populate('trackId')
+      : [];
 
   const recentlyPlayed =
-    await RecentlyPlayed.find({
-      userId,
-    }).populate('trackId');
+    userId
+      ? await RecentlyPlayed.find({
+          userId,
+        }).populate('trackId')
+      : [];
 
   // -----------------------------------
   // Seed Track
@@ -116,8 +131,11 @@ getRecommendations({
       continue;
     }
 
-    // Avoid recommending
-    // currently playing seed
+    // -----------------------------------
+    // Avoid Recommending
+    // Current Seed Track
+    // -----------------------------------
+
     if (
       seedTrackId &&
       track._id.toString() ===
