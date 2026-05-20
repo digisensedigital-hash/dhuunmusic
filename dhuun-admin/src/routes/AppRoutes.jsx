@@ -102,7 +102,7 @@ export default function AppRoutes() {
 
       {/* ----------------------------------- */}
       {/* Register */}
-      {/* ----------------------------------- */}
+      {/* ----------------------------------- 
 
       <Route
         path="/register"
@@ -118,7 +118,7 @@ export default function AppRoutes() {
                 <RegisterPage />
               )
         }
-      />
+      />*/}
 
       {/* ----------------------------------- */}
       {/* Dashboard */}
