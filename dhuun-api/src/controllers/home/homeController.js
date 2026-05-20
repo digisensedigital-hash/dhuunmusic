@@ -47,14 +47,20 @@ export const getHomeFeed =
         })
           .sort({ rank: 1 })
           .limit(10)
-          .populate({
-            path: 'trackId',
-            populate: {
-              path: 'primaryArtist',
-              select:
-                'stageName profileImage'
-            }
-          });
+          .populate('trackId');
+
+      // -----------------------------------
+      // Ensure Primary Artist Population
+      // -----------------------------------
+
+      for (const item of trending) {
+        if (item.trackId) {
+          await item.trackId.populate(
+            'primaryArtist',
+            'stageName profileImage'
+          );
+        }
+      }
 
       // -----------------------------------
       // Sparse Catalog Fallback
@@ -117,11 +123,11 @@ export const getHomeFeed =
       // -----------------------------------
 
       const recommended =
-        userId
-            ? await getRecommendations(
-                userId
-            )
-            : [];
+      userId
+        ? await getRecommendations({
+            userId
+          })
+        : [];
 
       // -----------------------------------
         // Recently Played
