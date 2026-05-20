@@ -49,8 +49,9 @@ HomePage() {
 
   const trending =
   data?.home?.trending
-    ?.map((item) => item.track)
-    ?.filter(Boolean) || [];
+    ?.filter(
+      (item) => item.track
+    ) || [];
 
   const recommended =
     (
