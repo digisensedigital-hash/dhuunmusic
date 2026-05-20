@@ -8,15 +8,6 @@ HorizontalTrackRail({
 }) {
 
   // -----------------------------------
-  // Debug Incoming Items
-  // -----------------------------------
-
-  console.log(
-    `[RAIL_DEBUG] ${title}`,
-    items
-  );
-
-  // -----------------------------------
   // Remove Invalid Entries
   // -----------------------------------
 
@@ -26,11 +17,6 @@ HorizontalTrackRail({
         item?.track
     );
 
-  console.log(
-    `[RAIL_VALID] ${title}`,
-    validItems
-  );
-
   // -----------------------------------
   // Empty State
   // -----------------------------------
@@ -38,23 +24,7 @@ HorizontalTrackRail({
   if (
     !validItems.length
   ) {
-    return (
-      <section className="mb-10">
-        <div className="text-red-400 text-sm">
-          No valid items for:
-          {' '}
-          {title}
-        </div>
-
-        <pre className="text-white text-xs overflow-auto mt-2 bg-black/30 p-3 rounded-xl">
-          {JSON.stringify(
-            items,
-            null,
-            2
-          )}
-        </pre>
-      </section>
-    );
+    return null;
   }
 
   return (
@@ -75,27 +45,20 @@ HorizontalTrackRail({
       </div>
 
       {/* -------------------------------- */}
-      {/* Debug Preview */}
-      {/* -------------------------------- */}
-
-      <pre className="text-white text-[10px] overflow-auto mb-4 bg-black/30 p-3 rounded-xl">
-        {JSON.stringify(
-          validItems[0],
-          null,
-          2
-        )}
-      </pre>
-
-      {/* -------------------------------- */}
       {/* Horizontal Rail */}
       {/* -------------------------------- */}
 
       <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-1">
         {validItems.map(
-          (item) => (
+          (
+            item,
+            index
+          ) => (
             <div
               key={
-                item.track?.id
+                item.track?.id ||
+                item.track?._id ||
+                `${title}-${index}`
               }
               className="min-w-[180px] max-w-[180px] flex-shrink-0"
             >
