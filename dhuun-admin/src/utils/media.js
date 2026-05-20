@@ -1,7 +1,12 @@
 const MEDIA_BASE_URL =
   import.meta.env
     .VITE_MEDIA_BASE_URL ||
-  '';
+  (
+    window.location.hostname ===
+    'localhost'
+      ? 'http://127.0.0.1:9000'
+      : 'https://media.dhuunmusic.in'
+  );
 
 export function getMediaUrl(
   path
@@ -11,14 +16,45 @@ export function getMediaUrl(
     return '';
   }
 
+  // -----------------------------------
+  // Already Absolute URL
+  // -----------------------------------
+
   if (
     path.startsWith('http')
   ) {
-    return path.replace(
-      '127.0.0.1',
+
+    // Local Development
+    if (
+      window.location.hostname ===
       'localhost'
-    );
+    ) {
+      return path
+        .replace(
+          '127.0.0.1',
+          'localhost'
+        )
+        .replace(
+          'media.dhuunmusic.in',
+          'localhost:9000'
+        );
+    }
+
+    // Production
+    return path
+      .replace(
+        '127.0.0.1:9000',
+        'media.dhuunmusic.in'
+      )
+      .replace(
+        'http://',
+        'https://'
+      );
   }
+
+  // -----------------------------------
+  // Relative Media Path
+  // -----------------------------------
 
   const normalizedPath =
     path.startsWith('/')
@@ -26,6 +62,6 @@ export function getMediaUrl(
       : `/${path}`;
 
   return encodeURI(
-  `${MEDIA_BASE_URL}/dhuun-media${normalizedPath}`
-);
+    `${MEDIA_BASE_URL}/dhuun-media${normalizedPath}`
+  );
 }

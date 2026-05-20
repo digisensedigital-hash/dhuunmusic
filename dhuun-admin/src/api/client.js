@@ -1,10 +1,20 @@
 import axios
   from 'axios';
 
+const API_BASE_URL =
+  import.meta.env
+    .VITE_API_URL ||
+  (
+    window.location.hostname ===
+    'localhost'
+      ? 'http://localhost:8000/api'
+      : 'https://api.dhuunmusic.in/api'
+  );
+
 const client =
   axios.create({
     baseURL:
-      'http://localhost:8000/api',
+      API_BASE_URL,
   });
 
 /* ----------------------------------- */
