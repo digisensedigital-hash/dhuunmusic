@@ -34,10 +34,14 @@ TrackCard({
   // Intelligent Playback Startup
   // -----------------------------------
 
+  if (!track) {
+  return null;
+  }
+
   const isSaved =
-    isTrackSaved(
-      track.id
-    );
+  isTrackSaved(
+    track.id
+  );
 
   const handlePlay =
     async () => {
@@ -208,7 +212,11 @@ TrackCard({
           </h3>
 
           <Link
-            to={`/artist/${track.primaryArtist?.id}`}
+            to={
+              track.primaryArtist?.id
+                ? `/artist/${track.primaryArtist.id}`
+                : '#'
+            }
             className="flex items-center gap-3 mt-3 group/artist"
           >
 

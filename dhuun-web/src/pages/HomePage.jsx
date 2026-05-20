@@ -114,28 +114,16 @@ HomePage() {
   trending[0]?.track || null;
     
   const newReleases =
-  trending
-    .slice(0, 6)
-    .map((item) => item.track)
-    .filter(Boolean);
+  trending.slice(0, 6);
 
-const moodPicks =
-  trending
-    .slice(2, 8)
-    .map((item) => item.track)
-    .filter(Boolean);
+  const moodPicks =
+    trending.slice(2, 8);
 
-const hindiPop =
-  trending
-    .slice(1, 7)
-    .map((item) => item.track)
-    .filter(Boolean);
+  const hindiPop =
+    trending.slice(1, 7);
 
-const nightVibes =
-  trending
-    .slice(3, 9)
-    .map((item) => item.track)
-    .filter(Boolean);
+  const nightVibes =
+    trending.slice(3, 9);
 
   const playlists = [
   {
