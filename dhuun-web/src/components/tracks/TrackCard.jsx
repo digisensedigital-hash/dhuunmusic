@@ -19,6 +19,10 @@ import {
   Link,
 } from 'react-router-dom';
 
+import {
+  getMediaUrl,
+} from '../../utils/media';
+
 export default function
 TrackCard({
   track,
@@ -227,8 +231,10 @@ TrackCard({
 
               <img
                 src={
-                  track.primaryArtist
-                    .profileImage
+                  getMediaUrl(
+                    track.primaryArtist
+                      ?.profileImage
+                  )
                 }
                 alt={
                   track.primaryArtist
