@@ -206,20 +206,24 @@ export const getHomeFeed =
 
         home: {
           trending:
-            trending.map(
-              (item) => ({
-                rank:
-                  item.rank,
+            trending
+              .filter(
+                (item) => item.trackId
+              )
+              .map(
+                (item) => ({
+                  rank:
+                    item.rank,
 
-                score:
-                  item.score,
+                  score:
+                    item.score,
 
-                track:
-                  serializeTrack(
-                    item.trackId
-                  )
-              })
-            ),
+                  track:
+                    serializeTrack(
+                      item.trackId
+                    )
+                })
+              ),
 
           recommended:
             recommended.map(
