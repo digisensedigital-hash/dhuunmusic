@@ -18,7 +18,59 @@ import {
   getArtists,
 } from '../../api/getArtists';
 
+import {
+  getTracks,
+} from '../../api/tracks';
+
 import toast from 'react-hot-toast';
+
+/* ----------------------------------- */
+/* Catalog Taxonomy */
+/* ----------------------------------- */
+
+const GENRES = [
+  'Pop',
+  'Bollywood',
+  'Indie',
+  'Hip-Hop',
+  'Rap',
+  'Rock',
+  'EDM',
+  'Lo-fi',
+  'Sufi',
+  'Ghazal',
+  'Classical',
+  'Folk',
+  'Instrumental',
+  'Ambient',
+  'Devotional',
+];
+
+const LANGUAGES = [
+  'Hindi',
+  'Urdu',
+  'Bengali',
+  'Marathi',
+  'Punjabi',
+  'Kashmiri',
+  'Tamil',
+  'Telugu',
+  'Malayalam',
+  'Kannada',
+  'Gujarati',
+  'English',
+];
+
+const VERSION_TYPES = [
+  'ORIGINAL',
+  'ACOUSTIC',
+  'LIVE',
+  'REMIX',
+  'INSTRUMENTAL',
+  'LOFI',
+  'RADIO_EDIT',
+  'COVER',
+];
 
 export default function TrackFormModal({
   
@@ -67,7 +119,21 @@ export default function TrackFormModal({
       '',
 
     scheduledPublishAt:
-  '',
+      '',
+
+    /* ----------------------------------- */
+    /* Variant Relationships */
+    /* ----------------------------------- */
+
+    isMasterTrack:
+      false,
+
+    masterTrackId:
+      '',
+
+    versionType:
+      'ORIGINAL',
+
   });
 
   const [
@@ -91,6 +157,11 @@ export default function TrackFormModal({
   ] = useState([]);
 
   const [
+  masterTracks,
+  setMasterTracks,
+  ] = useState([]);
+
+  const [
   contributors,
   setContributors,
   ] = useState([
@@ -110,17 +181,22 @@ export default function TrackFormModal({
   ]);
 
   /* ----------------------------------- */
-/* Hydrate Edit Data */
-/* ----------------------------------- */
+  /* Hydrate Edit Data */
+  /* ----------------------------------- */
 
-useEffect(() => {
+  useEffect(() => {
 
-  if (
-    mode !== 'edit' ||
-    !initialData
-  ) {
-    return;
-  }
+    console.log(
+      'INITIAL DATA',
+      initialData
+    );
+
+    if (
+      mode !== 'edit' ||
+      !initialData
+    ) {
+      return;
+    }
 
   setForm({
     title:
@@ -188,7 +264,30 @@ useEffect(() => {
             .toISOString()
             .split('T')[0]
         : '',
+
+    /* ----------------------------------- */
+    /* Variant Relationships */
+    /* ----------------------------------- */
+
+    isMasterTrack:
+      initialData.isMasterTrack === true,
+
+    masterTrackId:
+
+      initialData.masterTrackId?._id ||
+
+      initialData.masterTrackId ||
+
+      '',
+
+    versionType:
+      initialData.versionType ||
+      'ORIGINAL',      
+
+
       });
+
+    
 
   setContributors(
     initialData.contributors
@@ -227,6 +326,18 @@ useEffect(() => {
 
         setArtists(
           response.artists || []
+        );
+
+        const tracksResponse =
+          await getTracks();
+
+        setMasterTracks(
+
+          (tracksResponse.tracks || [])
+            .filter(
+              (track) =>
+                track.isMasterTrack
+            )
         );
 
       } catch (error) {
@@ -494,6 +605,28 @@ const handleUpload =
       formData.append(
         'isrc',
         form.isrc
+      );
+
+      /* ----------------------------------- */
+      /* Variant Relationships */
+      /* ----------------------------------- */
+
+      formData.append(
+        'isMasterTrack',
+        form.isMasterTrack
+      );
+
+      if (form.masterTrackId) {
+
+        formData.append(
+          'masterTrackId',
+          form.masterTrackId
+        );
+      }
+
+      formData.append(
+        'versionType',
+        form.versionType
       );
 
       /* ----------------------------------- */
@@ -777,8 +910,7 @@ const handleUpload =
                 Genre
               </label>
 
-              <input
-                type="text"
+              <select
                 value={form.genre}
                 onChange={(e) =>
                   setForm({
@@ -787,9 +919,23 @@ const handleUpload =
                       e.target.value,
                   })
                 }
-                className="w-full rounded-2xl border border-zinc-800 bg-black px-4 py-4 text-white outline-none transition focus:border-zinc-600"
-                placeholder="Romantic, Hip-Hop, Devotional..."
-              />
+                className="w-full rounded-2xl border border-zinc-800 bg-black px-4 py-4 text-white outline-none"
+              >
+
+                <option value="">
+                  Select genre
+                </option>
+
+                {GENRES.map((genre) => (
+                  <option
+                    key={genre}
+                    value={genre}
+                  >
+                    {genre}
+                  </option>
+                ))}
+
+              </select>
             </div>
 
             {/* Language */}
@@ -799,8 +945,7 @@ const handleUpload =
                 Language
               </label>
 
-              <input
-                type="text"
+              <select
                 value={form.language}
                 onChange={(e) =>
                   setForm({
@@ -809,9 +954,180 @@ const handleUpload =
                       e.target.value,
                   })
                 }
-                className="w-full rounded-2xl border border-zinc-800 bg-black px-4 py-4 text-white outline-none transition focus:border-zinc-600"
-                placeholder="Hindi"
-              />
+                className="w-full rounded-2xl border border-zinc-800 bg-black px-4 py-4 text-white outline-none"
+              >
+
+                <option value="">
+                  Select language
+                </option>
+
+                {LANGUAGES.map((language) => (
+                  <option
+                    key={language}
+                    value={language}
+                  >
+                    {language}
+                  </option>
+                ))}
+
+              </select>
+            </div>
+
+            {/* ----------------------------------- */}
+            {/* Variant Relationships */}
+            {/* ----------------------------------- */}
+
+            <div className="col-span-2 rounded-3xl border border-zinc-800 bg-black p-6">
+
+              <h3 className="text-lg font-semibold text-white">
+                Variant Relationships
+              </h3>
+
+              <p className="mt-1 text-sm text-zinc-500">
+                Link alternate language or version releases together.
+              </p>
+
+              <div className="mt-6 grid grid-cols-2 gap-6">
+
+                {/* Master Toggle */}
+
+                <div className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-950 px-5 py-4">
+
+                  <div>
+
+                    <p className="font-medium text-white">
+                      Master Track
+                    </p>
+
+                    <p className="mt-1 text-sm text-zinc-500">
+                      Use this as the primary release root.
+                    </p>
+
+                  </div>
+
+                  <input
+                    type="checkbox"
+
+                    checked={
+                      form.isMasterTrack
+                    }
+
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+
+                        isMasterTrack:
+                          e.target.checked,
+
+                        masterTrackId:
+                          e.target.checked
+                            ? ''
+                            : form.masterTrackId,
+                      })
+                    }
+
+                    className="h-5 w-5"
+                  />
+
+                </div>
+
+                {/* Version Type */}
+
+                <div>
+
+                  <label className="mb-2 block text-sm font-medium text-zinc-300">
+                    Version Type
+                  </label>
+
+                  <select
+                    value={
+                      form.versionType
+                    }
+
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+
+                        versionType:
+                          e.target.value,
+                      })
+                    }
+
+                    className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-4 text-white outline-none"
+                  >
+
+                    {VERSION_TYPES.map(
+                      (type) => (
+
+                        <option
+                          key={type}
+                          value={type}
+                        >
+                          {type}
+                        </option>
+
+                      )
+                    )}
+
+                  </select>
+
+                </div>
+
+                {/* Master Track Select */}
+
+                <div className="col-span-2">
+
+                  <label className="mb-2 block text-sm font-medium text-zinc-300">
+                    Select Master Track
+                  </label>
+
+                  <select
+
+                    disabled={
+                      form.isMasterTrack
+                    }
+
+                    value={
+                      form.masterTrackId
+                    }
+
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+
+                        masterTrackId:
+                          e.target.value,
+                      })
+                    }
+
+                    className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-4 text-white outline-none disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+
+                    <option value="">
+                      Select master track
+                    </option>
+
+                    {masterTracks.map(
+                      (track) => (
+
+                        <option
+                          key={track._id}
+                          value={track._id}
+                        >
+                          {track.title}
+                          {' • '}
+                          {track.language}
+                        </option>
+
+                      )
+                    )}
+
+                  </select>
+
+                </div>
+
+              </div>
+
             </div>
 
             {/* Release Type */}

@@ -18,17 +18,23 @@ MainLayout({
   children
 }) {
   return (
-    <div className="bg-[#07070B] text-white min-h-screen flex justify-center">
+
+    <div className="flex min-h-screen justify-center bg-[#07070B] text-white">
+
       {/* -------------------------------- */}
       {/* Mobile Runtime Shell */}
       {/* -------------------------------- */}
 
-      <div className="w-full max-w-md min-h-screen bg-[#0B0B12] relative overflow-hidden border-x border-white/5">
+      <div className="relative min-h-screen w-full max-w-md overflow-x-hidden border-x border-white/5 bg-[#0B0B12]">
+
         {/* -------------------------------- */}
         {/* Scrollable Content */}
         {/* -------------------------------- */}
 
-        <main className="pb-52">
+        <main
+          id="app-scroll-container"
+          className="h-screen overflow-y-auto pb-52"
+        >
           {children}
         </main>
 
@@ -61,7 +67,9 @@ MainLayout({
         {/* -------------------------------- */}
 
         <BottomNav />
+
       </div>
+
     </div>
   );
 }

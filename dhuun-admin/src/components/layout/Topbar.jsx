@@ -5,6 +5,7 @@ import {
 
 import {
   useLocation,
+  useSearchParams,
 } from 'react-router-dom';
 
 const pageTitles = {
@@ -59,8 +60,19 @@ const pageTitles = {
 };
 
 export default function Topbar() {
+
   const location =
     useLocation();
+
+  const [
+    searchParams,
+    setSearchParams,
+  ] = useSearchParams();
+
+  const search =
+    searchParams.get(
+      'search'
+    ) || '';
 
   const currentPage =
     pageTitles[
@@ -102,7 +114,23 @@ export default function Topbar() {
 
           <input
             type="text"
+
+            value={search}
+
+            onChange={(e) => {
+
+              const value =
+                e.target.value;
+
+              setSearchParams(
+                value
+                  ? { search: value }
+                  : {}
+              );
+            }}
+
             placeholder="Search tracks, artists, playlists..."
+
             className="w-72 bg-transparent text-sm text-white outline-none placeholder:text-zinc-500"
           />
         </div>

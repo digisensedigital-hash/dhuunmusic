@@ -20,6 +20,7 @@ generateQueue({
   trackId,
   userId
 }) {
+
   const currentTrack =
     await Track.findById(
       trackId
@@ -46,9 +47,9 @@ generateQueue({
   // -----------------------------------
 
   const recommendations =
-  await getRecommendations({
-    userId,
-  });
+    await getRecommendations({
+      userId,
+    });
 
   // -----------------------------------
   // Trending Expansion
@@ -64,8 +65,10 @@ generateQueue({
       .limit(25)
       .populate({
         path: 'trackId',
+
         populate: {
           path: 'primaryArtist',
+
           select:
             'stageName profileImage'
         }
@@ -82,6 +85,7 @@ generateQueue({
   // -----------------------------------
 
   for (const item of related.relatedTracks) {
+
     if (
       item.id?.toString() ===
       trackId
@@ -97,10 +101,15 @@ generateQueue({
   // -----------------------------------
 
   for (const item of recommendations) {
+
     if (
-      item.track._id.toString() ===
+      item.track?._id?.toString() ===
       trackId
     ) {
+      continue;
+    }
+
+    if (!item.track) {
       continue;
     }
 
@@ -114,6 +123,7 @@ generateQueue({
   // -----------------------------------
 
   for (const item of trending) {
+
     if (!item.trackId) {
       continue;
     }
@@ -131,12 +141,32 @@ generateQueue({
   }
 
   // -----------------------------------
+  // Playback Safety Filter
+  // -----------------------------------
+
+  const playableQueue =
+    queueTracks.filter(
+      (track) =>
+
+        track &&
+
+        track.isActive ===
+          true &&
+
+        track.processingStatus ===
+          'READY' &&
+
+        track.publishingStatus ===
+          'PUBLISHED'
+    );
+
+  // -----------------------------------
   // Playback Intelligence Pipeline
   // -----------------------------------
 
   const dedupedQueue =
     dedupeQueue(
-      queueTracks
+      playableQueue
     );
 
   const balancedQueue =
@@ -145,6 +175,7 @@ generateQueue({
     );
 
   return {
+
     currentTrack,
 
     nextTracks:

@@ -88,8 +88,25 @@ HeroFeaturedCard({
           <button
             onClick={() =>
               playTrack({
-                track,
-                queue,
+
+                track: {
+                  ...track,
+
+                  id:
+                    track.id ||
+                    track._id,
+                },
+
+                queue: [
+                  {
+                    ...track,
+
+                    id:
+                      track.id ||
+                      track._id,
+                  },
+                ],
+
                 startIndex: 0,
               })
             }

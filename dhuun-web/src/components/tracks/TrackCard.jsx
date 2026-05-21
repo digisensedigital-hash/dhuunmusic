@@ -17,6 +17,7 @@ import {
 
 import {
   Link,
+  useNavigate,
 } from 'react-router-dom';
 
 import {
@@ -28,6 +29,10 @@ TrackCard({
   track,
   recommendationReason,
 }) {
+
+  const navigate =
+    useNavigate();
+
   const {
     playTrack,
     toggleSaveTrack,
@@ -39,17 +44,21 @@ TrackCard({
   // -----------------------------------
 
   if (!track) {
-  return null;
+    return null;
   }
 
   const isSaved =
-  isTrackSaved(
-    track.id
-  );
+    isTrackSaved(
+      track.id
+    );
 
   const handlePlay =
-    async () => {
+    async (e) => {
+
+      e.stopPropagation();
+
       try {
+
         const response =
           await loadPlaybackQueue(
             track.id
@@ -70,6 +79,7 @@ TrackCard({
         });
 
       } catch (error) {
+
         console.error(
           'Failed to load playback queue:',
           error
@@ -87,12 +97,30 @@ TrackCard({
       }
     };
 
+  /* ----------------------------------- */
+  /* Navigation */
+  /* ----------------------------------- */
+
+  const handleNavigate =
+    () => {
+
+      navigate(
+        `/track/${track.id}`
+      );
+    };
+
   return (
     <motion.div
+
       whileTap={{
         scale: 0.97,
       }}
-      className="group relative overflow-hidden rounded-[34px] border border-white/10 bg-[#15151D] shadow-2xl"
+
+      onClick={
+        handleNavigate
+      }
+
+      className="group relative cursor-pointer overflow-hidden rounded-[34px] border border-white/10 bg-[#15151D] shadow-2xl"
     >
 
       {/* -------------------------------- */}
@@ -104,19 +132,32 @@ TrackCard({
         {/* Real Artwork */}
 
         {track.coverImage ? (
+
           <motion.img
+
             whileHover={{
               scale: 1.06,
             }}
+
             transition={{
               duration: 0.4,
             }}
-            src={track.coverImage}
+
+            src={
+              getMediaUrl(
+                track.coverImage
+              )
+            }
+
             alt={track.title}
-            className="w-full h-full object-cover"
+
+            className="h-full w-full object-cover"
           />
+
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500" />
+
+          <div className="h-full w-full bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500" />
+
         )}
 
         {/* Ambient Overlay */}
@@ -125,59 +166,75 @@ TrackCard({
 
         {/* Top Glow */}
 
-        <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white/10 to-transparent" />
 
         {/* Floating Play Button */}
 
         <motion.button
+
           whileTap={{
             scale: 0.92,
           }}
+
           onClick={handlePlay}
-          className="absolute bottom-4 right-4 w-14 h-14 rounded-full bg-white text-black flex items-center justify-center shadow-2xl backdrop-blur transition-all duration-300 group-hover:scale-110"
+
+          className="absolute bottom-4 right-4 flex h-14 w-14 items-center justify-center rounded-full bg-white text-black shadow-2xl backdrop-blur transition-all duration-300 group-hover:scale-110"
         >
+
           <Play
             size={22}
             fill="currentColor"
             className="ml-1"
           />
+
         </motion.button>
 
         {/* Save Button */}
 
         <button
+
           onClick={(e) => {
+
             e.stopPropagation();
 
             toggleSaveTrack(
               track
             );
           }}
-          className="absolute top-4 right-4 w-11 h-11 rounded-full border border-white/10 bg-black/40 backdrop-blur-xl flex items-center justify-center transition-all duration-300 hover:scale-110"
+
+          className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/40 backdrop-blur-xl transition-all duration-300 hover:scale-110"
         >
+
           <AnimatePresence mode="wait">
+
             <motion.div
+
               key={
                 isSaved
                   ? 'saved'
                   : 'unsaved'
               }
+
               initial={{
                 scale: 0.6,
                 opacity: 0,
               }}
+
               animate={{
                 scale: 1,
                 opacity: 1,
               }}
+
               exit={{
                 scale: 0.6,
                 opacity: 0,
               }}
+
               transition={{
                 duration: 0.18,
               }}
             >
+
               <Heart
                 size={18}
                 className={
@@ -186,17 +243,53 @@ TrackCard({
                     : 'text-white'
                 }
               />
+
             </motion.div>
+
           </AnimatePresence>
+
         </button>
 
         {/* Floating Genre Pill */}
 
         {track.genre && (
-          <div className="absolute top-4 left-4 rounded-full border border-white/10 bg-black/40 backdrop-blur-xl px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-white/70">
+
+          <div className="absolute left-4 top-4 rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-white/70 backdrop-blur-xl">
+
             {track.genre}
+
           </div>
+
         )}
+
+        {/* Multi-language Badge */}
+
+        {track.hasVariants && (
+
+          <div className="absolute bottom-4 left-4 rounded-full border border-fuchsia-400/20 bg-fuchsia-500/15 px-3 py-1 text-[11px] font-medium text-fuchsia-200 shadow-lg backdrop-blur-xl">
+
+            <div className="flex items-center gap-2">
+
+              <span>
+
+                🌐
+
+              </span>
+
+              <span>
+
+                {track.variantCount > 1
+                  ? `${track.variantCount} Versions`
+                  : 'Multi-language'}
+
+              </span>
+
+            </div>
+
+          </div>
+
+        )}
+
       </div>
 
       {/* -------------------------------- */}
@@ -207,21 +300,33 @@ TrackCard({
 
         {/* Ambient Blur */}
 
-        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent" />
 
         <div className="relative">
 
-          <h3 className="text-[17px] font-bold truncate">
+          {/* Track Title */}
+
+          <h3 className="truncate text-[17px] font-bold transition-colors group-hover:text-fuchsia-300">
+
             {track.title}
+
           </h3>
 
+          {/* Artist */}
+
           <Link
+
             to={
               track.primaryArtist?.id
                 ? `/artist/${track.primaryArtist.id}`
                 : '#'
             }
-            className="flex items-center gap-3 mt-3 group/artist"
+
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+
+            className="group/artist mt-3 flex items-center gap-3"
           >
 
             {/* Avatar */}
@@ -230,22 +335,25 @@ TrackCard({
               ?.profileImage ? (
 
               <img
+
                 src={
                   getMediaUrl(
                     track.primaryArtist
                       ?.profileImage
                   )
                 }
+
                 alt={
                   track.primaryArtist
                     ?.stageName
                 }
-                className="w-8 h-8 rounded-full object-cover border border-white/10"
+
+                className="h-8 w-8 rounded-full border border-white/10 object-cover"
               />
 
             ) : (
 
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-[10px] font-bold text-white">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-[10px] font-bold text-white">
 
                 {(
                   track.primaryArtist
@@ -256,6 +364,7 @@ TrackCard({
                   .toUpperCase()}
 
               </div>
+
             )}
 
             {/* Meta */}
@@ -266,7 +375,7 @@ TrackCard({
 
                 <div className="flex items-center gap-1.5">
 
-                  <p className="text-sm text-white/70 truncate transition-colors group-hover/artist:text-white">
+                  <p className="truncate text-sm text-white/70 transition-colors group-hover/artist:text-white">
 
                     {track.primaryArtist
                       ?.stageName ||
@@ -274,30 +383,38 @@ TrackCard({
 
                   </p>
 
-                  <div className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-sky-400" />
 
                 </div>
 
                 {recommendationReason && (
-                  <p className="text-[11px] text-fuchsia-300/80 mt-2 line-clamp-2 leading-relaxed">
+
+                  <p className="mt-2 line-clamp-2 text-[11px] leading-relaxed text-fuchsia-300/80">
 
                     {
                       recommendationReason
                     }
 
                   </p>
+
                 )}
 
               </div>
 
-              <p className="text-[11px] text-white/35 uppercase tracking-[0.18em] mt-0.5">
+              <p className="mt-0.5 text-[11px] uppercase tracking-[0.18em] text-white/35">
+
                 Featured Artist
+
               </p>
 
             </div>
+
           </Link>
+
         </div>
+
       </div>
+
     </motion.div>
   );
 }

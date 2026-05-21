@@ -3,9 +3,25 @@ import getPublicFileUrl
 
 export default function
 serializeTrack(track) {
-  if (!track) return null;
+
+  if (!track) {
+    return null;
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Variant Intelligence
+  |--------------------------------------------------------------------------
+  */
+
+  const hasVariants =
+
+    track.isMasterTrack ||
+
+    !!track.masterTrackId;
 
   return {
+
     id: track._id,
 
     title: track.title,
@@ -16,7 +32,40 @@ serializeTrack(track) {
 
     language: track.language,
 
+    lyrics: track.lyrics,
+
+    contributors:
+      track.contributors || [],
+
+    isExplicit:
+      track.isExplicit,
+
     duration: track.duration,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Variant Relationships
+    |--------------------------------------------------------------------------
+    */
+
+    isMasterTrack:
+      track.isMasterTrack || false,
+
+    masterTrackId:
+      track.masterTrackId || null,
+
+    versionType:
+      track.versionType ||
+      'ORIGINAL',
+
+    hasVariants,
+
+    variantCount:
+      track.variantCount || 1,
+
+    /* ----------------------------------- */
+    /* Media */
+    /* ----------------------------------- */
 
     coverImage:
       track.coverImage
@@ -30,20 +79,25 @@ serializeTrack(track) {
         track.hlsMasterUrl
       ),
 
+    /* ----------------------------------- */
+    /* Artist */
+    /* ----------------------------------- */
+
     primaryArtist:
-    track.primaryArtist
-      ? {
-          id:
-            track.primaryArtist._id,
+      track.primaryArtist
+        ? {
 
-          stageName:
-            track.primaryArtist
-              .stageName,
+            id:
+              track.primaryArtist._id,
 
-          profileImage:
-            track.primaryArtist
-              .profileImage || ''
-        }
-      : null
+            stageName:
+              track.primaryArtist
+                .stageName,
+
+            profileImage:
+              track.primaryArtist
+                .profileImage || ''
+          }
+        : null
   };
 }

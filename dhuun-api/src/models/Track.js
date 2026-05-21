@@ -335,6 +335,44 @@ const trackSchema = new mongoose.Schema(
     },
 
     /* ---------------------------------------------------------------------- */
+    /* Variant Relationships */
+    /* ---------------------------------------------------------------------- */
+
+    isMasterTrack: {
+      type: Boolean,
+      default: false,
+
+      index: true,
+    },
+
+    masterTrackId: {
+      type: mongoose.Schema.Types.ObjectId,
+
+      ref: 'Track',
+
+      default: null,
+
+      index: true,
+    },
+
+    versionType: {
+      type: String,
+
+      enum: [
+        'ORIGINAL',
+        'ACOUSTIC',
+        'LIVE',
+        'REMIX',
+        'INSTRUMENTAL',
+        'LOFI',
+        'RADIO_EDIT',
+        'COVER',
+      ],
+
+      default: 'ORIGINAL',
+    },
+
+    /* ---------------------------------------------------------------------- */
     /* Publishing Workflow */
     /* ---------------------------------------------------------------------- */
 

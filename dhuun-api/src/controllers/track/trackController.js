@@ -36,6 +36,9 @@ export const createTrack =
         moods,
         tags,
         contributors,
+        isMasterTrack,
+        masterTrackId,
+        versionType,
       } = req.body;
 
       const artist =
@@ -251,6 +254,77 @@ export const createTrack =
                 );
 
             /* ----------------------------------- */
+            /* Variant Relationships */
+            /* ----------------------------------- */
+
+            let normalizedMasterTrackId =
+              null;
+
+            const parsedIsMasterTrack =
+
+            isMasterTrack === true ||
+
+            isMasterTrack === 'true';
+
+            /*
+            |--------------------------------------------------------------------------
+            | Variant Validation
+            |--------------------------------------------------------------------------
+            */
+
+            if (!parsedIsMasterTrack) {
+
+              if (!masterTrackId) {
+
+                return res.status(400)
+                  .json({
+                    success: false,
+
+                    message:
+                      'Master track selection required for variants',
+                  });
+              }
+
+              const masterTrack =
+                await Track.findById(
+                  masterTrackId
+                );
+
+              if (!masterTrack) {
+
+                return res.status(404)
+                  .json({
+                    success: false,
+
+                    message:
+                      'Master track not found',
+                  });
+              }
+
+              /*
+              |--------------------------------------------------------------------------
+              | Prevent Variant → Variant Chains
+              |--------------------------------------------------------------------------
+              */
+
+              if (
+                !masterTrack.isMasterTrack
+              ) {
+
+                return res.status(400)
+                  .json({
+                    success: false,
+
+                    message:
+                      'Selected track is not a master track',
+                  });
+              }
+
+              normalizedMasterTrackId =
+                masterTrack._id;
+            }
+
+            /* ----------------------------------- */
             /* Slug */
             /* ----------------------------------- */
 
@@ -342,6 +416,21 @@ export const createTrack =
 
                 processingStatus:
                   'READY',
+
+
+                /* ----------------------------------- */
+                /* Variant Relationships */
+                /* ----------------------------------- */
+
+                isMasterTrack:
+                  parsedIsMasterTrack,
+
+                masterTrackId:
+                  normalizedMasterTrackId,
+
+                versionType:
+                  versionType ||
+                  'ORIGINAL',
 
                 /* ----------------------------------- */
                 /* Publishing Workflow */
@@ -453,6 +542,9 @@ export const createTrack =
                 publishingStatus,
                 rejectionReason,
                 scheduledPublishAt,
+                isMasterTrack,
+                masterTrackId,
+                versionType,
               } = req.body;
 
               /* ----------------------------------- */
@@ -529,6 +621,108 @@ export const createTrack =
                       'Royalty share must equal 100%',
                   });
               }
+              
+              /* ----------------------------------- */
+              /* Variant Relationships */
+              /* ----------------------------------- */
+
+              const parsedIsMasterTrack =
+
+                isMasterTrack === true ||
+
+                isMasterTrack === 'true';
+
+              /*
+              |--------------------------------------------------------------------------
+              | Master Track
+              |--------------------------------------------------------------------------
+              */
+
+              if (parsedIsMasterTrack) {
+
+                track.isMasterTrack =
+                  true;
+
+                track.masterTrackId =
+                  null;
+              }
+
+              /*
+              |--------------------------------------------------------------------------
+              | Variant Track
+              |--------------------------------------------------------------------------
+              */
+
+              else if (
+                masterTrackId
+              ) {
+
+                const masterTrack =
+                  await Track.findById(
+                    masterTrackId
+                  );
+
+                if (!masterTrack) {
+
+                  return res.status(404)
+                    .json({
+                      success: false,
+
+                      message:
+                        'Master track not found',
+                    });
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | Prevent Variant → Variant Chains
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                  !masterTrack.isMasterTrack
+                ) {
+
+                  return res.status(400)
+                    .json({
+                      success: false,
+
+                      message:
+                        'Selected track is not a master track',
+                    });
+                }
+
+                track.isMasterTrack =
+                  false;
+
+                track.masterTrackId =
+                  masterTrack._id;
+              }
+
+              /*
+              |--------------------------------------------------------------------------
+              | Standalone Track
+              |--------------------------------------------------------------------------
+              */
+
+              else {
+
+                track.isMasterTrack =
+                  false;
+
+                track.masterTrackId =
+                  null;
+              }
+
+              /* ----------------------------------- */
+              /* Version Type */
+              /* ----------------------------------- */
+
+              if (versionType) {
+
+                track.versionType =
+                  versionType;
+              }  
 
               /* ----------------------------------- */
               /* Optional Cover Update */
@@ -781,6 +975,19 @@ export const createTrack =
 
                       processingStatus:
                         track.processingStatus,
+
+                      /* ----------------------------------- */
+                      /* Variant Relationships */
+                      /* ----------------------------------- */
+
+                      isMasterTrack:
+                        track.isMasterTrack,
+
+                      masterTrackId:
+                        track.masterTrackId,
+
+                      versionType:
+                        track.versionType,
 
                       publishingStatus:
                         track.publishingStatus,

@@ -19,6 +19,8 @@ import SearchPage
 import ArtistPage
   from '../pages/ArtistPage';
 
+import TrackDetailsPage
+  from '../pages/TrackDetailsPage';
 
 import LibraryPage
   from '../pages/LibraryPage';
@@ -27,8 +29,11 @@ export default function
 AppRoutes() {
   return (
     <BrowserRouter>
+
       <MainLayout>
+
         <Routes>
+
           <Route
             path="/"
             element={
@@ -58,15 +63,23 @@ AppRoutes() {
           />
 
           <Route
+            path="/track/:id"
+            element={
+              <TrackDetailsPage />
+            }
+          />
+
+          <Route
             path="/library"
             element={
               <LibraryPage />
             }
-          />  
-
+          />
 
         </Routes>
+
       </MainLayout>
+
     </BrowserRouter>
   );
 }

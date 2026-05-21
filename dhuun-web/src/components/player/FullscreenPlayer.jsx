@@ -22,6 +22,8 @@
     const {
         currentTrack,
 
+        queue,
+
         isPlaying,
 
         currentTime,
@@ -76,6 +78,9 @@
 
         return `${mins}:${secs}`;
     };
+
+    const hasQueue =
+    queue.length > 1;
 
     return (
         <AnimatePresence>
@@ -416,102 +421,186 @@
                 {/* Controls */}
 
                 <motion.div
-                    initial={{
+                initial={{
                     y: 20,
                     opacity: 0,
-                    }}
-                    animate={{
+                }}
+                animate={{
                     y: 0,
                     opacity: 1,
-                    }}
-                    transition={{
+                }}
+                transition={{
                     delay: 0.2,
-                    }}
-                    className="mt-8 flex items-center justify-between"
+                }}
+                className="mt-8 flex items-center justify-between"
                 >
+
+                {/* Shuffle */}
+
+                <div className="w-10 flex justify-start">
+
+                    {hasQueue && (
+
                     <button
                         onClick={
-                            toggleShuffle
+                        toggleShuffle
                         }
                         className={
-                            isShuffleEnabled
+                        isShuffleEnabled
                             ? 'text-fuchsia-400'
                             : 'text-white/60'
                         }
-                        >
-                        <Shuffle
-                            size={24}
-                        />
-                    </button>
-
-                    <button
-                    onClick={
-                        playPreviousTrack
-                    }
                     >
-                    <SkipBack
-                        size={30}
-                    />
+
+                        <Shuffle
+                        size={24}
+                        />
+
                     </button>
 
-                    <motion.button
+                    )}
+
+                </div>
+
+                {/* Previous */}
+
+                <button
+                    onClick={
+                    playPreviousTrack
+                    }
+                >
+
+                    <SkipBack
+                    size={30}
+                    />
+
+                </button>
+
+                {/* Play Pause */}
+
+                <motion.button
                     whileTap={{
-                        scale: 0.92,
+                    scale: 0.92,
                     }}
                     onClick={
-                        togglePlayPause
+                    togglePlayPause
                     }
-                    className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center shadow-2xl"
-                    >
+                    className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-black shadow-2xl"
+                >
+
                     {isPlaying ? (
-                        <Pause
+
+                    <Pause
                         size={28}
-                        />
+                    />
+
                     ) : (
-                        <Play
+
+                    <Play
                         size={28}
                         className="ml-1"
-                        />
+                    />
+
                     )}
-                    </motion.button>
+
+                </motion.button>
+
+                {/* Next */}
+
+                <button
+                    onClick={
+                    playNextTrack
+                    }
+                >
+
+                    <SkipForward
+                    size={30}
+                    />
+
+                </button>
+
+                {/* Repeat */}
+
+                <div className="w-10 flex justify-end">
+
+                    {(
+                    hasQueue ||
+
+                    !hasQueue
+                    ) && (
 
                     <button
-                    onClick={
-                        playNextTrack
+                    onClick={() => {
+
+                        /*
+                        -----------------------------------
+                        Single Track Playback
+                        -----------------------------------
+                        */
+
+                        if (!hasQueue) {
+
+                        if (
+                            repeatMode ===
+                            'one'
+                        ) {
+
+                            cycleRepeatMode();
+
+                            return;
+                        }
+
+                        cycleRepeatMode();
+
+                        return;
+                        }
+
+                        /*
+                        -----------------------------------
+                        Queue Playback
+                        -----------------------------------
+                        */
+
+                        cycleRepeatMode();
+                    }}
+
+                    className={
+                        repeatMode !== 'off'
+                        ? 'text-fuchsia-400'
+                        : 'text-white/60'
                     }
                     >
-                    <SkipForward
-                        size={30}
-                    />
+
+                    <div className="relative">
+
+                        <Repeat
+                        size={24}
+                        />
+
+                        {repeatMode ===
+                        'one' && (
+
+                        <span className="absolute -bottom-2 -right-2 text-[10px] font-bold">
+
+                            1
+
+                        </span>
+
+                        )}
+
+                    </div>
+
                     </button>
 
-                    <button
-                        onClick={
-                            cycleRepeatMode
-                        }
-                        className={
-                            repeatMode !==
-                            'off'
-                            ? 'text-fuchsia-400'
-                            : 'text-white/60'
-                        }
-                        >
-                        <div className="relative">
-                            <Repeat
-                            size={24}
-                            />
+                    )}
 
-                            {repeatMode ===
-                            'one' && (
-                            <span className="absolute -bottom-2 -right-2 text-[10px] font-bold">
-                                1
-                            </span>
-                            )}
-                        </div>
-                    </button>
+                </div>
+
                 </motion.div>
 
                 {/* Bottom Actions */}
+
+                {hasQueue && (
 
                 <motion.div
                     initial={{
@@ -523,23 +612,32 @@
                     transition={{
                     delay: 0.24,
                     }}
-                    className="mt-auto pb-[max(18px,env(safe-area-inset-bottom))] pt-6 flex items-center justify-center"
+                    className="mt-auto flex items-center justify-center pb-[max(18px,env(safe-area-inset-bottom))] pt-6"
                 >
+
                     <button
                     onClick={
                         openQueueDrawer
                     }
                     className="flex items-center gap-3 text-white/70"
                     >
+
                     <ListMusic
                         size={22}
                     />
 
                     <span className="text-sm font-medium">
+
                         Up Next
+
                     </span>
+
                     </button>
+
                 </motion.div>
+
+                )}
+
                 </motion.div>
             </motion.div>
             )}

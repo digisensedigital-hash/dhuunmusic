@@ -12,7 +12,9 @@ import serializeTrack
 export const getPublicTrackDetails =
   async (req, res) => {
     try {
-      const { id } = req.params;
+
+      const { id } =
+        req.params;
 
       const track =
         await Track.findOne({
@@ -33,30 +35,166 @@ export const getPublicTrackDetails =
 
           isActive: true,
         })
+
           .populate(
             'primaryArtist',
             'stageName profileImage bio'
           );
 
       if (!track) {
-        return res.status(404).json({
-          success: false,
 
-          message:
-            'Track not found'
-        });
+        return res.status(404)
+          .json({
+            success: false,
+
+            message:
+              'Track not found'
+          });
       }
+
+      /* ----------------------------------- */
+      /* Variant Resolution */
+      /* ----------------------------------- */
+
+      let rootMasterTrackId =
+        null;
+
+      /*
+      |--------------------------------------------------------------------------
+      | Master Track
+      |--------------------------------------------------------------------------
+      */
+
+      if (
+        track.isMasterTrack
+      ) {
+
+        rootMasterTrackId =
+          track._id;
+      }
+
+      /*
+      |--------------------------------------------------------------------------
+      | Variant Track
+      |--------------------------------------------------------------------------
+      */
+
+      else if (
+        track.masterTrackId
+      ) {
+
+        rootMasterTrackId =
+          track.masterTrackId;
+      }
+
+      /* ----------------------------------- */
+      /* Variants */
+      /* ----------------------------------- */
+
+      let variants = [];
+
+      if (rootMasterTrackId) {
+
+        const variantTracks =
+          await Track.find({
+
+            publishingStatus:
+              'PUBLISHED',
+
+            processingStatus:
+              'READY',
+
+            isActive: true,
+
+            $or: [
+
+              {
+                _id:
+                  rootMasterTrackId
+              },
+
+              {
+                masterTrackId:
+                  rootMasterTrackId
+              }
+            ]
+          })
+
+            .populate(
+              'primaryArtist',
+              'stageName profileImage'
+            )
+
+            .sort({
+              createdAt: 1
+            });
+
+        variants =
+          variantTracks.map(
+            (variantTrack) => ({
+
+              _id:
+                variantTrack._id,
+
+              title:
+                variantTrack.title,
+
+              language:
+                variantTrack.language,
+
+              versionType:
+                variantTrack.versionType,
+
+              isMasterTrack:
+                variantTrack.isMasterTrack,
+
+              coverImage:
+                variantTrack.coverImage,
+
+              primaryArtist:
+                variantTrack.primaryArtist
+                  ? {
+                      _id:
+                        variantTrack
+                          .primaryArtist
+                          ._id,
+
+                      stageName:
+                        variantTrack
+                          .primaryArtist
+                          .stageName,
+
+                      profileImage:
+                        variantTrack
+                          .primaryArtist
+                          .profileImage,
+                    }
+                  : null,
+            })
+          );
+      }
+
+      /* ----------------------------------- */
+      /* Analytics */
+      /* ----------------------------------- */
 
       const analytics =
         await TrackAnalytics.findOne({
-          trackId: track._id
+          trackId:
+            track._id
         });
+
+      /* ----------------------------------- */
+      /* Trending */
+      /* ----------------------------------- */
 
       const trending =
         await TrendingTrack.findOne({
-          trackId: track._id,
+          trackId:
+            track._id,
 
-          window: 'DAILY'
+          window:
+            'DAILY'
         });
 
       return res.json({
@@ -64,6 +202,14 @@ export const getPublicTrackDetails =
 
         track:
           serializeTrack(track),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Variants
+        |--------------------------------------------------------------------------
+        */
+
+        variants,
 
         analytics: analytics
           ? {
@@ -93,6 +239,7 @@ export const getPublicTrackDetails =
       });
 
     } catch (error) {
+
       console.error(error);
 
       return res.status(500)

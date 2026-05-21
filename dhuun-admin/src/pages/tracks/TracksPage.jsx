@@ -3,6 +3,10 @@ import {
   useState,
 } from 'react';
 
+import {
+  useSearchParams,
+} from 'react-router-dom';
+
 import toast from 'react-hot-toast';
 
 import TrackTable
@@ -23,6 +27,17 @@ import {
 } from '../../utils/media';
 
 export default function TracksPage() {
+
+  const [
+  searchParams,
+  ] = useSearchParams();
+
+  const search =
+    (
+      searchParams.get(
+        'search'
+      ) || ''
+    ).toLowerCase();
 
   /* ----------------------------------- */
   /* Upload Modal */
@@ -94,6 +109,20 @@ export default function TracksPage() {
   ] = useState('');
 
   /* ----------------------------------- */
+  /* Pagination */
+  /* ----------------------------------- */
+
+  const [
+    itemsPerPage,
+    setItemsPerPage,
+  ] = useState(10);
+
+  const [
+    currentPage,
+    setCurrentPage,
+  ] = useState(1);
+
+  /* ----------------------------------- */
   /* Fetch Tracks */
   /* ----------------------------------- */
 
@@ -126,8 +155,91 @@ export default function TracksPage() {
     };
 
   useEffect(() => {
-    fetchTracks();
+
+  fetchTracks();
+
+  /*
+  |--------------------------------------------------------------------------
+  | Auto Refresh
+  |--------------------------------------------------------------------------
+  */
+
+  const interval =
+    setInterval(() => {
+
+      fetchTracks();
+
+    }, 30000);
+
+  return () => {
+    clearInterval(interval);
+  };
+
   }, []);
+
+  /* ----------------------------------- */
+  /* Search Filtering */
+  /* ----------------------------------- */
+
+  const filteredTracks =
+    tracks.filter((track) => {
+
+      if (!search) {
+        return true;
+      }
+
+      return (
+
+        track.title
+          ?.toLowerCase()
+          .includes(search)
+
+        ||
+
+        track.artistName
+          ?.toLowerCase()
+          .includes(search)
+
+        ||
+
+        track.genre
+          ?.toLowerCase()
+          .includes(search)
+
+        ||
+
+        track.language
+          ?.toLowerCase()
+          .includes(search)
+
+        ||
+
+        track.publishingStatus
+          ?.toLowerCase()
+          .includes(search)
+      );
+    });
+
+  /* ----------------------------------- */
+  /* Pagination */
+  /* ----------------------------------- */
+
+  const totalPages =
+    Math.ceil(
+      filteredTracks.length /
+      itemsPerPage
+    );
+
+  const paginatedTracks =
+    filteredTracks.slice(
+
+      (
+        currentPage - 1
+      ) * itemsPerPage,
+
+      currentPage *
+        itemsPerPage
+      );
 
   /* ----------------------------------- */
   /* View Track */
@@ -253,7 +365,7 @@ export default function TracksPage() {
       {/* ----------------------------------- */}
 
       <TrackTable
-        tracks={tracks}
+        tracks={paginatedTracks}
         loading={loading}
         error={error}
         onView={
@@ -266,6 +378,92 @@ export default function TracksPage() {
           handleDeleteTrack
         }
       />
+
+      {/* ----------------------------------- */}
+      {/* Page Size */}
+      {/* ----------------------------------- */}
+
+      <div className="mb-4 flex justify-end">
+
+        <select
+          value={itemsPerPage}
+          onChange={(e) => {
+
+            setItemsPerPage(
+              Number(
+                e.target.value
+              )
+            );
+
+            setCurrentPage(1);
+
+          }}
+          className="rounded-2xl border border-zinc-800 bg-black px-4 py-2 text-sm text-white outline-none"
+        >
+
+          <option value={10}>
+            10 per page
+          </option>
+
+          <option value={25}>
+            25 per page
+          </option>
+
+          <option value={50}>
+            50 per page
+          </option>
+
+          <option value={100}>
+            100 per page
+          </option>
+
+        </select>
+
+      </div>  
+
+      {/* ----------------------------------- */}
+      {/* Pagination */}
+      {/* ----------------------------------- */}
+
+      <div className="mt-8 flex items-center justify-center gap-3">
+
+        <button
+          disabled={
+            currentPage === 1 ||
+            totalPages <= 1
+          }
+          onClick={() =>
+            setCurrentPage(
+              (prev) => prev - 1
+            )
+          }
+          className="rounded-2xl border border-zinc-800 bg-black px-4 py-2 text-sm text-white transition hover:border-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Previous
+        </button>
+
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 px-5 py-2 text-sm font-medium text-white">
+
+          Page {currentPage} of {Math.max(totalPages, 1)}
+
+        </div>
+
+        <button
+          disabled={
+            currentPage === totalPages ||
+            totalPages <= 1
+          }
+          onClick={() =>
+            setCurrentPage(
+              (prev) => prev + 1
+            )
+          }
+          className="rounded-2xl border border-zinc-800 bg-black px-4 py-2 text-sm text-white transition hover:border-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Next
+        </button>
+
+      </div>  
 
       {/* ----------------------------------- */}
       {/* Upload Modal */}

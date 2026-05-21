@@ -1,6 +1,7 @@
 import {
   Pause,
   Play,
+  ListMusic,
 } from 'lucide-react';
 
 import { motion }
@@ -11,8 +12,11 @@ import usePlayerStore
 
 export default function
 PlayerBar() {
+
   const {
     currentTrack,
+
+    queue,
 
     isPlaying,
 
@@ -25,6 +29,8 @@ PlayerBar() {
     togglePlayPause,
 
     openExpandedPlayer,
+
+    openQueueDrawer,
   } = usePlayerStore();
 
   // -----------------------------------
@@ -56,17 +62,23 @@ PlayerBar() {
         100
       : 0;
 
+  const hasQueue =
+    queue.length > 1;
+
   return (
-    <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-40">
+
+    <div className="fixed bottom-20 left-1/2 z-40 w-full max-w-md -translate-x-1/2 px-4">
+
       <motion.div
         layoutId="player-shell"
-        className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#18181F]/95 backdrop-blur-2xl shadow-2xl"
+        className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#18181F]/95 shadow-2xl backdrop-blur-2xl"
       >
+
         {/* -------------------------------- */}
         {/* Ambient Glow */}
         {/* -------------------------------- */}
 
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-fuchsia-500/5 to-pink-500/10 pointer-events-none" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-purple-500/10 via-fuchsia-500/5 to-pink-500/10" />
 
         {/* -------------------------------- */}
         {/* Content */}
@@ -76,17 +88,20 @@ PlayerBar() {
           onClick={
             openExpandedPlayer
           }
-          className="relative flex items-center gap-4 px-4 py-4 cursor-pointer"
+          className="relative flex cursor-pointer items-center gap-4 px-4 py-4"
         >
+
           {/* -------------------------------- */}
           {/* Artwork */}
           {/* -------------------------------- */}
 
           <motion.div
             layoutId="player-artwork"
-            className="relative w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 bg-white/5"
+            className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-2xl bg-white/5"
           >
+
             {currentTrack.coverImage ? (
+
               <img
                 src={
                   currentTrack.coverImage
@@ -94,33 +109,70 @@ PlayerBar() {
                 alt={
                   currentTrack.title
                 }
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
               />
+
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-white/20 text-3xl font-black bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500">
+
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500 text-3xl font-black text-white/20">
+
                 ♪
+
               </div>
+
             )}
+
           </motion.div>
 
           {/* -------------------------------- */}
           {/* Track Meta */}
           {/* -------------------------------- */}
 
-          <div className="flex-1 min-w-0">
-            <h3 className="text-base font-semibold truncate">
+          <div className="min-w-0 flex-1">
+
+            <h3 className="truncate text-base font-semibold">
+
               {
                 currentTrack.title
               }
+
             </h3>
 
-            <p className="text-sm text-white/50 truncate mt-1">
+            <p className="mt-1 truncate text-sm text-white/50">
+
               {currentTrack
                 .primaryArtist
                 ?.stageName ||
                 'Unknown Artist'}
+
             </p>
+
           </div>
+
+          {/* -------------------------------- */}
+          {/* Queue Button */}
+          {/* -------------------------------- */}
+
+          {hasQueue && (
+
+            <button
+              onClick={(e) => {
+
+                e.stopPropagation();
+
+                openQueueDrawer();
+              }}
+
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-white/5 text-white/70 transition hover:bg-white/10 hover:text-white"
+            >
+
+              <ListMusic
+                size={20}
+              />
+
+            </button>
+
+          )}
 
           {/* -------------------------------- */}
           {/* Playback Control */}
@@ -128,22 +180,31 @@ PlayerBar() {
 
           <button
             onClick={(e) => {
+
               e.stopPropagation();
 
               togglePlayPause();
             }}
-            className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center shadow-xl transition-transform active:scale-95"
+
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-black shadow-xl transition-transform active:scale-95"
           >
+
             {isPlaying ? (
+
               <Pause size={22} />
+
             ) : (
+
               <Play
                 size={22}
                 fill="currentColor"
                 className="ml-1"
               />
+
             )}
+
           </button>
+
         </div>
 
         {/* -------------------------------- */}
@@ -151,15 +212,19 @@ PlayerBar() {
         {/* -------------------------------- */}
 
         <div className="h-[3px] w-full bg-white/5">
+
           <motion.div
             layoutId="player-progress"
-            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-300"
+            className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300"
             style={{
               width: `${progress}%`,
             }}
           />
+
         </div>
+
       </motion.div>
+
     </div>
   );
 }
