@@ -22,14 +22,14 @@ import playlistRoutes from './routes/playlist/playlistRoutes.js';
 import libraryRoutes from './routes/library/libraryRoutes.js';
 import homeRoutes from './routes/home/homeRoutes.js';
 import playerRoutes from './routes/player/playerRoutes.js';
+import aiRoutes from './routes/ai.routes.js';
 import recommendationRoutes from './routes/recommendation/recommendationRoutes.js';
 
 /* -------------------------------------------------------------------------- */
 /* Jobs */
 /* -------------------------------------------------------------------------- */
 
-import startPublishingScheduler
-  from './jobs/publishingScheduler.js';
+import startPublishingScheduler from './jobs/publishingScheduler.js';
 
 /* -------------------------------------------------------------------------- */
 /* Environment */
@@ -163,6 +163,11 @@ app.use(
 app.use(
   '/api/recommendations',
   recommendationRoutes
+);
+
+app.use(
+  '/api/ai',
+  aiRoutes
 );
 
 /* -------------------------------------------------------------------------- */
