@@ -6,7 +6,7 @@ const API_BASE_URL =
 
 export default async function
 convertLyricsScript({
-  lyrics,
+  trackId,
   targetScript,
 }) {
 
@@ -16,7 +16,7 @@ convertLyricsScript({
       `${API_BASE_URL}/ai/script-convert`,
 
       {
-        lyrics,
+        trackId,
         targetScript,
       }
     );

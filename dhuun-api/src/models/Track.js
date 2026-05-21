@@ -223,6 +223,11 @@ const trackSchema = new mongoose.Schema(
       default: '',
     },
 
+    lyricsVersion: {
+      type: Number,
+      default: 1,
+    },
+
     isExplicit: {
       type: Boolean,
       default: false,

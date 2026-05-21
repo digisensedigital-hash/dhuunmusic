@@ -195,6 +195,45 @@ TrackDetailsPage() {
       -----------------------------------
       */
 
+      /*
+      -----------------------------------
+      Persistent Browser Cache
+      -----------------------------------
+      */
+
+      const trackId =
+        track.id || track._id;
+
+      const localCacheKey =
+        `dhuun-script-${trackId}-${script}`;
+
+      const localCache =
+        localStorage.getItem(
+          localCacheKey
+        );
+
+      if (localCache) {
+
+        setConvertedLyrics(
+          localCache
+        );
+
+        setTransliterationCache(
+          (prev) => ({
+            ...prev,
+
+            [script]:
+              localCache,
+          })
+        );
+
+        setIsScriptMenuOpen(
+          false
+        );
+
+        return;
+      }
+
       try {
 
         setConvertingLyrics(
@@ -202,15 +241,14 @@ TrackDetailsPage() {
         );
 
         const response =
-          await convertLyricsScript({
+        await convertLyricsScript({
 
-            lyrics:
-              track.lyrics,
+          trackId:
+            trackId,
 
-            targetScript:
-              script,
-          });
-
+          targetScript:
+            script,
+        });
         const renderedLyrics =
           response.lyrics;
 
@@ -226,6 +264,19 @@ TrackDetailsPage() {
               renderedLyrics,
           })
         );
+
+      /*
+      -----------------------------------
+      Persistent Browser Cache Save
+      -----------------------------------
+      */
+
+      localStorage.setItem(
+
+        `dhuun-script-${trackId}-${script}`,
+
+        renderedLyrics
+      );
 
       } catch (error) {
 

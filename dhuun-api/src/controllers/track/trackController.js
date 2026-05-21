@@ -769,6 +769,22 @@ export const createTrack =
               track.language =
                 language || track.language;
 
+              /* ----------------------------------- */
+              /* Lyrics Versioning */
+              /* ----------------------------------- */
+
+              if (
+
+                typeof lyrics === 'string' &&
+
+                lyrics !== track.lyrics
+
+              ) {
+
+                track.lyricsVersion =
+                  (track.lyricsVersion || 1) + 1;
+              }
+
               track.lyrics =
                 lyrics || track.lyrics;
 
