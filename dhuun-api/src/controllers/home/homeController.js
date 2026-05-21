@@ -47,7 +47,26 @@ export const getHomeFeed =
         })
           .sort({ rank: 1 })
           .limit(10)
-          .populate('trackId');
+          .populate({
+            path: 'trackId',
+
+            match: {
+              publishingStatus:
+                'PUBLISHED',
+
+              processingStatus:
+                'READY',
+
+              isActive: true,
+            },
+
+            populate: {
+              path: 'primaryArtist',
+
+              select:
+                'stageName profileImage',
+            },
+          });
 
       // -----------------------------------
       // Ensure Primary Artist Population
@@ -77,9 +96,18 @@ export const getHomeFeed =
 
         const fallbackTracks =
         await Track.find({
-            _id: {
+
+          _id: {
             $nin: existingIds
-            }
+          },
+
+          publishingStatus:
+            'PUBLISHED',
+
+          processingStatus:
+            'READY',
+
+          isActive: true,
         })
             .sort({
               createdAt: -1
@@ -141,9 +169,19 @@ export const getHomeFeed =
                 .sort({
                 playedAt: -1
                 })
-                .limit(10)
+                .limit(50)
                 .populate({
                 path: 'trackId',
+
+                match: {
+                  publishingStatus:
+                    'PUBLISHED',
+
+                  processingStatus:
+                    'READY',
+
+                  isActive: true,
+                },
                 populate: {
                     path: 'primaryArtist',
                     select:
@@ -164,9 +202,19 @@ export const getHomeFeed =
                 .sort({
                 savedAt: -1
                 })
-                .limit(10)
+                .limit(50)
                 .populate({
                 path: 'trackId',
+
+                match: {
+                  publishingStatus:
+                    'PUBLISHED',
+
+                  processingStatus:
+                    'READY',
+
+                  isActive: true,
+                },
                 populate: {
                     path: 'primaryArtist',
                     select:
@@ -231,12 +279,22 @@ export const getHomeFeed =
             ),
 
           recentlyPlayed:
-            recentlyPlayed.map(
+          recentlyPlayed
+            .filter(
+              (item) => item.trackId
+            )
+            .slice(0, 10)
+            .map(
               serializeRecentlyPlayed
             ),
 
           savedTracks:
-            savedTracks.map(
+          savedTracks
+            .filter(
+              (item) => item.trackId
+            )
+            .slice(0, 10)
+            .map(
               serializeSavedTrack
             ),
 

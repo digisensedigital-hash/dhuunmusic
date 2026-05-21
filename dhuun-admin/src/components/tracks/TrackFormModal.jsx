@@ -55,6 +55,19 @@ export default function TrackFormModal({
     moods: '',
 
     tags: '',
+
+    /* ----------------------------------- */
+    /* Publishing Workflow */
+    /* ----------------------------------- */
+
+    publishingStatus:
+      'DRAFT',
+
+    rejectionReason:
+      '',
+
+    scheduledPublishAt:
+  '',
   });
 
   const [
@@ -154,7 +167,28 @@ useEffect(() => {
     tags:
       initialData.tags?.join(', ') ||
       '',
-  });
+
+    /* ----------------------------------- */
+    /* Publishing Workflow */
+    /* ----------------------------------- */
+
+    publishingStatus:
+      initialData.publishingStatus ||
+      'DRAFT',
+
+    rejectionReason:
+      initialData.rejectionReason ||
+      '',
+
+    scheduledPublishAt:
+      initialData.scheduledPublishAt
+        ? new Date(
+            initialData.scheduledPublishAt
+          )
+            .toISOString()
+            .split('T')[0]
+        : '',
+      });
 
   setContributors(
     initialData.contributors
@@ -460,6 +494,25 @@ const handleUpload =
       formData.append(
         'isrc',
         form.isrc
+      );
+
+      /* ----------------------------------- */
+      /* Publishing Workflow */
+      /* ----------------------------------- */
+
+      formData.append(
+        'publishingStatus',
+        form.publishingStatus
+      );
+
+      formData.append(
+        'rejectionReason',
+        form.rejectionReason
+      );
+
+      formData.append(
+        'scheduledPublishAt',
+        form.scheduledPublishAt
       );
 
       /* ----------------------------------- */
@@ -914,6 +967,176 @@ const handleUpload =
               className="w-full rounded-2xl border border-zinc-800 bg-black px-4 py-4 text-white outline-none"
               placeholder="Paste song lyrics..."
             />
+          </div>
+
+          /* ----------------------------------- */
+          /* Publishing Workflow */
+          /* ----------------------------------- */
+
+          <div className="rounded-3xl border border-zinc-800 bg-black p-6">
+
+            <h3 className="text-lg font-semibold text-white">
+              Publishing Workflow
+            </h3>
+
+            <p className="mt-1 text-sm text-zinc-500">
+              Control review lifecycle, publishing visibility, and moderation status.
+            </p>
+
+            <div className="mt-6 grid grid-cols-2 gap-6">
+
+              {/* Publishing Status */}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-zinc-300">
+                  Publishing Status
+                </label>
+
+                <select
+                  value={
+                    form.publishingStatus
+                  }
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+
+                      publishingStatus:
+                        e.target.value,
+                    })
+                  }
+                  className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-4 text-white outline-none"
+                >
+
+                  <option value="DRAFT">
+                    DRAFT
+                  </option>
+
+                  <option value="UNDER_REVIEW">
+                    UNDER REVIEW
+                  </option>
+
+                  <option value="PUBLISHED">
+                    PUBLISHED
+                  </option>
+
+                  <option value="HIDDEN">
+                    HIDDEN
+                  </option>
+
+                  <option value="REJECTED">
+                    REJECTED
+                  </option>
+
+                  <option value="TAKEDOWN">
+                    TAKEDOWN
+                  </option>
+
+                </select>
+              </div>
+
+              {/* Scheduled Publish */}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-zinc-300">
+                  Scheduled Publish Date
+                </label>
+
+                <input
+                  type="date"
+                  value={
+                    form.scheduledPublishAt
+                  }
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+
+                      scheduledPublishAt:
+                        e.target.value,
+                    })
+                  }
+                  className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-4 text-white outline-none"
+                />
+              </div>
+
+            </div>
+
+            {/* Rejection Reason */}
+
+            {(form.publishingStatus ===
+              'REJECTED' ||
+              form.publishingStatus ===
+              'TAKEDOWN') && (
+
+              <div className="mt-6">
+
+                <label className="mb-2 block text-sm font-medium text-zinc-300">
+                  Rejection / Takedown Reason
+                </label>
+
+                <textarea
+                  rows={4}
+                  value={
+                    form.rejectionReason
+                  }
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+
+                      rejectionReason:
+                        e.target.value,
+                    })
+                  }
+                  className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-4 text-white outline-none"
+                  placeholder="Explain why this track was rejected or removed..."
+                />
+
+              </div>
+            )}
+
+            {/* Review Metadata */}
+
+            {mode === 'edit' &&
+              initialData && (
+
+              <div className="mt-6 grid grid-cols-2 gap-6">
+
+                <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+
+                  <p className="text-xs uppercase tracking-wide text-zinc-500">
+                    Published At
+                  </p>
+
+                  <p className="mt-2 text-sm font-medium text-white">
+                    {
+                      initialData.publishedAt
+                        ? new Date(
+                            initialData.publishedAt
+                          ).toLocaleString()
+                        : 'Not Published'
+                    }
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+
+                  <p className="text-xs uppercase tracking-wide text-zinc-500">
+                    Last Reviewed
+                  </p>
+
+                  <p className="mt-2 text-sm font-medium text-white">
+                    {
+                      initialData.reviewedAt
+                        ? new Date(
+                            initialData.reviewedAt
+                          ).toLocaleString()
+                        : 'Not Reviewed'
+                    }
+                  </p>
+                </div>
+
+              </div>
+            )}
+
           </div>
 
           {/* ----------------------------------- */}

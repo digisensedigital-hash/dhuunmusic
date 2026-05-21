@@ -15,7 +15,24 @@ export const getPublicTrackDetails =
       const { id } = req.params;
 
       const track =
-        await Track.findById(id)
+        await Track.findOne({
+          _id: id,
+
+          /*
+          |--------------------------------------------------------------------------
+          | Publishing Protection
+          |--------------------------------------------------------------------------
+          | Only publicly available tracks
+          */
+
+          publishingStatus:
+            'PUBLISHED',
+
+          processingStatus:
+            'READY',
+
+          isActive: true,
+        })
           .populate(
             'primaryArtist',
             'stageName profileImage bio'
@@ -24,7 +41,9 @@ export const getPublicTrackDetails =
       if (!track) {
         return res.status(404).json({
           success: false,
-          message: 'Track not found'
+
+          message:
+            'Track not found'
         });
       }
 
@@ -36,10 +55,11 @@ export const getPublicTrackDetails =
       const trending =
         await TrendingTrack.findOne({
           trackId: track._id,
+
           window: 'DAILY'
         });
 
-      res.json({
+      return res.json({
         success: true,
 
         track:
@@ -71,13 +91,16 @@ export const getPublicTrackDetails =
             }
           : null
       });
+
     } catch (error) {
       console.error(error);
 
-      res.status(500).json({
-        success: false,
-        message:
-          'Failed to fetch track details'
-      });
+      return res.status(500)
+        .json({
+          success: false,
+
+          message:
+            'Failed to fetch track details'
+        });
     }
   };

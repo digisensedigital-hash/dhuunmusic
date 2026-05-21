@@ -86,9 +86,19 @@ export const createTrack =
         );
 
       await generateHLS(
-        audioFile.path,
-        hlsOutputDir
-      );
+      audioFile.path,
+
+      hlsOutputDir,
+
+      /*
+      |--------------------------------------------------------------------------
+      | Track Lifecycle Automation
+      |--------------------------------------------------------------------------
+      | Temporary pre-track creation flow
+      */
+
+      null
+    );
 
       await uploadDirectoryToMinio(
         hlsOutputDir,
@@ -333,8 +343,21 @@ export const createTrack =
                 processingStatus:
                   'READY',
 
-                visibility:
-                  'PUBLISHED',
+                /* ----------------------------------- */
+                /* Publishing Workflow */
+                /* ----------------------------------- */
+
+                publishingStatus:
+                  'DRAFT',
+
+                publishedAt:
+                  null,
+
+                reviewedAt:
+                  null,
+
+                reviewedBy:
+                  null,
 
                 /* ----------------------------------- */
                 /* Contributors */
@@ -427,6 +450,9 @@ export const createTrack =
                 moods,
                 tags,
                 contributors,
+                publishingStatus,
+                rejectionReason,
+                scheduledPublishAt,
               } = req.body;
 
               /* ----------------------------------- */
@@ -589,6 +615,61 @@ export const createTrack =
 
               track.totalRoyaltyShare =
                 totalRoyaltyShare;
+              
+              /* ----------------------------------- */
+              /* Publishing Workflow */
+              /* ----------------------------------- */
+
+              if (publishingStatus) {
+
+                track.publishingStatus =
+                  publishingStatus;
+
+                /*
+                |--------------------------------------------------------------------------
+                | Publish Timestamp
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                  publishingStatus === 'PUBLISHED' &&
+                  !track.publishedAt
+                ) {
+                  track.publishedAt =
+                    new Date();
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | Review Metadata
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                  publishingStatus === 'UNDER_REVIEW' ||
+                  publishingStatus === 'REJECTED' ||
+                  publishingStatus === 'PUBLISHED'
+                ) {
+                  track.reviewedAt =
+                    new Date();
+
+                  track.reviewedBy =
+                    req.user.id;
+                }
+              }
+
+              if (
+                typeof rejectionReason !==
+                'undefined'
+              ) {
+                track.rejectionReason =
+                  rejectionReason;
+              }
+
+              if (scheduledPublishAt) {
+                track.scheduledPublishAt =
+                  scheduledPublishAt;
+              }
 
               await track.save();
 
@@ -701,8 +782,11 @@ export const createTrack =
                       processingStatus:
                         track.processingStatus,
 
-                      visibility:
-                        track.visibility,
+                      publishingStatus:
+                        track.publishingStatus,
+
+                      publishedAt:
+                        track.publishedAt,
 
                       primaryArtist:
                         track.primaryArtist,
@@ -737,6 +821,7 @@ export const createTrack =
             export const deleteTrack =
               async (req, res) => {
                 try {
+
                   const { id } =
                     req.params;
 
@@ -753,9 +838,93 @@ export const createTrack =
                       });
                   }
 
+                  /* ----------------------------------- */
+                  /* Governance Protection */
+                  /* ----------------------------------- */
+
                   /*
                   |--------------------------------------------------------------------------
-                  | TODO
+                  | Published Tracks
+                  |--------------------------------------------------------------------------
+                  | Never hard delete published content.
+                  | Convert to TAKEDOWN instead.
+                  */
+
+                  if (
+                    track.publishingStatus ===
+                    'PUBLISHED'
+                  ) {
+
+                    track.publishingStatus =
+                      'TAKEDOWN';
+
+                    track.reviewedAt =
+                      new Date();
+
+                    track.reviewedBy =
+                      req.user.id;
+
+                    await track.save();
+
+                    return res.json({
+                      success: true,
+
+                      softDeleted: true,
+
+                      message:
+                        'Published track moved to TAKEDOWN status',
+                    });
+                  }
+
+                  /*
+                  |--------------------------------------------------------------------------
+                  | Review Queue Protection
+                  |--------------------------------------------------------------------------
+                  */
+
+                  if (
+                    track.publishingStatus ===
+                    'UNDER_REVIEW'
+                  ) {
+
+                    track.publishingStatus =
+                      'HIDDEN';
+
+                    track.reviewedAt =
+                      new Date();
+
+                    track.reviewedBy =
+                      req.user.id;
+
+                    await track.save();
+
+                    return res.json({
+                      success: true,
+
+                      softDeleted: true,
+
+                      message:
+                        'Track hidden from review queue',
+                    });
+                  }
+
+                  /* ----------------------------------- */
+                  /* Hard Delete Allowed */
+                  /* ----------------------------------- */
+
+                  /*
+                  |--------------------------------------------------------------------------
+                  | Safe States
+                  |--------------------------------------------------------------------------
+                  | DRAFT
+                  | REJECTED
+                  | HIDDEN
+                  | TAKEDOWN
+                  */
+
+                  /*
+                  |--------------------------------------------------------------------------
+                  | Future Cleanup
                   |--------------------------------------------------------------------------
                   | Future:
                   | - Remove MinIO assets
@@ -771,10 +940,14 @@ export const createTrack =
                   return res.json({
                     success: true,
 
+                    hardDeleted: true,
+
                     message:
                       'Track deleted successfully',
                   });
+
                 } catch (error) {
+
                   console.error(error);
 
                   return res.status(500)

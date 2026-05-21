@@ -4,7 +4,13 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
+import path from 'path';
+
 import connectDB from './config/db.js';
+
+/* -------------------------------------------------------------------------- */
+/* Routes */
+/* -------------------------------------------------------------------------- */
 
 import authRoutes from './routes/auth/authRoutes.js';
 import artistRoutes from './routes/artist/artistRoutes.js';
@@ -18,7 +24,16 @@ import homeRoutes from './routes/home/homeRoutes.js';
 import playerRoutes from './routes/player/playerRoutes.js';
 import recommendationRoutes from './routes/recommendation/recommendationRoutes.js';
 
-import path from 'path';
+/* -------------------------------------------------------------------------- */
+/* Jobs */
+/* -------------------------------------------------------------------------- */
+
+import startPublishingScheduler
+  from './jobs/publishingScheduler.js';
+
+/* -------------------------------------------------------------------------- */
+/* Environment */
+/* -------------------------------------------------------------------------- */
 
 dotenv.config({
   path: new URL(
@@ -29,12 +44,22 @@ dotenv.config({
 
 const app = express();
 
+/* -------------------------------------------------------------------------- */
+/* Database */
+/* -------------------------------------------------------------------------- */
+
 connectDB();
+
+/* -------------------------------------------------------------------------- */
+/* Middleware */
+/* -------------------------------------------------------------------------- */
 
 app.use(
   cors({
     origin: true,
+
     credentials: true,
+
     allowedHeaders: [
       'Content-Type',
       'Authorization',
@@ -44,15 +69,22 @@ app.use(
 
 app.use(express.json());
 
+/* -------------------------------------------------------------------------- */
+/* Upload Serving */
+/* -------------------------------------------------------------------------- */
+
 app.use(
   '/uploads',
+
   express.static(
     process.env.NODE_ENV ===
       'production'
-        ? '/var/www/dhuunmusic/storage/temp'
-        : path.resolve(
-            '../storage/temp'
-          )
+
+      ? '/var/www/dhuunmusic/storage/temp'
+
+      : path.resolve(
+          '../storage/temp'
+        )
   )
 );
 
@@ -60,37 +92,95 @@ app.use(helmet());
 
 app.use(morgan('dev'));
 
+/* -------------------------------------------------------------------------- */
+/* Health */
+/* -------------------------------------------------------------------------- */
+
 app.get('/', (req, res) => {
-  res.json({
+
+  return res.json({
     success: true,
-    message: 'Dhuun API Running'
+
+    message:
+      'Dhuun API Running',
   });
 });
 
-app.use('/api/auth', authRoutes);
+/* -------------------------------------------------------------------------- */
+/* API Routes */
+/* -------------------------------------------------------------------------- */
 
-app.use('/api/artists', artistRoutes);
+app.use(
+  '/api/auth',
+  authRoutes
+);
 
-app.use('/api/tracks', trackRoutes);
+app.use(
+  '/api/artists',
+  artistRoutes
+);
 
-app.use('/api/listens', listenRoutes);
+app.use(
+  '/api/tracks',
+  trackRoutes
+);
 
-app.use('/api/analytics', analyticsRoutes);
+app.use(
+  '/api/listens',
+  listenRoutes
+);
 
-app.use('/api/discovery', discoveryRoutes);
+app.use(
+  '/api/analytics',
+  analyticsRoutes
+);
 
-app.use('/api/playlists', playlistRoutes);
+app.use(
+  '/api/discovery',
+  discoveryRoutes
+);
 
-app.use('/api/library', libraryRoutes);
+app.use(
+  '/api/playlists',
+  playlistRoutes
+);
 
-app.use('/api/home', homeRoutes);
+app.use(
+  '/api/library',
+  libraryRoutes
+);
 
-app.use('/api/player', playerRoutes);
+app.use(
+  '/api/home',
+  homeRoutes
+);
 
-app.use( '/api/recommendations', recommendationRoutes );
+app.use(
+  '/api/player',
+  playerRoutes
+);
 
-const PORT = process.env.PORT || 8000;
+app.use(
+  '/api/recommendations',
+  recommendationRoutes
+);
+
+/* -------------------------------------------------------------------------- */
+/* Start Server */
+/* -------------------------------------------------------------------------- */
+
+const PORT =
+  process.env.PORT || 8000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+
+  console.log(
+    `Server running on port ${PORT}`
+  );
+
+  /* ---------------------------------------------------------------------- */
+  /* Background Jobs */
+  /* ---------------------------------------------------------------------- */
+
+  startPublishingScheduler();
 });

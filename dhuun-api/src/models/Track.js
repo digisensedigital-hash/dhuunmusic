@@ -334,17 +334,25 @@ const trackSchema = new mongoose.Schema(
       default: '',
     },
 
-    visibility: {
+    /* ---------------------------------------------------------------------- */
+    /* Publishing Workflow */
+    /* ---------------------------------------------------------------------- */
+
+    publishingStatus: {
       type: String,
 
       enum: [
-        'PRIVATE',
-        'PENDING',
+        'DRAFT',
+        'UNDER_REVIEW',
         'PUBLISHED',
+        'HIDDEN',
+        'REJECTED',
         'TAKEDOWN',
       ],
 
-      default: 'PRIVATE',
+      default: 'DRAFT',
+
+      index: true,
     },
 
     processingStatus: {
@@ -358,6 +366,35 @@ const trackSchema = new mongoose.Schema(
       ],
 
       default: 'UPLOADED',
+
+      index: true,
+    },
+
+    publishedAt: {
+      type: Date,
+      default: null,
+    },
+
+    reviewedAt: {
+      type: Date,
+      default: null,
+    },
+
+    reviewedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
+
+    rejectionReason: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+
+    scheduledPublishAt: {
+      type: Date,
+      default: null,
     },
 
     /* ---------------------------------------------------------------------- */

@@ -273,17 +273,42 @@ export default function TrackTable({
 
             <div>
 
-              <span
-                className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
-                  track.visibility ===
-                  'PUBLISHED'
-                    ? 'bg-emerald-500/15 text-emerald-400'
-                    : 'bg-yellow-500/15 text-yellow-400'
-                }`}
-              >
-                {track.visibility}
-              </span>
-            </div>
+                <span
+                  className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
+                    track.publishingStatus ===
+                    'PUBLISHED'
+
+                      ? 'bg-emerald-500/15 text-emerald-400'
+
+                      : track.publishingStatus ===
+                        'UNDER_REVIEW'
+
+                      ? 'bg-blue-500/15 text-blue-400'
+
+                      : track.publishingStatus ===
+                        'REJECTED'
+
+                      ? 'bg-red-500/15 text-red-400'
+
+                      : track.publishingStatus ===
+                        'TAKEDOWN'
+
+                      ? 'bg-red-500/15 text-red-400'
+
+                      : track.publishingStatus ===
+                        'HIDDEN'
+
+                      ? 'bg-zinc-700/40 text-zinc-300'
+
+                      : 'bg-yellow-500/15 text-yellow-400'
+                  }`}
+                >
+                  {
+                    track.publishingStatus ||
+                    'DRAFT'
+                  }
+                </span>
+              </div>
 
             <div>
 
@@ -291,7 +316,19 @@ export default function TrackTable({
                 className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
                   track.processingStatus ===
                   'READY'
+
+                    ? 'bg-emerald-500/15 text-emerald-400'
+
+                    : track.processingStatus ===
+                      'PROCESSING'
+
                     ? 'bg-blue-500/15 text-blue-400'
+
+                    : track.processingStatus ===
+                      'FAILED'
+
+                    ? 'bg-red-500/15 text-red-400'
+
                     : 'bg-orange-500/15 text-orange-400'
                 }`}
               >
