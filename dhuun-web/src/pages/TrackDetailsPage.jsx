@@ -9,15 +9,21 @@ import {
 } from 'react-router-dom';
 
 import {
+  Check,
+  ChevronDown,
   Clock3,
   Globe,
   Music2,
   Play,
   User2,
+  X,
 } from 'lucide-react';
 
 import getTrackDetails
   from '../api/getTrackDetails';
+
+import convertLyricsScript
+  from '../api/convertLyricsScript';
 
 import {
   getMediaUrl,
@@ -54,11 +60,188 @@ TrackDetailsPage() {
     setVariants,
   ] = useState([]);
 
+  const [
+  selectedScript,
+  setSelectedScript,
+  ] = useState(
+    'Original Script'
+  );
+
+  const [
+    isScriptMenuOpen,
+    setIsScriptMenuOpen,
+  ] = useState(false);
+
+  const [
+    convertedLyrics,
+    setConvertedLyrics,
+  ] = useState('');
+
+  const [
+  convertingLyrics,
+  setConvertingLyrics,
+  ] = useState(false);
+
+  const [
+    transliterationCache,
+    setTransliterationCache,
+  ] = useState({});
+
   const playTrack =
     usePlayerStore(
       (state) =>
         state.playTrack
     );
+
+  const SCRIPT_OPTIONS = [
+
+  'Original Script',
+
+  'Roman English',
+
+  'Hindi',
+
+  'Marathi',
+
+  'Urdu',
+
+  'Arabic',
+
+  'Bengali',
+
+  'Tamil',
+
+  'Telugu',
+
+  'Malayalam',
+
+  'Gujarati',
+
+  'Punjabi',
+
+  'Japanese',
+
+  'Korean',
+
+  'Russian',
+
+  'Spanish',
+
+  'French',
+
+  ];
+
+  /* ----------------------------------- */
+  /* Script Conversion */
+  /* ----------------------------------- */
+
+  const handleScriptChange =
+    async (script) => {
+
+      setSelectedScript(
+        script
+      );
+
+      /*
+      -----------------------------------
+      Original Script
+      -----------------------------------
+      */
+
+      if (
+        script ===
+        'Original Script'
+      ) {
+
+        setConvertedLyrics(
+          ''
+        );
+
+        setIsScriptMenuOpen(
+          false
+        );
+
+        return;
+      }
+
+      /*
+      -----------------------------------
+      Cache Hit
+      -----------------------------------
+      */
+
+      if (
+        transliterationCache[
+          script
+        ]
+      ) {
+
+        setConvertedLyrics(
+          transliterationCache[
+            script
+          ]
+        );
+
+        setIsScriptMenuOpen(
+          false
+        );
+
+        return;
+      }
+
+      /*
+      -----------------------------------
+      Temporary Mock Conversion
+      -----------------------------------
+      */
+
+      try {
+
+        setConvertingLyrics(
+          true
+        );
+
+        const response =
+          await convertLyricsScript({
+
+            lyrics:
+              track.lyrics,
+
+            targetScript:
+              script,
+          });
+
+        const renderedLyrics =
+          response.lyrics;
+
+        setConvertedLyrics(
+          renderedLyrics
+        );
+
+        setTransliterationCache(
+          (prev) => ({
+            ...prev,
+
+            [script]:
+              renderedLyrics,
+          })
+        );
+
+      } catch (error) {
+
+        console.error(error);
+
+      } finally {
+
+        setConvertingLyrics(
+          false
+        );
+
+        setIsScriptMenuOpen(
+          false
+        );
+      }
+    };
 
   /* ----------------------------------- */
   /* Fetch Track */
@@ -461,15 +644,178 @@ TrackDetailsPage() {
 
           <div className="mt-16 rounded-3xl border border-zinc-800 bg-zinc-950 p-8">
 
-            <h2 className="text-2xl font-bold">
+            {/* ----------------------------------- */}
+            {/* Header */}
+            {/* ----------------------------------- */}
 
-              Lyrics
+            <div className="flex items-center justify-between gap-4">
 
-            </h2>
+              <h2 className="text-2xl font-bold">
 
-            <div className="mt-6 whitespace-pre-wrap text-lg leading-9 text-zinc-300">
+                Lyrics
 
-              {track.lyrics}
+              </h2>
+
+              <button
+                onClick={() =>
+                  setIsScriptMenuOpen(
+                    true
+                  )
+                }
+                className="flex items-center gap-2 rounded-2xl border border-fuchsia-500/20 bg-fuchsia-500/10 px-4 py-2 text-sm font-medium text-fuchsia-200 backdrop-blur-xl transition hover:border-fuchsia-400/40"
+              >
+
+                <Globe size={16} />
+
+                {selectedScript}
+
+                <ChevronDown
+                  size={16}
+                />
+
+              </button>
+
+            </div>
+
+            {/* ----------------------------------- */}
+            {/* Lyrics Content */}
+            {/* ----------------------------------- */}
+
+            <div className="mt-6 min-h-[220px]">
+
+              {convertingLyrics ? (
+
+                <div className="space-y-4 animate-pulse">
+
+                  <div className="h-4 w-3/4 rounded-full bg-zinc-800" />
+
+                  <div className="h-4 w-full rounded-full bg-zinc-800" />
+
+                  <div className="h-4 w-5/6 rounded-full bg-zinc-800" />
+
+                  <div className="h-4 w-2/3 rounded-full bg-zinc-800" />
+
+                  <div className="h-4 w-full rounded-full bg-zinc-800" />
+
+                </div>
+
+              ) : (
+
+                <div className="whitespace-pre-wrap text-lg leading-9 text-zinc-300 transition-all duration-300">
+
+                  {convertedLyrics ||
+                    track.lyrics}
+
+                </div>
+
+              )}
+
+            </div>
+
+          </div>
+
+        )}
+
+        {/* ----------------------------------- */}
+        {/* Script Selector */}
+        {/* ----------------------------------- */}
+
+        {isScriptMenuOpen && (
+
+          <div className="fixed inset-0 z-50 flex justify-center bg-black/70 backdrop-blur-sm">
+
+            <div className="absolute bottom-0 w-full max-w-md rounded-t-[36px] border-t border-zinc-800 bg-[#0B0B12] p-6">
+
+              {/* Header */}
+
+              <div className="flex items-center justify-between">
+
+                <div>
+
+                  <h3 className="text-xl font-bold">
+
+                    Read Lyrics In
+
+                  </h3>
+
+                  <p className="mt-1 text-sm text-zinc-500">
+
+                    Choose your preferred writing system
+
+                  </p>
+
+                </div>
+
+                <button
+                  onClick={() =>
+                    setIsScriptMenuOpen(
+                      false
+                    )
+                  }
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-800 bg-zinc-950"
+                >
+
+                  <X size={18} />
+
+                </button>
+
+              </div>
+
+              {/* Options */}
+
+              <div className="mt-6 max-h-[60vh] space-y-2 overflow-y-auto">
+
+                {SCRIPT_OPTIONS.map(
+                  (option) => {
+
+                    const active =
+                      selectedScript ===
+                      option;
+
+                    return (
+
+                      <button
+                        key={option}
+
+                        onClick={() =>
+                          handleScriptChange(
+                            option
+                          )
+                        }
+
+                        className={`flex w-full items-center justify-between rounded-2xl border px-5 py-4 text-left transition ${
+                          active
+                            ? 'border-fuchsia-500/30 bg-fuchsia-500/10'
+                            : 'border-zinc-800 bg-zinc-950 hover:border-zinc-700'
+                        }`}
+                      >
+
+                        <div>
+
+                          <p className="font-medium">
+
+                            {option}
+
+                          </p>
+
+                        </div>
+
+                        {active && (
+
+                          <Check
+                            size={18}
+                            className="text-fuchsia-300"
+                          />
+
+                        )}
+
+                      </button>
+
+                    );
+                  }
+                )}
+
+              </div>
 
             </div>
 

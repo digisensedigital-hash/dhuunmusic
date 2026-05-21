@@ -71,11 +71,6 @@ GlobalPlayer() {
     const streamUrl =
       currentTrack.streamUrl;
 
-    console.log(
-      'Loading stream:',
-      streamUrl
-    );
-
     setAudioRef(audio);
 
     // -----------------------------------
@@ -117,9 +112,6 @@ GlobalPlayer() {
       activeTrackSessionRef.current ===
       currentTrack.id
     ) {
-      console.log(
-        '[LISTEN_SESSION_ALREADY_ACTIVE]'
-      );
     } else {
       activeTrackSessionRef.current =
         currentTrack.id;
@@ -136,11 +128,6 @@ GlobalPlayer() {
           ) {
             sessionRef.current =
               response.sessionId;
-
-            console.log(
-              '[LISTEN_SESSION_STARTED]',
-              response.sessionId
-            );
 
             // -----------------------------------
             // Heartbeat Loop
@@ -211,9 +198,6 @@ GlobalPlayer() {
         'application/vnd.apple.mpegurl'
       )
     ) {
-      console.log(
-        'Using native HLS'
-      );
 
       audio.src =
         streamUrl;
@@ -234,9 +218,6 @@ GlobalPlayer() {
     else if (
       Hls.isSupported()
     ) {
-      console.log(
-        'Using HLS.js'
-      );
 
       const hls =
         new Hls({
@@ -257,9 +238,6 @@ GlobalPlayer() {
       hls.on(
         Hls.Events.MANIFEST_PARSED,
         () => {
-          console.log(
-            'Manifest parsed'
-          );
 
           if (isPlaying) {
             audio
@@ -362,16 +340,10 @@ GlobalPlayer() {
 
     const handleWaiting =
       () => {
-        console.log(
-          '[AUDIO_WAITING]'
-        );
       };
 
     const handleCanPlay =
       () => {
-        console.log(
-          '[AUDIO_CANPLAY]'
-        );
     };
 
     // -----------------------------------
@@ -386,10 +358,6 @@ GlobalPlayer() {
         ) {
           return;
         }
-
-        console.log(
-          '[VISIBILITY_RESUME]'
-        );
 
         // -----------------------------------
         // Soft Resume Retry Loop
@@ -433,11 +401,6 @@ GlobalPlayer() {
 
               try {
                 await audio.play();
-
-                console.log(
-                  '[AUDIO_RESUME_RETRY]',
-                  attempts
-                );
               } catch (error) {
                 console.error(
                   '[AUDIO_RESUME_FAILED]',
@@ -678,10 +641,6 @@ GlobalPlayer() {
     // -----------------------------------
     // Intelligent Continuation
     // -----------------------------------
-
-    console.log(
-      '[SMART_QUEUE_PREFETCH]'
-    );
 
     // -----------------------------------
     // Fetch Intelligent Recommendations
