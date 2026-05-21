@@ -13,6 +13,7 @@ export const createArtist =
       const {
         stageName,
         bio,
+        isVerified,
       } = req.body;
 
       const existingArtist =
@@ -38,11 +39,15 @@ export const createArtist =
 
           bio,
 
+          isVerified:
+            isVerified === true ||
+            isVerified === 'true',
+
           profileImage:
-          req.file
-            ? `/uploads/${req.file.filename}`
-            : '',
-      });
+            req.file
+              ? `/uploads/${req.file.filename}`
+              : '',
+        });
 
       res.status(201).json({
         success: true,
@@ -136,11 +141,13 @@ export const updateArtist =
         artist.artistType;
 
       if (
-        typeof isVerified ===
-        'boolean'
+        typeof isVerified !==
+        'undefined'
       ) {
+
         artist.isVerified =
-          isVerified;
+          isVerified === true ||
+          isVerified === 'true';
       }
 
       if (req.file) {

@@ -10,6 +10,10 @@ import {
   getArtists,
 } from '../../api/getArtists';
 
+import {
+  deleteArtist,
+} from '../../api/deleteArtist';
+
 import ArtistFormModal
   from '../../components/artists/ArtistFormModal';
 
@@ -38,6 +42,11 @@ export default function ArtistsPage() {
   const [
     selectedArtist,
     setSelectedArtist,
+  ] = useState(null);
+
+  const [
+    deletingArtist,
+    setDeletingArtist,
   ] = useState(null);
 
   /* ----------------------------------- */
@@ -73,7 +82,46 @@ export default function ArtistsPage() {
     fetchArtists();
   }, []);
 
+  /* ----------------------------------- */
+  /* Delete Artist */
+  /* ----------------------------------- */
+
+  const handleDelete =
+    async () => {
+
+      if (
+        !deletingArtist
+      ) {
+        return;
+      }
+
+      try {
+
+        await deleteArtist(
+          deletingArtist._id
+        );
+
+        toast.success(
+          'Artist deleted successfully'
+        );
+
+        setDeletingArtist(
+          null
+        );
+
+        fetchArtists();
+
+      } catch (error) {
+        console.error(error);
+
+        toast.error(
+          'Failed to delete artist'
+        );
+      }
+    };
+
   return (
+
     <div className="space-y-8">
 
       {/* ----------------------------------- */}
@@ -117,10 +165,6 @@ export default function ArtistsPage() {
 
       ) : artists.length === 0 ? (
 
-        /* ----------------------------------- */
-        /* Empty State */
-        /* ----------------------------------- */
-
         <div className="rounded-3xl border border-dashed border-zinc-800 bg-zinc-950 p-16 text-center">
 
           <h2 className="text-2xl font-bold text-white">
@@ -135,10 +179,6 @@ export default function ArtistsPage() {
         </div>
 
       ) : (
-
-        /* ----------------------------------- */
-        /* Artist Grid */
-        /* ----------------------------------- */
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
 
@@ -244,6 +284,11 @@ export default function ArtistsPage() {
                   </button>
 
                   <button
+                    onClick={() =>
+                      setDeletingArtist(
+                        artist
+                      )
+                    }
                     className="text-sm font-medium text-red-400 transition hover:text-red-300"
                   >
                     Delete
@@ -293,6 +338,66 @@ export default function ArtistsPage() {
           fetchArtists
         }
       />
+
+      {/* ----------------------------------- */}
+      {/* Delete Confirmation Modal */}
+      {/* ----------------------------------- */}
+
+      {deletingArtist && (
+
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6">
+
+          <div className="w-full max-w-md rounded-3xl border border-zinc-800 bg-zinc-950 p-8">
+
+            <h2 className="text-2xl font-bold text-white">
+              Delete Artist
+            </h2>
+
+            <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+
+              Are you sure you want to delete{' '}
+
+              <span className="font-semibold text-white">
+                {
+                  deletingArtist.stageName
+                }
+              </span>
+
+              ?
+
+              This action cannot be undone.
+
+            </p>
+
+            <div className="mt-8 flex items-center justify-end gap-3">
+
+              <button
+                onClick={() =>
+                  setDeletingArtist(
+                    null
+                  )
+                }
+                className="rounded-2xl border border-zinc-700 px-5 py-3 text-sm font-medium text-zinc-300 transition hover:border-zinc-500 hover:text-white"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={
+                  handleDelete
+                }
+                className="rounded-2xl bg-red-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-400"
+              >
+                Delete Artist
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
 
     </div>
   );
