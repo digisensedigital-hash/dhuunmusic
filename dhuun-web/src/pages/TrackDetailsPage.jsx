@@ -125,10 +125,6 @@ TrackDetailsPage() {
 
   'Russian',
 
-  'Spanish',
-
-  'French',
-
   ];
 
   /* ----------------------------------- */
@@ -176,15 +172,27 @@ TrackDetailsPage() {
         ]
       ) {
 
-        setConvertedLyrics(
-          transliterationCache[
-            script
-          ]
+        setConvertingLyrics(
+          true
         );
 
-        setIsScriptMenuOpen(
-          false
-        );
+        setTimeout(() => {
+
+          setConvertedLyrics(
+            transliterationCache[
+              script
+            ]
+          );
+
+          setConvertingLyrics(
+            false
+          );
+
+          setIsScriptMenuOpen(
+            false
+          );
+
+        }, 180);
 
         return;
       }
@@ -214,25 +222,37 @@ TrackDetailsPage() {
 
       if (localCache) {
 
-        setConvertedLyrics(
-          localCache
-        );
+          setConvertingLyrics(
+            true
+          );
 
-        setTransliterationCache(
-          (prev) => ({
-            ...prev,
+          setTimeout(() => {
 
-            [script]:
-              localCache,
-          })
-        );
+            setConvertedLyrics(
+              localCache
+            );
 
-        setIsScriptMenuOpen(
-          false
-        );
+            setTransliterationCache(
+              (prev) => ({
+                ...prev,
 
-        return;
-      }
+                [script]:
+                  localCache,
+              })
+            );
+
+            setConvertingLyrics(
+              false
+            );
+
+            setIsScriptMenuOpen(
+              false
+            );
+
+          }, 180);
+
+          return;
+        }
 
       try {
 
@@ -775,7 +795,7 @@ TrackDetailsPage() {
 
           <div className="fixed inset-0 z-50 flex justify-center bg-black/70 backdrop-blur-sm">
 
-            <div className="absolute bottom-0 w-full max-w-md rounded-t-[36px] border-t border-zinc-800 bg-[#0B0B12] p-6">
+            <div className="absolute bottom-0 w-full max-w-md rounded-t-[36px] border-t border-zinc-800 bg-[#0B0B12] p-6 pb-[max(2rem,env(safe-area-inset-bottom))]">
 
               {/* Header */}
 
@@ -814,9 +834,11 @@ TrackDetailsPage() {
 
               {/* Options */}
 
-              <div className="mt-6 max-h-[60vh] space-y-2 overflow-y-auto">
+              <div className="mt-6 max-h-[60vh] overflow-y-auto overscroll-contain pr-1 pb-24">
 
-                {SCRIPT_OPTIONS.map(
+                <div className="space-y-2">
+
+                  {SCRIPT_OPTIONS.map(
                   (option) => {
 
                     const active =
@@ -865,6 +887,8 @@ TrackDetailsPage() {
                     );
                   }
                 )}
+
+              </div>
 
               </div>
 

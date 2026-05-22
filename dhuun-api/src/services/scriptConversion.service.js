@@ -19,8 +19,6 @@ const SUPPORTED_SCRIPTS = [
   'Japanese',
   'Korean',
   'Russian',
-  'Spanish',
-  'French',
 ];
 
 function buildPrompt({
