@@ -683,6 +683,12 @@ const usePlayerStore =
           queue,
         }),
 
+    setPlayOrder:
+    (playOrder) =>
+      set({
+        playOrder,
+      }),
+
     setCurrentIndex:
       (index) =>
         set({

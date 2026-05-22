@@ -71,7 +71,7 @@ PlayerBar() {
 
       <motion.div
         layoutId="player-shell"
-        className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#18181F]/95 shadow-2xl backdrop-blur-2xl"
+        className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[#18181F]/95 shadow-2xl backdrop-blur-2xl"
       >
 
         {/* -------------------------------- */}
@@ -88,7 +88,7 @@ PlayerBar() {
           onClick={
             openExpandedPlayer
           }
-          className="relative flex cursor-pointer items-center gap-4 px-4 py-4"
+          className="relative flex cursor-pointer items-center gap-4 px-4 py-3"
         >
 
           {/* -------------------------------- */}
@@ -97,7 +97,7 @@ PlayerBar() {
 
           <motion.div
             layoutId="player-artwork"
-            className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-2xl bg-white/5"
+            className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-2xl bg-white/5"
           >
 
             {currentTrack.coverImage ? (
@@ -186,7 +186,7 @@ PlayerBar() {
               togglePlayPause();
             }}
 
-            className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-black shadow-xl transition-transform active:scale-95"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-black shadow-xl transition-transform active:scale-95"
           >
 
             {isPlaying ? (

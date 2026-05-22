@@ -1,7 +1,18 @@
 import {
   X,
   Music2,
+  GripVertical,
 } from 'lucide-react';
+
+import {
+  motion,
+  Reorder,
+  AnimatePresence,
+} from 'framer-motion';
+
+import {
+  useRef,
+} from 'react';
 
 import usePlayerStore
   from '../../store/playerStore';
@@ -21,21 +32,12 @@ QueueDrawer() {
     closeQueueDrawer,
 
     playQueueTrack,
+
+    setPlayOrder,
   } = usePlayerStore();
 
-  // -----------------------------------
-  // Hidden
-  // -----------------------------------
-
-  if (
-
-  !isQueueDrawerOpen ||
-
-  queue.length <= 1
-
-  ) {
-    return null;
-  }
+  const isDraggingRef =
+    useRef(false);
 
   const effectiveOrder =
     playOrder?.length
@@ -50,202 +52,384 @@ QueueDrawer() {
         queue[queueIndex]
     );
 
+  /* ----------------------------------- */
+  /* Queue Reorder */
+  /* ----------------------------------- */
+
+  const handleReorder =
+    (reorderedTracks) => {
+
+      const reorderedIndexes =
+        reorderedTracks.map(
+          (track) =>
+
+            queue.findIndex(
+              (q) =>
+
+                (
+                  q.id ||
+                  q._id
+                ) ===
+                (
+                  track.id ||
+                  track._id
+                )
+            )
+        );
+
+      setPlayOrder(
+        reorderedIndexes
+      );
+    };
+
   return (
 
-    <div className="fixed inset-0 z-[300] flex items-end bg-black/60 backdrop-blur-md">
+    <AnimatePresence>
 
-      {/* -------------------------------- */}
-      {/* Backdrop */}
-      {/* -------------------------------- */}
+      {isQueueDrawerOpen &&
 
-      <div
-        onClick={
-          closeQueueDrawer
-        }
-        className="absolute inset-0"
-      />
+      queue.length > 1 && (
 
-      {/* -------------------------------- */}
-      {/* Drawer */}
-      {/* -------------------------------- */}
+        <motion.div
 
-      <div className="relative mx-auto flex max-h-[78vh] w-full max-w-md flex-col overflow-hidden rounded-t-[36px] border-t border-white/10 bg-[#111118]">
+          initial={{
+            opacity: 0,
+          }}
 
-        {/* -------------------------------- */}
-        {/* Handle */}
-        {/* -------------------------------- */}
+          animate={{
+            opacity: 1,
+          }}
 
-        <div className="flex justify-center pb-3 pt-4">
+          exit={{
+            opacity: 0,
+          }}
 
-          <div className="h-1.5 w-14 rounded-full bg-white/15" />
+          transition={{
+            duration: 0.14,
+          }}
 
-        </div>
+          className="fixed inset-0 z-[300] flex items-end bg-black/60 backdrop-blur-md"
+        >
 
-        {/* -------------------------------- */}
-        {/* Header */}
-        {/* -------------------------------- */}
+          {/* -------------------------------- */}
+          {/* Backdrop */}
+          {/* -------------------------------- */}
 
-        <div className="flex items-center justify-between px-6 pb-5">
-
-          <div>
-
-            <h2 className="text-xl font-black text-white">
-
-              Up Next
-
-            </h2>
-
-            <p className="mt-1 text-sm text-white/40">
-
-              {queue.length}{' '}
-              tracks in queue
-
-            </p>
-
-          </div>
-
-          <button
+          <div
             onClick={
               closeQueueDrawer
             }
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-white/70"
+            className="absolute inset-0"
+          />
+
+          {/* -------------------------------- */}
+          {/* Drawer */}
+          {/* -------------------------------- */}
+
+          <motion.div
+
+            drag="y"
+
+            dragConstraints={{
+              top: 0,
+              bottom: 0,
+            }}
+
+            dragElastic={0.12}
+
+            onDragEnd={(
+              _,
+              info
+            ) => {
+
+              if (
+
+                info.offset.y > 120 ||
+
+                info.velocity.y > 500
+
+              ) {
+
+                closeQueueDrawer();
+              }
+            }}
+
+            initial={{
+              y: 500,
+            }}
+
+            animate={{
+              y: 0,
+            }}
+
+            exit={{
+              y: 420,
+              opacity: 0,
+              transition: {
+                duration: 0.18,
+                ease: 'easeOut',
+              },
+            }}
+
+            transition={{
+              type: 'spring',
+              damping: 34,
+              stiffness: 420,
+              mass: 0.7,
+            }}
+
+            className="relative mx-auto flex max-h-[78vh] w-full max-w-md flex-col overflow-hidden rounded-t-[36px] border-t border-white/10 bg-[#111118]"
           >
 
-            <X size={20} />
+            {/* -------------------------------- */}
+            {/* Handle */}
+            {/* -------------------------------- */}
 
-          </button>
+            <div
+              onClick={
+                closeQueueDrawer
+              }
+              className="flex cursor-pointer justify-center pb-3 pt-4"
+            >
 
-        </div>
+              <div className="h-1.5 w-14 rounded-full bg-white/15" />
 
-        {/* -------------------------------- */}
-        {/* Queue List */}
-        {/* -------------------------------- */}
+            </div>
 
-        <div className="overflow-y-auto px-4 pb-[max(24px,env(safe-area-inset-bottom))]">
+            {/* -------------------------------- */}
+            {/* Header */}
+            {/* -------------------------------- */}
 
-          <div className="space-y-2">
+            <div className="flex items-center justify-between px-6 pb-5">
 
-            {orderedQueue.map(
-              (
-                track,
-                playbackIndex
-              ) => {
+              <div>
 
-                const isActive =
-                  playbackIndex ===
-                  currentIndex;
+                <h2 className="text-xl font-black text-white">
 
-                return (
+                  Up Next
 
-                  <button
-                    key={
-                      track.id ||
-                      track._id ||
-                      `${track.title}-${playbackIndex}`
-                    }
+                </h2>
 
-                    onClick={() =>
-                      playQueueTrack(
-                        effectiveOrder[
-                          playbackIndex
-                        ]
-                      )
-                    }
+                <p className="mt-1 text-sm text-white/40">
 
-                    className={`flex w-full items-center gap-4 rounded-2xl px-4 py-3 transition-all ${
-                      isActive
-                        ? 'border border-white/10 bg-white/10'
-                        : 'bg-white/[0.03]'
-                    }`}
-                  >
+                  {queue.length}{' '}
+                  tracks in queue
 
-                    {/* Artwork */}
+                </p>
 
-                    <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-white/5">
+              </div>
 
-                      {track.coverImage ? (
+              <button
+                onClick={
+                  closeQueueDrawer
+                }
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-white/70"
+              >
 
-                        <img
-                          src={
-                            track.coverImage
-                          }
-                          alt={
-                            track.title
-                          }
-                          className="h-full w-full object-cover"
-                        />
+                <X size={20} />
 
-                      ) : (
+              </button>
 
-                        <div className="flex h-full w-full items-center justify-center text-white/20">
+            </div>
 
-                          <Music2
-                            size={22}
-                          />
+            {/* -------------------------------- */}
+            {/* Queue List */}
+            {/* -------------------------------- */}
 
-                        </div>
+            <div className="overflow-y-auto px-4 pb-[max(24px,env(safe-area-inset-bottom))]">
 
-                      )}
+              <Reorder.Group
 
-                    </div>
+                axis="y"
 
-                    {/* Meta */}
+                dragDirectionLock
 
-                    <div className="min-w-0 flex-1 text-left">
+                values={orderedQueue}
 
-                      <h3
-                        className={`truncate font-semibold ${
-                          isActive
-                            ? 'text-white'
-                            : 'text-white/90'
-                        }`}
-                      >
+                onReorder={
+                  handleReorder
+                }
 
-                        {
-                          track.title
+                className="space-y-2"
+              >
+
+                {orderedQueue.map(
+                  (
+                    track,
+                    playbackIndex
+                  ) => {
+
+                    const isActive =
+                      playbackIndex ===
+                      currentIndex;
+
+                    return (
+
+                      <Reorder.Item
+
+                        key={
+                          track.id ||
+                          track._id ||
+                          `${track.title}-${playbackIndex}`
                         }
 
-                      </h3>
+                        value={track}
 
-                      <p className="mt-1 truncate text-sm text-white/40">
+                        whileDrag={{
+                          scale: 1.02,
+                        }}
 
-                        {track
-                          .primaryArtist
-                          ?.stageName ||
-                          'Unknown Artist'}
+                        onDragStart={() => {
 
-                      </p>
+                          isDraggingRef.current =
+                            true;
+                        }}
 
-                    </div>
+                        onDragEnd={() => {
 
-                    {/* Playing Indicator */}
+                          setTimeout(() => {
 
-                    {isActive && (
+                            isDraggingRef.current =
+                              false;
 
-                      <div className="flex items-center gap-1">
+                          }, 120);
+                        }}
 
-                        <span className="h-4 w-1 animate-pulse rounded-full bg-purple-400" />
+                        className="list-none"
+                      >
 
-                        <span className="delay-75 h-6 w-1 animate-pulse rounded-full bg-fuchsia-400" />
+                        <button
+                          onClick={() => {
 
-                        <span className="delay-150 h-3 w-1 animate-pulse rounded-full bg-pink-400" />
+                            if (
+                              isDraggingRef.current
+                            ) {
+                              return;
+                            }
 
-                      </div>
+                            playQueueTrack(
+                              effectiveOrder[
+                                playbackIndex
+                              ]
+                            );
+                          }}
 
-                    )}
+                          className={`flex w-full items-center gap-4 rounded-2xl px-4 py-3 transition-all ${
+                            isActive
+                              ? 'border border-white/10 bg-white/10'
+                              : 'bg-white/[0.03]'
+                          }`}
+                        >
 
-                  </button>
+                          {/* Artwork */}
 
-                );
-              }
-            )}
+                          <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl bg-white/5">
 
-          </div>
+                            {track.coverImage ? (
 
-        </div>
+                              <img
+                                src={
+                                  track.coverImage
+                                }
+                                alt={
+                                  track.title
+                                }
+                                className="h-full w-full object-cover"
+                              />
 
-      </div>
+                            ) : (
 
-    </div>
+                              <div className="flex h-full w-full items-center justify-center text-white/20">
+
+                                <Music2
+                                  size={22}
+                                />
+
+                              </div>
+
+                            )}
+
+                          </div>
+
+                          {/* Meta */}
+
+                          <div className="min-w-0 flex-1 text-left">
+
+                            <h3
+                              className={`truncate font-semibold ${
+                                isActive
+                                  ? 'text-white'
+                                  : 'text-white/90'
+                              }`}
+                            >
+
+                              {
+                                track.title
+                              }
+
+                            </h3>
+
+                            <p className="mt-1 truncate text-sm text-white/40">
+
+                              {track
+                                .primaryArtist
+                                ?.stageName ||
+                                'Unknown Artist'}
+
+                            </p>
+
+                          </div>
+
+                          {/* Right Actions */}
+
+                          <div className="flex items-center gap-3">
+
+                            {/* Playing Indicator */}
+
+                            {isActive && (
+
+                              <div className="flex items-center gap-1">
+
+                                <span className="h-4 w-1 animate-pulse rounded-full bg-purple-400" />
+
+                                <span className="delay-75 h-6 w-1 animate-pulse rounded-full bg-fuchsia-400" />
+
+                                <span className="delay-150 h-3 w-1 animate-pulse rounded-full bg-pink-400" />
+
+                              </div>
+
+                            )}
+
+                            {/* Drag Handle */}
+
+                            <div className="cursor-grab text-white/20 active:cursor-grabbing">
+
+                              <GripVertical
+                                size={18}
+                              />
+
+                            </div>
+
+                          </div>
+
+                        </button>
+
+                      </Reorder.Item>
+
+                    );
+                  }
+                )}
+
+              </Reorder.Group>
+
+            </div>
+
+          </motion.div>
+
+        </motion.div>
+
+      )}
+
+    </AnimatePresence>
   );
 }
