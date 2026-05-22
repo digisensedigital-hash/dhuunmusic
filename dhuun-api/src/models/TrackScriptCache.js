@@ -26,8 +26,11 @@ const trackScriptCacheSchema = new mongoose.Schema(
     },
 
     lyricsVersion: {
-      type: Number,
-      default: 1,
+    type: Number,
+
+    required: true,
+
+    default: 1,
     },
   },
   {
