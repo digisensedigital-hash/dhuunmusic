@@ -128,32 +128,6 @@ QueueDrawer() {
 
           <motion.div
 
-            drag="y"
-
-            dragConstraints={{
-              top: 0,
-              bottom: 0,
-            }}
-
-            dragElastic={0.12}
-
-            onDragEnd={(
-              _,
-              info
-            ) => {
-
-              if (
-
-                info.offset.y > 120 ||
-
-                info.velocity.y > 500
-
-              ) {
-
-                closeQueueDrawer();
-              }
-            }}
-
             initial={{
               y: 500,
             }}
@@ -185,16 +159,44 @@ QueueDrawer() {
             {/* Handle */}
             {/* -------------------------------- */}
 
-            <div
+            <motion.div
+
+              drag="y"
+
+              dragConstraints={{
+                top: 0,
+                bottom: 0,
+              }}
+
+              dragElastic={0.18}
+
+              onDragEnd={(
+                _,
+                info
+              ) => {
+
+                if (
+
+                  info.offset.y > 80 ||
+
+                  info.velocity.y > 400
+
+                ) {
+
+                  closeQueueDrawer();
+                }
+              }}
+
               onClick={
                 closeQueueDrawer
               }
+
               className="flex cursor-pointer justify-center pb-3 pt-4"
             >
 
               <div className="h-1.5 w-14 rounded-full bg-white/15" />
 
-            </div>
+            </motion.div>
 
             {/* -------------------------------- */}
             {/* Header */}
