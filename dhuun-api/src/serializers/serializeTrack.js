@@ -34,6 +34,16 @@ serializeTrack(track) {
 
     lyrics: track.lyrics,
 
+    allowMeaningGeneration:
+    track.allowMeaningGeneration,
+
+    syncedLyrics:
+      track.syncedLyrics || [],
+
+    syncedLyricsStatus:
+      track.syncedLyricsStatus ||
+      'NONE',
+
     contributors:
       track.contributors || [],
 

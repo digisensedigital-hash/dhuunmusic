@@ -38,11 +38,11 @@ export default function LyricsPanel({
       {/* Floating Lyrics Toolbar */}
       {/* ----------------------------------- */}
 
-      <div className="sticky top-20 z-20 flex items-center justify-between gap-4 border-b border-white/5 bg-[#0A0A10]/90 px-5 py-4 backdrop-blur-2xl">
+      <div className="border-b border-white/5 px-6 py-5">
 
-        {/* Left */}
+        {/* Header */}
 
-        <div className="min-w-0 flex-1">
+        <div>
 
           <p className="text-xs uppercase tracking-[0.32em] text-zinc-500">
 
@@ -50,7 +50,7 @@ export default function LyricsPanel({
 
           </p>
 
-          <h2 className="mt-1 text-xl font-black tracking-tight text-white">
+          <h2 className="mt-2 text-3xl font-black leading-none tracking-tight text-white">
 
             Feel Every Line
 
@@ -58,9 +58,17 @@ export default function LyricsPanel({
 
         </div>
 
+      </div>
+
+      {/* ----------------------------------- */}
+      {/* Lyrics Body */}
+      {/* ----------------------------------- */}
+
+      <div className="border-t border-white/5 px-6 pt-6">
+
         {/* Controls */}
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-center gap-3 px-1 pb-8 pt-5">
 
           {/* Script */}
 
@@ -71,7 +79,7 @@ export default function LyricsPanel({
               )
             }
 
-            className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-white transition hover:border-white/20 hover:bg-white/[0.06]"
+            className="flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-medium text-white transition hover:border-white/20 hover:bg-white/[0.06]"
           >
 
             <Globe size={15} />
@@ -86,37 +94,50 @@ export default function LyricsPanel({
 
           {/* Meaning Toggle */}
 
-          <button
-            onClick={
-              handleMeaningToggle
-            }
+          {track?.allowMeaningGeneration
+            ?? true ? (
 
-            className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition ${
-              meaningEnabled
-                ? 'border-fuchsia-500/20 bg-fuchsia-500/10 text-fuchsia-100'
-                : 'border-white/10 bg-white/[0.04] text-zinc-400'
-            }`}
-          >
+            <button
+              onClick={
+                handleMeaningToggle
+              }
+
+              className={`flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition ${
+                meaningEnabled
+                  ? 'border-fuchsia-500/20 bg-fuchsia-500/10 text-fuchsia-100'
+                  : 'border-white/10 bg-white/[0.04] text-zinc-400'
+              }`}
+            >
+
+              <Languages
+                size={15}
+              />
+
+              {meaningEnabled
+                ? 'Meaning On'
+                : 'Meaning'}
+
+            </button>
+
+          ) : (
+
+            <div className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-sm font-medium text-zinc-500">
 
             <Languages
               size={15}
             />
 
-            {meaningEnabled
-              ? 'Meaning On'
-              : 'Meaning'}
+            <span className="whitespace-nowrap">
 
-          </button>
+              Meaning Unavailable
+
+            </span>
+
+          </div>
+
+          )}
 
         </div>
-
-      </div>
-
-      {/* ----------------------------------- */}
-      {/* Lyrics Body */}
-      {/* ----------------------------------- */}
-
-      <div className="lyrics-scroll flex-1 overflow-y-auto px-6 py-4 [scrollbar-width:none] [-ms-overflow-style:none]">
 
         {convertingLyrics ? (
 
@@ -154,7 +175,7 @@ export default function LyricsPanel({
 
         ) : (
 
-          <div className="space-y-5 px-1 pb-16 pt-24">
+          <div className="lyrics-scroll max-h-[65vh] overflow-y-auto space-y-5 border-t border-white/5 px-1 pt-8 pb-16 pr-2">
 
             {(
               convertedLyrics ||

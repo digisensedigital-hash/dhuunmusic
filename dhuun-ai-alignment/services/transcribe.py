@@ -30,8 +30,12 @@ def transcribe_audio(
 
     segments, info = (
         model.transcribe(
+
             audio_path,
-            beam_size=5
+
+            beam_size=5,
+
+            word_timestamps=True
         )
     )
 
@@ -43,6 +47,32 @@ def transcribe_audio(
     transcript_segments = []
 
     for segment in segments:
+
+        words = []
+
+        if segment.words:
+
+            for word in (
+                segment.words
+            ):
+
+                words.append({
+
+                    "word":
+                        word.word.strip(),
+
+                    "start":
+                        round(
+                            word.start,
+                            2
+                        ),
+
+                    "end":
+                        round(
+                            word.end,
+                            2
+                        )
+                })
 
         transcript_segments.append({
 
@@ -57,8 +87,10 @@ def transcribe_audio(
             ),
 
             "text":
-                segment.text.strip()
+                segment.text.strip(),
 
+            "words":
+                words
         })
 
     return transcript_segments

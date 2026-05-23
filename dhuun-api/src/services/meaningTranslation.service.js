@@ -47,6 +47,20 @@ translateLyricsMeaning({
   }
 
   if (
+  !track.allowMeaningGeneration
+  ) {
+
+    const error =
+      new Error(
+        'Meaning generation disabled for this track'
+      );
+
+    error.statusCode = 403;
+
+    throw error;
+  }
+
+  if (
     !track.lyrics?.trim()
   ) {
 

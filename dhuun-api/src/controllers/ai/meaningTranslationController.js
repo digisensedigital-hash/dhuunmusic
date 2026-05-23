@@ -65,7 +65,9 @@ translateLyricsMeaningController =
         error
       );
 
-      return res.status(500)
+      return res.status(
+        error.statusCode || 500
+      )
         .json({
 
           success: false,
@@ -76,4 +78,4 @@ translateLyricsMeaningController =
             'Failed to translate lyrics meaning',
         });
     }
-  };
+   };

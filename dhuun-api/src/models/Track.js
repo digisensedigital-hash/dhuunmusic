@@ -228,6 +228,67 @@ const trackSchema = new mongoose.Schema(
       default: 1,
     },
 
+    allowMeaningGeneration: {
+      type: Boolean,
+      default: true,
+    },
+
+    /* ---------------------------------------------------------------------- */
+    /* Synced Lyrics */
+    /* ---------------------------------------------------------------------- */
+
+    syncedLyrics: [
+      {
+        startTime: {
+          type: Number,
+          required: true,
+        },
+
+        endTime: {
+          type: Number,
+          default: 0,
+        },
+
+        text: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+
+        words: [
+          {
+            word: {
+              type: String,
+              required: true,
+            },
+
+            startTime: {
+              type: Number,
+              required: true,
+            },
+
+            endTime: {
+              type: Number,
+              required: true,
+            },
+          },
+        ],
+      },
+    ],
+
+    syncedLyricsStatus: {
+      type: String,
+
+      enum: [
+        'NONE',
+        'PROCESSING',
+        'READY',
+        'FAILED',
+      ],
+
+      default: 'NONE',
+    },
+
     isExplicit: {
       type: Boolean,
       default: false,

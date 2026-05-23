@@ -93,6 +93,9 @@ export default function TrackFormModal({
 
     lyrics: '',
 
+    allowMeaningGeneration:
+    true,
+
     releaseType:
       'SINGLE',
 
@@ -215,6 +218,9 @@ export default function TrackFormModal({
 
     lyrics:
       initialData.lyrics || '',
+
+    allowMeaningGeneration:
+      initialData.allowMeaningGeneration ?? true,
 
     releaseType:
       initialData.releaseType ||
@@ -585,6 +591,11 @@ const handleUpload =
       formData.append(
         'lyrics',
         form.lyrics
+      );
+
+      formData.append(
+        'allowMeaningGeneration',
+        form.allowMeaningGeneration
       );
 
       formData.append(
@@ -1283,6 +1294,46 @@ const handleUpload =
               className="w-full rounded-2xl border border-zinc-800 bg-black px-4 py-4 text-white outline-none"
               placeholder="Paste song lyrics..."
             />
+          </div>
+
+          {/* ----------------------------------- */}
+          {/* AI Meaning Controls */}
+          {/* ----------------------------------- */}
+
+          <div className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-black px-5 py-4">
+
+            <div>
+
+              <p className="font-medium text-white">
+                Allow AI Meaning Generation
+              </p>
+
+              <p className="mt-1 text-sm text-zinc-500">
+                Disable for devotional, spiritual,
+                qawwali, or sensitive poetic tracks.
+              </p>
+
+            </div>
+
+            <input
+              type="checkbox"
+
+              checked={
+                form.allowMeaningGeneration
+              }
+
+              onChange={(e) =>
+                setForm({
+                  ...form,
+
+                  allowMeaningGeneration:
+                    e.target.checked,
+                })
+              }
+
+              className="h-5 w-5"
+            />
+
           </div>
 
           /* ----------------------------------- */

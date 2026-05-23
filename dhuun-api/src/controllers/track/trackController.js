@@ -16,6 +16,8 @@ import getAudioMetadata from '../../services/media/getAudioMetadata.js';
 
 import generateHLS from '../../services/media/generateHLS.js';
 
+import generateSyncedLyrics from '../../services/ai/generateSyncedLyrics.js';
+
 /* ----------------------------------- */
 /* Create Track */
 /* ----------------------------------- */
@@ -39,6 +41,7 @@ export const createTrack =
         isMasterTrack,
         masterTrackId,
         versionType,
+        allowMeaningGeneration,
       } = req.body;
 
       const artist =
@@ -359,6 +362,9 @@ export const createTrack =
 
                 lyrics,
 
+                allowMeaningGeneration:
+                  allowMeaningGeneration !== 'false',
+
                 releaseType,
 
                 releaseDate,
@@ -460,12 +466,118 @@ export const createTrack =
               });
 
             /* ----------------------------------- */
-            /* Cleanup */
+            /* Background Synced Lyrics Generation */
             /* ----------------------------------- */
 
-            fs.unlinkSync(
-              audioFile.path
-            );
+              if (
+              track.lyrics &&
+              audioFile?.path
+            ) {
+
+              track.syncedLyricsStatus =
+                'PROCESSING';
+
+              await track.save();
+
+              const aiTempPath =
+                path.resolve(
+                  '../storage/temp-ai',
+                  `${Date.now()}-${audioFile.originalname}`
+                );
+
+              fs.mkdirSync(
+                path.dirname(aiTempPath),
+                {
+                  recursive: true,
+                }
+              );
+
+              fs.copyFileSync(
+                audioFile.path,
+                aiTempPath
+              );
+
+              generateSyncedLyrics({
+
+                audioPath:
+                  aiTempPath,
+
+                lyrics:
+                  track.lyrics,
+
+              })
+
+                .then(
+
+                  async (
+                    syncedLyrics
+                  ) => {
+
+                    if (
+                      syncedLyrics.length
+                    ) {
+
+                      track.syncedLyrics =
+                        syncedLyrics;
+
+                      track.syncedLyricsStatus =
+                        'READY';
+
+                    } else {
+
+                      track.syncedLyricsStatus =
+                        'FAILED';
+                    }
+
+                    await track.save();
+
+                    console.log(
+                      '✅ Synced lyrics generated'
+                    );
+
+                    if (
+                      fs.existsSync(
+                        aiTempPath
+                      )
+                    ) {
+
+                      fs.unlinkSync(
+                        aiTempPath
+                      );
+                    }}
+                )
+
+                .catch(
+                  async (error) => {
+
+                    console.error(
+                      '❌ Synced lyrics failed'
+                    );
+
+                    console.error(error);
+
+                    track.syncedLyricsStatus =
+                      'FAILED';
+
+                    await track.save();
+
+                    if (
+                      fs.existsSync(
+                        aiTempPath
+                      )
+                    ) {
+
+                      fs.unlinkSync(
+                        aiTempPath
+                      );
+                    }
+                  }
+                );
+            }
+
+            /* ----------------------------------- */
+            /* Cleanup */
+            /* ----------------------------------- */
 
             if (
               req.files
@@ -545,6 +657,7 @@ export const createTrack =
                 isMasterTrack,
                 masterTrackId,
                 versionType,
+                allowMeaningGeneration,
               } = req.body;
 
               /* ----------------------------------- */
@@ -823,10 +936,118 @@ export const createTrack =
 
                 track.audioFormat =
                   metadata.format;
+                
+                /* ----------------------------------- */
+                /* Regenerate Synced Lyrics */
+                /* ----------------------------------- */
 
-                fs.unlinkSync(
-                  audioFile.path
-                );
+                if (
+                  lyrics || track.lyrics
+                ) {
+
+                  track.syncedLyricsStatus =
+                    'PROCESSING';
+
+                  await track.save();
+
+                  const aiTempPath =
+                    path.resolve(
+                      '../storage/temp-ai',
+                      `${Date.now()}-${audioFile.originalname}`
+                    );
+
+                  fs.mkdirSync(
+                    path.dirname(aiTempPath),
+                    {
+                      recursive: true,
+                    }
+                  );
+
+                  fs.copyFileSync(
+                    audioFile.path,
+                    aiTempPath
+                  );
+
+                  generateSyncedLyrics({
+
+                    audioPath:
+                      aiTempPath,
+
+                    lyrics:
+                      lyrics || track.lyrics,
+
+                  })
+
+                    .then(
+
+                      async (
+                        syncedLyrics
+                      ) => {
+
+                        if (
+                          syncedLyrics.length
+                        ) {
+
+                          track.syncedLyrics =
+                            syncedLyrics;
+
+                          track.syncedLyricsStatus =
+                            'READY';
+
+                        } else {
+
+                          track.syncedLyricsStatus =
+                            'FAILED';
+                        }
+
+                        await track.save();
+
+                        console.log(
+                          '✅ Synced lyrics regenerated'
+                        );
+
+                        if (
+                          fs.existsSync(
+                            audioFile.path
+                          )
+                        ) {
+
+                          fs.unlinkSync(
+                            aiTempPath
+                          );
+                        }
+
+                      }
+                    )
+
+                    .catch(
+                      async (error) => {
+
+                        console.error(
+                          '❌ Synced lyrics regeneration failed'
+                        );
+
+                        console.error(error);
+
+                        track.syncedLyricsStatus =
+                          'FAILED';
+
+                        await track.save();
+
+                        if (
+                          fs.existsSync(
+                            aiTempPath
+                          )
+                        ) {
+
+                          fs.unlinkSync(
+                            aiTempPath
+                          );
+                        }
+
+                      }
+                    );
+                }  
 
                 fs.rmSync(
                   hlsOutputDir,
@@ -872,6 +1093,15 @@ export const createTrack =
 
               track.lyrics =
                 lyrics || track.lyrics;
+
+              if (
+                typeof allowMeaningGeneration !==
+                'undefined'
+              ) {
+
+                track.allowMeaningGeneration =
+                  allowMeaningGeneration !== 'false';
+              }
 
               track.releaseType =
                 releaseType ||
@@ -1024,6 +1254,9 @@ export const createTrack =
 
                       lyrics:
                         track.lyrics,
+
+                      allowMeaningGeneration:
+                        track.allowMeaningGeneration,
 
                       moods:
                         track.moods,

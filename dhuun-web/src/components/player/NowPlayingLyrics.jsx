@@ -38,18 +38,55 @@ NowPlayingLyrics({
   -----------------------------------
   */
 
+  const activeIndex =
+    syncedLyrics.findIndex(
+
+      (line) =>
+
+        currentTime >=
+          line.startTime &&
+
+        currentTime <=
+          line.endTime
+    );
+
   const activeLine =
-    syncedLyrics
-      .slice()
-      .reverse()
-      .find(
+    activeIndex >= 0
 
-        (line) =>
+      ? syncedLyrics[
+          activeIndex
+        ]
 
-          currentTime >=
-          line.startTime
+      : null;
 
-      );
+  /*
+  -----------------------------------
+  Progress %
+  -----------------------------------
+  */
+
+  const progress =
+
+    activeLine
+
+      ? Math.min(
+
+          (
+            (
+              currentTime -
+              activeLine.startTime
+            ) /
+
+            (
+              activeLine.endTime -
+              activeLine.startTime
+            )
+          ) * 100,
+
+          100
+        )
+
+      : 0;
 
   /*
   -----------------------------------
@@ -61,7 +98,7 @@ NowPlayingLyrics({
 
     return (
 
-      <div className="h-[140px]" />
+      <div className="h-[120px]" />
 
     );
   }
@@ -78,12 +115,12 @@ NowPlayingLyrics({
         items-center
         justify-center
         overflow-hidden
-        px-6
+        px-8
       "
     >
 
       {/* ----------------------------------- */}
-      {/* Ambient Glow */}
+      {/* Ambient Background */}
       {/* ----------------------------------- */}
 
       <div
@@ -93,7 +130,7 @@ NowPlayingLyrics({
           inset-0
           bg-gradient-to-b
           from-transparent
-          via-fuchsia-500/[0.05]
+          via-fuchsia-500/[0.03]
           to-transparent
         "
       />
@@ -102,24 +139,39 @@ NowPlayingLyrics({
       {/* Center Glow */}
       {/* ----------------------------------- */}
 
-      <div
+      <motion.div
+
+        animate={{
+          opacity:
+            0.18 +
+            (progress / 100) * 0.35,
+
+          scale:
+            0.96 +
+            (progress / 100) * 0.08,
+        }}
+
+        transition={{
+          duration: 0.35,
+        }}
+
         className="
           pointer-events-none
           absolute
           left-1/2
           top-1/2
-          h-[110px]
-          w-[90%]
+          h-[100px]
+          w-[88%]
           -translate-x-1/2
           -translate-y-1/2
           rounded-full
-          bg-white/[0.04]
+          bg-white/[0.05]
           blur-3xl
         "
       />
 
       {/* ----------------------------------- */}
-      {/* Active Line */}
+      {/* Lyrics */}
       {/* ----------------------------------- */}
 
       <AnimatePresence
@@ -128,13 +180,13 @@ NowPlayingLyrics({
 
         <motion.div
 
-          key={activeLine.text}
+          key={`${activeIndex}-${activeLine.text}`}
 
           initial={{
             opacity: 0,
-            y: 24,
-            scale: 0.96,
-            filter: 'blur(12px)',
+            y: 26,
+            scale: 0.985,
+            filter: 'blur(14px)',
           }}
 
           animate={{
@@ -146,9 +198,9 @@ NowPlayingLyrics({
 
           exit={{
             opacity: 0,
-            y: -24,
-            scale: 0.96,
-            filter: 'blur(12px)',
+            y: -26,
+            scale: 0.985,
+            filter: 'blur(14px)',
           }}
 
           transition={{
@@ -160,28 +212,76 @@ NowPlayingLyrics({
             relative
             z-10
             flex
+            max-w-full
             items-center
             justify-center
           "
         >
 
-          <p
-
+          <div
             className="
-              max-w-[92%]
-              text-center
-              text-[34px]
-              font-semibold
-              leading-[1.5]
-              tracking-[-0.03em]
-              text-white
-              drop-shadow-[0_0_36px_rgba(255,255,255,0.24)]
+              relative
+              overflow-hidden
             "
           >
 
-            {activeLine.text}
+            {/* ----------------------------------- */}
+            {/* Base Text */}
+            {/* ----------------------------------- */}
 
-          </p>
+            <p
+
+              className="
+                whitespace-nowrap
+                text-center
+                text-[24px]
+                font-medium
+                leading-[1.35]
+                tracking-[-0.03em]
+                text-white/30
+              "
+            >
+
+              {activeLine.text}
+
+            </p>
+
+            {/* ----------------------------------- */}
+            {/* Animated Progress Fill */}
+            {/* ----------------------------------- */}
+
+            <motion.p
+
+              animate={{
+                width: `${progress}%`,
+              }}
+
+              transition={{
+                ease: 'linear',
+                duration: 0.15,
+              }}
+
+              className="
+                absolute
+                left-0
+                top-0
+                overflow-hidden
+                whitespace-nowrap
+                text-center
+                text-[24px]
+                font-medium
+                leading-[1.35]
+                tracking-[-0.03em]
+                text-white
+                drop-shadow-[0_0_22px_rgba(255,255,255,0.22)]
+              "
+            >
+
+              {activeLine.text}
+
+            </motion.p>
+
+          </div>
 
         </motion.div>
 
@@ -200,7 +300,7 @@ NowPlayingLyrics({
           from-black
           via-transparent
           to-black
-          opacity-40
+          opacity-35
         "
       />
 

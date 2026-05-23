@@ -17,60 +17,124 @@ def similarity(a, b):
     ).ratio()
 
 # -----------------------------------
-# Build Word Timings
+# Normalize Word
 # -----------------------------------
 
-def build_word_timings(
-    line,
-    start_time,
-    line_duration
+def normalize_word(word):
+
+    return normalize_text(
+        word.strip()
+    )
+
+# -----------------------------------
+# Build Real Word Timings
+# -----------------------------------
+
+def build_real_word_timings(
+    lyric_line,
+    aligned_words
 ):
 
-    words = line.split()
-
-    if not words:
-        return []
-
-    word_duration = (
-        line_duration /
-        len(words)
+    lyric_words = (
+        lyric_line.split()
     )
 
     timed_words = []
 
-    accumulated_time = (
-        start_time
+    # -----------------------------------
+    # Safety
+    # -----------------------------------
+
+    if not aligned_words:
+
+        return timed_words
+
+    # -----------------------------------
+    # Timing Window
+    # -----------------------------------
+
+    line_start = float(
+        aligned_words[0]["start"]
     )
 
-    for word in words:
+    line_end = float(
+        aligned_words[-1]["end"]
+    ) - 0.35
 
-        word_start = round(
-            accumulated_time,
-            2
+    # -----------------------------------
+    # Safety Clamp
+    # -----------------------------------
+
+    if line_end <= line_start:
+
+        line_end = (
+            line_start + 1
         )
 
-        word_end = round(
-            accumulated_time +
-            word_duration,
-            2
+    line_duration = (
+        line_end - line_start
+    )
+
+    # -----------------------------------
+    # Fallback Safety
+    # -----------------------------------
+
+    if line_duration <= 0:
+
+        line_duration = (
+            len(lyric_words) * 0.4
+        )
+
+    duration_per_word = (
+
+        line_duration /
+
+        max(
+            len(lyric_words),
+            1
+        )
+    )
+
+    # -----------------------------------
+    # Word Distribution
+    # -----------------------------------
+
+    for index, lyric_word in enumerate(
+        lyric_words
+    ):
+
+        start_time = (
+
+            line_start +
+
+            (
+                index *
+                duration_per_word
+            )
+        )
+
+        end_time = (
+            start_time +
+            duration_per_word
         )
 
         timed_words.append({
 
             "word":
-                word,
+                lyric_word,
 
             "startTime":
-                word_start,
+                round(
+                    float(start_time),
+                    2
+                ),
 
             "endTime":
-                word_end
-
+                round(
+                    float(end_time),
+                    2
+                )
         })
-
-        accumulated_time += (
-            word_duration
-        )
 
     return timed_words
 
@@ -86,200 +150,202 @@ def build_synced_lyrics(
     synced_lyrics = []
 
     # -----------------------------------
-    # Split Lyrics Into Lines
+    # Normalize Lyrics
     # -----------------------------------
 
     lyric_lines = [
 
         line.strip()
 
-        for line in (
-            lyrics_text.splitlines()
-        )
+        for line in
+        lyrics_text.splitlines()
 
         if line.strip()
     ]
 
     # -----------------------------------
-    # Sequential Cursor
+    # Clean Transcript Segments
     # -----------------------------------
 
-    current_lyric_index = 0
+    cleaned_segments = []
 
-    # -----------------------------------
-    # Process Transcript Segments
-    # -----------------------------------
+    for segment in (
+        transcript_segments
+    ):
 
-    for segment in transcript_segments:
+        text = (
+            segment.get(
+                "text",
+                ""
+            ).strip()
+        )
 
-        if (
-            current_lyric_index >=
-            len(lyric_lines)
-        ):
-            break
+        words = (
+            segment.get(
+                "words",
+                []
+            )
+        )
 
-        matched_lines = []
+        segment_duration = (
 
-        segment_text = (
-            segment["text"]
+            float(
+                segment.get(
+                    "end",
+                    0
+                )
+            ) -
+
+            float(
+                segment.get(
+                    "start",
+                    0
+                )
+            )
         )
 
         # -----------------------------------
-        # Sequential Search Window
+        # Ignore Noise
         # -----------------------------------
 
-        search_window = lyric_lines[
-            current_lyric_index:
-            current_lyric_index + 6
-        ]
-
-        for lyric_line in (
-            search_window
+        if (
+            not text or
+            len(text) < 4
         ):
-
-            score = similarity(
-                lyric_line,
-                segment_text
-            )
-
-            if score > 0.22:
-
-                matched_lines.append(
-                    lyric_line
-                )
-
-        # -----------------------------------
-        # Skip Empty Segments
-        # -----------------------------------
-
-        if not matched_lines:
             continue
 
+        if (
+            segment_duration < 1.2
+        ):
+            continue
+
+        if not words:
+            continue
+
+        cleaned_segments.append(
+            segment
+        )
+
+    # -----------------------------------
+    # Sequential Mapping
+    # -----------------------------------
+
+    total_lines = min(
+
+        len(lyric_lines),
+
+        len(cleaned_segments)
+    )
+
+    for index in range(
+        total_lines
+    ):
+
+        segment_text = (
+            segment.get(
+                "text",
+                ""
+            )
+        )
+
+        best_match = ""
+
+        best_score = 0
+
+        for lyric in lyric_lines:
+
+            score = similarity(
+                segment_text,
+                lyric
+            )
+
+            if score > best_score:
+
+                best_score = score
+
+                best_match = lyric
+
+        lyric_line = (
+
+            best_match
+
+            if best_match
+
+            else segment_text
+        )
+
+        segment = (
+            cleaned_segments[index]
+        )
+
+        words = (
+            segment.get(
+                "words",
+                []
+            )
+        )
+
         # -----------------------------------
-        # Segment Timing
+        # Word Timings
         # -----------------------------------
 
-        segment_start = (
+        synced_words = (
+            build_real_word_timings(
+                lyric_line,
+                words
+            )
+        )
+
+        # -----------------------------------
+        # Line Timing
+        # -----------------------------------
+
+        line_start = float(
             segment["start"]
         )
 
-        segment_end = (
+        line_end = float(
             segment["end"]
-        )
+        ) - 0.35
 
-        segment_duration = max(
-            1,
-            segment_end -
-            segment_start
-        )
+        if line_end <= line_start:
 
-        # -----------------------------------
-        # Total Word Count
-        # -----------------------------------
-
-        total_words = sum(
-
-            len(line.split())
-
-            for line in matched_lines
-        )
-
-        accumulated_time = (
-            segment_start
-        )
-
-        # -----------------------------------
-        # Generate Synced Lines
-        # -----------------------------------
-
-        for line in matched_lines:
-
-            line_word_count = max(
-                1,
-                len(line.split())
-            )
-
-            line_duration = (
-
-                segment_duration *
-
-                (
-                    line_word_count /
-                    total_words
-                )
-            )
-
-            line_start_time = round(
-                accumulated_time,
-                2
-            )
-
-            synced_lyrics.append({
-
-                "startTime":
-                    line_start_time,
-
-                "text":
-                    line,
-
-                "words":
-                    build_word_timings(
-
-                        line,
-
-                        line_start_time,
-
-                        line_duration
-                    )
-
-            })
-
-            accumulated_time += (
-                line_duration
+            line_end = (
+                line_start + 1
             )
 
         # -----------------------------------
-        # Advance Cursor
+        # Append
         # -----------------------------------
 
-        current_lyric_index += len(
-            matched_lines
-        )
+        synced_lyrics.append({
+
+            "startTime":
+                round(
+                    line_start,
+                    2
+                ),
+
+            "endTime":
+                round(
+                    line_end,
+                    2
+                ),
+
+            "text":
+                lyric_line,
+
+            "words":
+                synced_words
+        })
 
     # -----------------------------------
-    # Remove Duplicate Lines
+    # Debug
     # -----------------------------------
 
-    unique_synced = []
-
-    used_lines = set()
-
-    for line in synced_lyrics:
-
-        normalized_line = (
-            normalize_text(
-                line["text"]
-            )
-        )
-
-        if normalized_line in used_lines:
-            continue
-
-        used_lines.add(
-            normalized_line
-        )
-
-        unique_synced.append(
-            line
-        )
-
-    # -----------------------------------
-    # Sort Final Output
-    # -----------------------------------
-
-    unique_synced.sort(
-        key=lambda x:
-            x["startTime"]
+    print(
+        f"\nFINAL SYNCED LYRICS COUNT: "
+        f"{len(synced_lyrics)}"
     )
 
-    return unique_synced
+    return synced_lyrics

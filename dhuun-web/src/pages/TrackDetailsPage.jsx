@@ -455,6 +455,14 @@ const handleMeaningToggle =
       return;
     }
 
+    if (
+    !track?.allowMeaningGeneration
+    ) {
+
+      return;
+
+    }
+
     try {
 
       setMeaningLoading(
@@ -495,6 +503,17 @@ const handleMeaningToggle =
       console.error(
         error
       );
+
+      const message =
+        error?.response?.data?.message;
+
+      if (
+        message ===
+        'Meaning generation disabled for this track'
+      ) {
+
+        return;
+      }
 
     } finally {
 
@@ -801,6 +820,7 @@ useEffect(() => {
             handleMeaningToggle
           }
           meaningEnabled={
+            track?.allowMeaningGeneration &&
             meaningEnabled
           }
           convertingLyrics={
