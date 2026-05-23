@@ -1,31 +1,47 @@
-
-Dhuun Originals
+# Dhuun Originals
 
 # Dependencies
+node_modules/
 
-node_modules
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
 
 # Environment
 .env
 .env.*
 
 # Builds
-dist
-build
+dist/
+build/
 
 # Runtime Storage
-uploads
-storage
+uploads/
+storage/
+temp/
+
+# Audio Files
+*.flac
+*.wav
+*.mp3
+*.m4a
+
+# Streaming Files
+*.ts
+*.m3u8
 
 # Logs
-logs
+logs/
 *.log
 
 # macOS
 .DS_Store
 
 # IDE
-.vscode
-.idea
+.vscode/
+.idea/
 
+# Git patches
 *.patch
