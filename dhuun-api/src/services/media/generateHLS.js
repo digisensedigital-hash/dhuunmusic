@@ -63,114 +63,131 @@ const generateHLS = async (
 
         ffmpeg(inputPath)
 
-          .outputOptions([
-            '-codec:a aac',
-            '-b:a 128k',
-            '-hls_time 10',
-            '-hls_playlist_type vod',
-          ])
+        .noVideo()
 
-          .output(
-            `${outputDir}/index.m3u8`
-          )
+        .audioCodec('aac')
 
-          /* -------------------------------------------------------------- */
-          /* Success */
-          /* -------------------------------------------------------------- */
+        .audioFrequency(44100)
 
-          .on(
-            'end',
+        .audioChannels(2)
 
-            async () => {
+        .outputOptions([
+          '-vn',
 
-              try {
+          '-c:a aac',
 
-                /* ---------------------------------------------------------- */
-                /* Mark Ready */
-                /* ---------------------------------------------------------- */
+          '-ar 44100',
 
-                if (trackId) {
+          '-ac 2',
 
-                  await Track.findByIdAndUpdate(
-                    trackId,
-                    {
-                      processingStatus:
-                        'READY',
-                    }
-                  );
-                }
+          '-b:a 128k',
 
-                console.log(
-                  '✅ HLS generation completed'
-                );
+          '-hls_time 10',
 
-                return resolve({
-                  success: true,
-                });
+          '-hls_list_size 0',
 
-              } catch (error) {
+          '-hls_playlist_type vod',
 
-                console.error(
-                  '❌ Failed updating READY status'
-                );
+          '-hls_segment_filename',
 
-                console.error(error);
+          `${outputDir}/index%d.ts`
+        ])
 
-                return reject(error);
-              }
-            }
-          )
+        .format('hls')
 
-          /* -------------------------------------------------------------- */
-          /* Failure */
-          /* -------------------------------------------------------------- */
+        .output(
+          `${outputDir}/index.m3u8`
+        )
 
-          .on(
-            'error',
+        /* -------------------------------------------------------------- */
+        /* Success */
+        /* -------------------------------------------------------------- */
 
-            async (error) => {
+        .on(
+          'end',
 
-              try {
+          async () => {
 
-                /* ---------------------------------------------------------- */
-                /* Mark Failed */
-                /* ---------------------------------------------------------- */
+            try {
 
-                if (trackId) {
+              if (trackId) {
 
-                  await Track.findByIdAndUpdate(
-                    trackId,
-                    {
-                      processingStatus:
-                        'FAILED',
-                    }
-                  );
-                }
-
-              } catch (
-                statusError
-              ) {
-
-                console.error(
-                  '❌ Failed updating FAILED status'
-                );
-
-                console.error(
-                  statusError
+                await Track.findByIdAndUpdate(
+                  trackId,
+                  {
+                    processingStatus:
+                      'READY',
+                  }
                 );
               }
+
+              console.log(
+                '✅ HLS generation completed'
+              );
+
+              return resolve({
+                success: true,
+              });
+
+            } catch (error) {
 
               console.error(
-                '❌ HLS generation failed'
+                '❌ Failed updating READY status'
               );
 
               console.error(error);
 
               return reject(error);
             }
-          )
+          }
+        )
 
-          .run();
+        /* -------------------------------------------------------------- */
+        /* Failure */
+        /* -------------------------------------------------------------- */
+
+        .on(
+          'error',
+
+          async (error) => {
+
+            try {
+
+              if (trackId) {
+
+                await Track.findByIdAndUpdate(
+                  trackId,
+                  {
+                    processingStatus:
+                      'FAILED',
+                  }
+                );
+              }
+
+            } catch (
+              statusError
+            ) {
+
+              console.error(
+                '❌ Failed updating FAILED status'
+              );
+
+              console.error(
+                statusError
+              );
+            }
+
+            console.error(
+              '❌ HLS generation failed'
+            );
+
+            console.error(error);
+
+            return reject(error);
+          }
+        )
+
+        .run();
 
       } catch (error) {
 

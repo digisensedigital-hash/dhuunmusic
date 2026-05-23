@@ -1,0 +1,5 @@
+whisperx
+torch
+torchaudio
+ffmpeg-python
+python-dotenv

@@ -17,6 +17,9 @@
     import usePlayerStore
     from '../../store/playerStore';
 
+    import NowPlayingLyrics
+    from './NowPlayingLyrics';
+
     export default function
     FullscreenPlayer() {
     const {
@@ -211,7 +214,15 @@
                         duration: 0.45,
                         ease: 'easeOut',
                     }}
-                    className="relative z-10 flex-1 flex flex-col px-8"
+                    className="
+                        relative
+                        z-10
+                        flex-1
+                        flex
+                        flex-col
+                        overflow-hidden
+                        px-8
+                    "
                 >
                 {/* Artwork */}
 
@@ -283,7 +294,13 @@
                     transition={{
                     delay: 0.12,
                     }}
-                    className="mt-10"
+                    className="
+                        mt-6
+                        flex
+                        min-h-0
+                        flex-1
+                        flex-col
+                    "
                 >
                     <h1 className="text-2xl font-black tracking-tight">
                     {
@@ -297,6 +314,20 @@
                         ?.stageName ||
                         'Unknown Artist'}
                     </p>
+
+                    <div className="mt-4 flex-1 min-h-0">
+
+                        <NowPlayingLyrics
+                            currentTrack={
+                                currentTrack
+                            }
+                            currentTime={
+                                currentTime
+                            }
+                        />
+
+                    </div>
+
                 </motion.div>
 
                 {/* -------------------------------- */}
@@ -313,7 +344,7 @@
                 transition={{
                     delay: 0.14,
                 }}
-                className="mt-10 flex items-end justify-center gap-1.5 h-10"
+                className="mt-4 flex items-end justify-center gap-1.5 h-8 shrink-0"
                 >
                 {[...Array(12)].map(
                     (_, index) => (
@@ -360,7 +391,7 @@
                     transition={{
                     delay: 0.16,
                     }}
-                    className="mt-10"
+                    className="mt-5 shrink-0"
                 >
                     
                     <motion.div
@@ -432,7 +463,7 @@
                 transition={{
                     delay: 0.2,
                 }}
-                className="mt-8 flex items-center justify-between"
+                className="mt-5 flex items-center justify-between shrink-0"
                 >
 
                 {/* Shuffle */}

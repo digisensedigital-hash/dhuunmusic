@@ -88,6 +88,17 @@ app.use(
   )
 );
 
+app.use(
+  '/tracks',
+
+  express.static(
+    path.join(
+      process.cwd(),
+      'uploads/tracks'
+    )
+  )
+);
+
 app.use(helmet());
 
 app.use(morgan('dev'));

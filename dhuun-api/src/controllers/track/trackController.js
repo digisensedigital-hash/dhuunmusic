@@ -751,6 +751,91 @@ export const createTrack =
                   coverFile.path
                 );
               }
+              
+              /* ----------------------------------- */
+              /* Optional Audio Update */
+              /* ----------------------------------- */
+
+              if (
+                req.files?.audio?.[0]
+              ) {
+
+                const audioFile =
+                  req.files.audio[0];
+
+                const metadata =
+                  await getAudioMetadata(
+                    audioFile.path
+                  );
+
+                const trackFolderId =
+                  Date.now().toString();
+
+                const hlsOutputDir =
+                  path.resolve(
+                    'uploads/tracks',
+                    trackFolderId,
+                    'hls'
+                  );
+
+                await generateHLS(
+
+                  audioFile.path,
+
+                  hlsOutputDir,
+
+                  track._id
+                );
+
+                await uploadDirectoryToMinio(
+
+                  hlsOutputDir,
+
+                  `tracks/${trackFolderId}/hls`
+                );
+
+                const audioPath =
+                  await uploadToMinio(
+
+                    audioFile.path,
+
+                    audioFile.originalname,
+
+                    audioFile.mimetype,
+
+                    'tracks/originals'
+                  );
+
+                track.originalAudio =
+                  audioPath;
+
+                track.hlsMasterUrl =
+                  `tracks/${trackFolderId}/hls/index.m3u8`;
+
+                track.duration =
+                  metadata.duration;
+
+                track.bitrate =
+                  metadata.bitrate;
+
+                track.codec =
+                  metadata.codec;
+
+                track.audioFormat =
+                  metadata.format;
+
+                fs.unlinkSync(
+                  audioFile.path
+                );
+
+                fs.rmSync(
+                  hlsOutputDir,
+                  {
+                    recursive: true,
+                    force: true,
+                  }
+                );
+              }
 
               /* ----------------------------------- */
               /* Update Track */
