@@ -16,7 +16,11 @@ import {
 } from '../../controllers/track/streamController.js';
 
 import {
+
+  getPublicTracks,
+
   getPublicTrackDetails
+
 } from '../../controllers/track/publicTrackController.js';
 
 import getRelatedTracksController from '../../controllers/track/getRelatedTracksController.js';
@@ -80,6 +84,13 @@ router.get(
 router.get(
   '/:id/stream',
   getTrackStream
+);
+
+
+// Public Tracks Catalog
+router.get(
+  '/public',
+  getPublicTracks
 );
 
 // Public Track Details

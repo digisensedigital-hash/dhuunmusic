@@ -12,6 +12,58 @@ import TrendingTrack
 import serializeTrack
   from '../../serializers/serializeTrack.js';
 
+export const getPublicTracks =
+  async (req, res) => {
+
+    try {
+
+      const tracks =
+        await Track.find({
+
+          publishingStatus:
+            'PUBLISHED',
+
+          processingStatus:
+            'READY',
+
+          isActive: true,
+
+        })
+
+          .populate(
+            'primaryArtist',
+            'stageName profileImage'
+          )
+
+          .sort({
+            createdAt: -1,
+          });
+
+      return res.json({
+
+        success: true,
+
+        tracks:
+          tracks.map(
+            serializeTrack
+          ),
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      return res.status(500)
+        .json({
+
+          success: false,
+
+          message:
+            'Failed to fetch public tracks',
+        });
+    }
+};
+
 export const getPublicTrackDetails =
   async (req, res) => {
     try {

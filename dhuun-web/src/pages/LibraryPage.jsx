@@ -1,4 +1,19 @@
 import {
+  useEffect,
+  useState,
+} from 'react';
+
+import {
+  getPublicTracks,
+} from '../api/tracks';
+
+import AllTracksView
+  from '../components/library/AllTracksView';
+
+import ArtistsView
+  from '../components/library/ArtistsView';
+
+import {
   Heart,
   Play,
   Pause,
@@ -10,6 +25,9 @@ import usePlayerStore
 import PlaylistTrackRow
   from '../components/playlists/PlaylistTrackRow';
 
+import LibraryTabs
+  from '../components/library/LibraryTabs';
+
 export default function
 LibraryPage() {
   const {
@@ -20,31 +38,109 @@ LibraryPage() {
   playTrack,
   } = usePlayerStore();
 
+  const [
+
+  activeTab,
+
+  setActiveTab,
+
+  ] = useState(
+    'saved'
+  );
+
+  const [
+
+  allTracks,
+
+  setAllTracks,
+
+] = useState([]);
+
+const [
+
+  loadingTracks,
+
+  setLoadingTracks,
+
+] = useState(false);
+
+useEffect(() => {
+
+  if (
+
+  activeTab !==
+  'all'
+
+  &&
+
+  activeTab !==
+  'artists'
+
+  ) {
+    return;
+  }
+
+  const loadTracks =
+    async () => {
+
+      try {
+
+        setLoadingTracks(
+          true
+        );
+
+        const data =
+          await getPublicTracks();
+
+        setAllTracks(
+          data.tracks || []
+        );
+
+      } catch (error) {
+
+        console.error(error);
+
+      } finally {
+
+        setLoadingTracks(
+          false
+        );
+      }
+    };
+
+  loadTracks();
+
+}, [activeTab]);
+
   const handlePlayAll =
-  () => {
+  (queue = []) => {
+
     if (
-      currentTrack?.id ===
-        savedTracks[0]
-          ?.id &&
-      isPlaying
+      !queue.length
     ) {
+      return;
+    }
+
+    if (
+
+      currentTrack?.id ===
+      queue[0]?.id &&
+
+      isPlaying
+
+    ) {
+
       togglePlayPause();
 
       return;
     }
 
-    if (
-      !savedTracks.length
-    ) {
-      return;
-    }
-
     playTrack({
-      track:
-        savedTracks[0],
 
-      queue:
-        savedTracks,
+      track:
+        queue[0],
+
+      queue,
 
       startIndex: 0,
     });
@@ -62,94 +158,121 @@ LibraryPage() {
       {/* Content */}
       {/* -------------------------------- */}
 
-      <div className="relative z-10 px-6 pt-8 pb-40">
-        {/* -------------------------------- */}
-        {/* Library Hero */}
-        {/* -------------------------------- */}
+      <div className="relative z-10 flex h-screen flex-col px-6 pt-8">
+        
+        <div className="flex items-center justify-between">
 
-        <div className="relative overflow-hidden rounded-[44px] border border-white/10 bg-[#14141B] p-6 min-h-[320px]">
-          {/* Glow */}
+          <div>
 
-          <div className="absolute -top-20 right-[-40px] w-[260px] h-[260px] bg-fuchsia-500/20 blur-[120px] rounded-full" />
+            <p className="text-xs uppercase tracking-[0.35em] text-white/35">
 
-          {/* Content */}
+              Dhuun
 
-          <div className="relative z-10 flex flex-col justify-end h-full">
-            {/* Icon */}
-
-            <div className="w-24 h-24 rounded-[30px] bg-gradient-to-br from-fuchsia-500 via-pink-500 to-purple-500 flex items-center justify-center shadow-2xl">
-              <Heart
-                size={42}
-                className="fill-white text-white"
-              />
-            </div>
-
-            <p className="mt-8 text-xs uppercase tracking-[0.35em] text-white/40">
-              Your Collection
             </p>
 
-            <h1 className="mt-4 text-5xl font-black tracking-tight leading-none">
-              Saved Tracks
+            <h1 className="mt-2 text-4xl font-black tracking-tight">
+
+              Library
+
             </h1>
 
-            <p className="mt-5 text-white/60 leading-relaxed max-w-[320px]">
-              Music you love,
-              collected into your
-              personal universe.
-            </p>
-
-            <button
-                onClick={handlePlayAll}
-                className="mt-8 h-14 px-8 rounded-full bg-white text-black flex items-center gap-3 font-semibold shadow-2xl w-fit"
-                >
-                {currentTrack?.id ===
-                    savedTracks[0]
-                    ?.id &&
-                isPlaying ? (
-                    <Pause size={20} />
-                ) : (
-                    <Play
-                    size={20}
-                    fill="currentColor"
-                    />
-                )}
-
-                Play All
-                </button>
-
-            {/* Stats */}
-
-            <div className="mt-8 flex items-center gap-8">
-              <div>
-                <div className="text-2xl font-black">
-                  {
-                    savedTracks.length
-                  }
-                </div>
-
-                <div className="text-[11px] uppercase tracking-[0.2em] text-white/35 mt-1">
-                  Saved
-                </div>
-              </div>
-
-              <div>
-                <div className="text-2xl font-black">
-                  HD
-                </div>
-
-                <div className="text-[11px] uppercase tracking-[0.2em] text-white/35 mt-1">
-                  Audio
-                </div>
-              </div>
-            </div>
           </div>
+
+          {((activeTab ===
+          'saved' &&
+
+          savedTracks.length >
+          0)
+
+          ||
+
+          (activeTab ===
+          'all' &&
+
+          allTracks.length >
+          0)
+
+        ) && (
+
+          <button
+
+            onClick={() =>
+
+              handlePlayAll(
+
+                activeTab ===
+                'saved'
+
+                  ? savedTracks
+
+                  : allTracks
+              )
+            }
+
+            className="h-12 px-5 rounded-full bg-white text-black flex items-center gap-2 text-sm font-semibold shadow-xl"
+
+          >
+
+            {isPlaying ? (
+
+              <Pause size={18} />
+
+            ) : (
+
+              <Play
+                size={18}
+                fill="currentColor"
+              />
+            )}
+
+            Play All
+
+          </button>
+        )}
+
         </div>
+
+        <div className="mt-6 flex items-center gap-6 text-sm text-white/45">
+
+          <div>
+
+            {savedTracks.length}
+            {' '}
+            Saved
+
+          </div>
+
+          <div>
+
+            {allTracks.length}
+            {' '}
+            Tracks
+
+          </div>
+
+        </div>
+
+        <LibraryTabs
+
+          activeTab={
+            activeTab
+          }
+
+          onChange={
+            setActiveTab
+          }
+        />
+
+      <div className="mt-6 flex-1 overflow-y-auto scrollbar-hide pb-40">
 
         {/* -------------------------------- */}
         {/* Empty State */}
         {/* -------------------------------- */}
 
-        {!savedTracks.length && (
+        {activeTab ===
+        'saved' &&
+
+        !savedTracks.length && (
           <div className="mt-14 rounded-[36px] border border-white/10 bg-white/[0.03] backdrop-blur-xl p-10 text-center">
             <div className="w-20 h-20 rounded-full bg-white/[0.04] border border-white/10 flex items-center justify-center mx-auto">
               <Heart
@@ -174,18 +297,35 @@ LibraryPage() {
         {/* Saved Tracks */}
         {/* -------------------------------- */}
 
-        {savedTracks.length >
+        {activeTab ===
+          'saved' &&
+
+          savedTracks.length >
           0 && (
           <div className="mt-12">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-3xl font-black tracking-tight">
+
+              <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-white/40">
+
+               Favourites
+
+              </p>
+
+              <h2 className="mt-2 text-3xl font-black tracking-tight text-white">
+
                 Your Tracks
+              
               </h2>
+
+              </div>
 
               <button className="text-sm text-white/40">
                 Recently Added
               </button>
             </div>
+
+            <div className="mb-6 border-t border-white/10" />
 
             <div className="flex flex-col gap-2">
               {savedTracks.map(
@@ -206,6 +346,24 @@ LibraryPage() {
             </div>
           </div>
         )}
+
+        {activeTab ===
+          'all' && (
+
+          <AllTracksView
+            tracks={allTracks}
+          />
+        )}
+
+        {activeTab ===
+          'artists' && (
+
+          <ArtistsView
+            tracks={allTracks}
+          />
+        )}
+
+      </div>
       </div>
     </div>
   );

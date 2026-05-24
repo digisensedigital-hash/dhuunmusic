@@ -94,20 +94,24 @@ serializeTrack(track) {
     /* ----------------------------------- */
 
     primaryArtist:
-      track.primaryArtist
-        ? {
+    track.primaryArtist
+      ? {
 
-            id:
-              track.primaryArtist._id,
+          id:
+            track.primaryArtist._id,
 
-            stageName:
-              track.primaryArtist
-                .stageName,
+          slug:
+            track.primaryArtist.slug,
 
-            profileImage:
-              track.primaryArtist
-                .profileImage || ''
-          }
-        : null
+          stageName:
+            track.primaryArtist
+              .stageName,
+
+          profileImage:
+            track.primaryArtist
+              ?.profileImage || ''
+
+        }
+      : null
   };
 }
