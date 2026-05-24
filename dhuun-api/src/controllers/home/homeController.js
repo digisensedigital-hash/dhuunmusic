@@ -81,6 +81,10 @@ export const getHomeFeed =
         }
       }
 
+      trending = trending.filter(
+        (item) => item.trackId
+      );
+
       // -----------------------------------
       // Sparse Catalog Fallback
       // -----------------------------------
