@@ -83,17 +83,28 @@ export default async function getRelatedTracks(
       .lean(),
 
     // Same Artist
-    Track.find({
-      primaryArtist:
-        sourceTrack.primaryArtist._id,
+    sourceTrack.primaryArtist?._id
 
-      _id: {
-        $ne: sourceTrack._id
-      },
+      ? Track.find({
 
-      processingStatus:
-     'READY'
-    })
+          primaryArtist:
+            sourceTrack.primaryArtist._id,
+
+          _id: {
+            $ne: sourceTrack._id
+          },
+
+          processingStatus:
+            'READY'
+        })
+          .populate(
+            'primaryArtist',
+            'stageName profileImage'
+          )
+          .limit(50)
+          .lean()
+
+      : Promise.resolve([])
       .populate(
         'primaryArtist',
         'stageName profileImage'

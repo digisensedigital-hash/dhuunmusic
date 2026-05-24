@@ -46,7 +46,7 @@ QueueDrawer() {
     useRef(false);
 
   const navigate =
-  useNavigate();
+    useNavigate();
 
   const effectiveOrder =
     playOrder?.length
@@ -309,7 +309,7 @@ QueueDrawer() {
                         className="list-none"
                       >
 
-                        <button
+                        <div
                           onClick={() => {
 
                             if (
@@ -325,7 +325,7 @@ QueueDrawer() {
                             );
                           }}
 
-                          className={`flex w-full items-center gap-4 rounded-2xl px-4 py-3 transition-all ${
+                          className={`flex w-full cursor-pointer items-center gap-4 rounded-2xl px-4 py-3 transition-all ${
                             isActive
                               ? 'border border-white/10 bg-white/10'
                               : 'bg-white/[0.03]'
@@ -464,7 +464,7 @@ QueueDrawer() {
 
                           </div>
 
-                        </button>
+                        </div>
 
                       </Reorder.Item>
 

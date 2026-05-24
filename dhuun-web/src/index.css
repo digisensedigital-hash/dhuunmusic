@@ -64,3 +64,60 @@ textarea {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+@keyframes lyricsMarqueeLeft {
+
+  from {
+    transform:
+      translateX(0%);
+  }
+
+  to {
+    transform:
+      translateX(-50%);
+  }
+}
+
+@keyframes lyricsMarqueeRight {
+
+  from {
+    transform:
+      translateX(-50%);
+  }
+
+  to {
+    transform:
+      translateX(0%);
+  }
+}
+
+.lyrics-marquee-left {
+
+  animation:
+    lyricsMarqueeLeft
+    35s
+    linear
+    infinite;
+
+  will-change:
+    transform;
+}
+
+.lyrics-marquee-right {
+
+  animation:
+    lyricsMarqueeRight
+    35s
+    linear
+    infinite;
+
+  will-change:
+    transform;
+}
+
+.lyrics-marquee-left:hover,
+.lyrics-marquee-right:hover {
+
+  animation-play-state:
+    paused;
+}

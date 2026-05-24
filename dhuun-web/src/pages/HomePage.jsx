@@ -2,13 +2,23 @@ import useHomeFeed from '../hooks/useHomeFeed';
 
 import HorizontalTrackRail from '../components/discovery/HorizontalTrackRail';
 
-import HeroFeaturedCard from '../components/discovery/HeroFeaturedCard';
+import ContinueListeningStack from '../components/discovery/ContinueListeningStack';
+
+import WideMoodRail from '../components/discovery/WideMoodRail';
+
+import ArtistBubbleRail from '../components/discovery/ArtistBubbleRail';
+
+import LyricsStripCarousel from '../components/discovery/LyricsStripCarousel';
 
 import PlaylistRail from '../components/playlists/PlaylistRail';
 
 import usePlayerStore from '../store/playerStore';
 
-import { useEffect, } from 'react';
+import ImmersiveHeroScene from '../components/discovery/ImmersiveHeroScene';
+
+import selectFeaturedTrack from '../lib/discovery/selectFeaturedTrack';
+
+import { useEffect, useState, } from 'react';
 
 export default function
 HomePage() {
@@ -20,28 +30,26 @@ HomePage() {
   } = useHomeFeed();
 
   const {
-    recentlyPlayed,
 
-    continueListening,
+  currentTrack,
 
-    enqueueSmartTracks,
+  recentlyPlayed,
+
+  continueListening,
+
+  enqueueSmartTracks,
+
   } = usePlayerStore();
 
   // -----------------------------------
-  // Refresh Home Feed
+  // Initial Feed Refresh
   // -----------------------------------
 
   useEffect(() => {
-    if (
-      recentlyPlayed.length >
-      0
-    ) {
-      refreshFeed(true);
-    }
-  }, [
-    recentlyPlayed,
-    refreshFeed,
-  ]);
+
+    refreshFeed(true);
+
+  }, []);
 
   // -----------------------------------
   // Derived Feed Data
@@ -61,6 +69,11 @@ HomePage() {
       track:
         item.track,
     }));
+  
+  const [
+  featuredTrack,
+  setFeaturedTrack,
+  ] = useState(null);  
 
   // -----------------------------------
   // Smart Queue Injection
@@ -84,6 +97,35 @@ HomePage() {
   }, [
     recommended,
     enqueueSmartTracks,
+  ]);
+
+  /* ----------------------------------- */
+  /* Featured Atmosphere */
+  /* ----------------------------------- */
+
+  useEffect(() => {
+
+    if (!trending.length) {
+      return;
+    }
+
+    const selectedTrack =
+
+      selectFeaturedTrack({
+
+        tracks:
+          trending,
+
+        recentlyPlayed,
+
+      });
+
+    setFeaturedTrack(
+      selectedTrack
+    );
+
+  }, [
+    trending,
   ]);
 
   // -----------------------------------
@@ -110,9 +152,6 @@ HomePage() {
     );
   }
 
-  const featuredTrack =
-  trending[0]?.track || null;
-    
   const newReleases =
   trending.slice(0, 6);
 
@@ -124,6 +163,36 @@ HomePage() {
 
   const nightVibes =
     trending.slice(3, 9);
+
+  /* ----------------------------------- */
+  /* Featured Artists */
+  /* ----------------------------------- */
+
+  const featuredArtists = [
+
+    ...new Map(
+
+      trending
+        .filter(
+          (item) =>
+            item.track
+              ?.primaryArtist
+        )
+
+        .map(
+          (item) => [
+
+            item.track
+              .primaryArtist.id,
+
+            item.track
+              .primaryArtist,
+          ]
+        )
+
+    ).values(),
+
+  ].slice(0, 12);
 
   const playlists = [
   {
@@ -211,99 +280,20 @@ HomePage() {
       {/* -------------------------------- */}
 
       <div className="relative z-10 px-6 pt-[max(56px,env(safe-area-inset-top))] pb-40">
-        {/* -------------------------------- */}
-        {/* Header */}
-        {/* -------------------------------- */}
+        
+        <ImmersiveHeroScene
+          track={featuredTrack}
+          queue={trending}
+        />
 
-        <div className="flex items-center gap-4 mb-12">
-          {/* Logo */}
+        <ArtistBubbleRail
+          title="Featured Artists"
+          artists={featuredArtists}
+        />
 
-          <img
-            src="/Dhuun.png"
-            alt="Dhuun Music"
-            className="w-16 h-16 object-contain drop-shadow-2xl"
-          />
-
-          {/* Title */}
-
-          <div className="relative overflow-hidden rounded-[34px] border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6">
-            {/* -------------------------------- */}
-            {/* Ambient Layers */}
-            {/* -------------------------------- */}
-
-            <div className="absolute -top-24 -right-16 w-[220px] h-[220px] bg-fuchsia-500/20 blur-[100px] rounded-full" />
-
-            <div className="absolute bottom-[-80px] left-[-40px] w-[200px] h-[200px] bg-purple-500/20 blur-[100px] rounded-full" />
-
-            {/* -------------------------------- */}
-            {/* Content */}
-            {/* -------------------------------- */}
-
-            <div className="relative z-10">
-              <p className="text-xs uppercase tracking-[0.35em] text-white/40 mb-4">
-                Welcome Back
-              </p>
-
-              <h1 className="text-5xl font-black tracking-tight leading-none">
-                Dhuun
-              </h1>
-
-              <p className="text-white/60 mt-5 text-sm leading-relaxed max-w-[260px]">
-                Discover immersive music,
-                cinematic playback,
-                and curated vibes.
-              </p>
-
-              {/* -------------------------------- */}
-              {/* Stats */}
-              {/* -------------------------------- */}
-
-              <div className="flex items-center gap-6 mt-8">
-                <div>
-                  <div className="text-2xl font-black">
-                    HD
-                  </div>
-
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">
-                    Audio
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-2xl font-black">
-                    ∞
-                  </div>
-
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">
-                    Vibes
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-2xl font-black">
-                    New
-                  </div>
-
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">
-                    Daily
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-
-        {/* -------------------------------- */}
-        {/* Hero Featured */}
-        {/* -------------------------------- */}
-
-        <div className="mb-12">
-          <HeroFeaturedCard
-            track={featuredTrack}
-            queue={trending}
-          />
-        </div>
+        <LyricsStripCarousel
+          items={trending}
+        />
 
         {/* -------------------------------- */}
         {/* Continue Listening */}
@@ -311,15 +301,20 @@ HomePage() {
 
         {continueListening.length >
           0 && (
-          <HorizontalTrackRail
+
+          <ContinueListeningStack
+
             title="Continue Listening"
+
             items={continueListening.map(
               (item) => ({
                 track:
                   item.track,
               })
             )}
+
           />
+
         )}
 
         {/* -------------------------------- */}
@@ -366,9 +361,14 @@ HomePage() {
 
         {recommended.length >
           0 && (
-          <HorizontalTrackRail
-            title="Recommended For You"
+          <WideMoodRail
+
+            title="Recommended"
+
+            subtitle="Curated For You"
+
             items={recommended}
+
           />
         )}
 
@@ -377,9 +377,14 @@ HomePage() {
           items={newReleases}
         />
 
-        <HorizontalTrackRail
+        <WideMoodRail
+
           title="Mood Picks"
+
+          subtitle="Immersive Discovery"
+
           items={moodPicks}
+
         />
 
         <HorizontalTrackRail
@@ -387,9 +392,14 @@ HomePage() {
           items={hindiPop}
         />
 
-        <HorizontalTrackRail
+        <WideMoodRail
+
           title="Night Vibes"
+
+          subtitle="After Dark"
+
           items={nightVibes}
+
         />
 
         <PlaylistRail
