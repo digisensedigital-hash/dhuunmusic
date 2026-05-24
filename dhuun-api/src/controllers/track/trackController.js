@@ -275,18 +275,7 @@ export const createTrack =
             |--------------------------------------------------------------------------
             */
 
-            if (!parsedIsMasterTrack) {
-
-              if (!masterTrackId) {
-
-                return res.status(400)
-                  .json({
-                    success: false,
-
-                    message:
-                      'Master track selection required for variants',
-                  });
-              }
+            if (masterTrackId) {
 
               const masterTrack =
                 await Track.findById(

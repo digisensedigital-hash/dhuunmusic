@@ -636,9 +636,17 @@ const handleUpload =
       }
 
       formData.append(
-        'versionType',
-        form.versionType
+        'isVariant',
+        !!form.masterTrackId
       );
+
+      if (form.masterTrackId) {
+
+        formData.append(
+          'versionType',
+          form.versionType
+        );
+      }
 
       /* ----------------------------------- */
       /* Publishing Workflow */
