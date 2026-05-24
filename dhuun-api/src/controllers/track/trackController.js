@@ -432,10 +432,17 @@ export const createTrack =
                 /* ----------------------------------- */
 
                 publishingStatus:
-                  'DRAFT',
+                req.body.publishingStatus ||
+                'DRAFT',
 
                 publishedAt:
-                  null,
+
+                req.body.publishingStatus ===
+                'PUBLISHED'
+
+                  ? new Date()
+
+                  : null,
 
                 reviewedAt:
                   null,
@@ -1213,8 +1220,18 @@ export const createTrack =
         export const getAllTracks =
           async (req, res) => {
             try {
-              const tracks =
-                await Track.find()
+                  const tracks =
+                  await Track.find({
+
+                    publishingStatus:
+                      'PUBLISHED',
+
+                    processingStatus:
+                      'READY',
+
+                    isActive: true,
+
+                  })
                   .populate(
                     'primaryArtist',
                     'stageName'
