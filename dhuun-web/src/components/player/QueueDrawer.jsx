@@ -14,6 +14,10 @@ import {
   useRef,
 } from 'react';
 
+import {
+  useNavigate,
+} from 'react-router-dom';
+
 import usePlayerStore
   from '../../store/playerStore';
 
@@ -31,6 +35,8 @@ QueueDrawer() {
 
     closeQueueDrawer,
 
+    closeExpandedPlayer,
+
     playQueueTrack,
 
     setPlayOrder,
@@ -38,6 +44,9 @@ QueueDrawer() {
 
   const isDraggingRef =
     useRef(false);
+
+  const navigate =
+  useNavigate();
 
   const effectiveOrder =
     playOrder?.length
@@ -355,7 +364,48 @@ QueueDrawer() {
 
                           {/* Meta */}
 
-                          <div className="min-w-0 flex-1 text-left">
+                          <button
+
+                            type="button"
+
+                            onClick={(event) => {
+
+                              event.stopPropagation();
+
+                              if (
+                                isDraggingRef.current
+                              ) {
+                                return;
+                              }
+
+                              const slug =
+                                track.slug;
+
+                              const trackId =
+                                track.id ||
+                                track._id;
+
+                              if (!slug && !trackId) {
+                                return;
+                              }
+
+                              closeQueueDrawer();
+
+                              closeExpandedPlayer();
+
+                              setTimeout(() => {
+
+                                navigate(
+                                  slug
+                                    ? `/track/${slug}`
+                                    : `/track/${trackId}`
+                                );
+
+                              }, 150);
+                            }}
+
+                            className="min-w-0 flex-1 text-left transition-opacity hover:opacity-80"
+                          >
 
                             <h3
                               className={`truncate font-semibold ${
@@ -380,7 +430,7 @@ QueueDrawer() {
 
                             </p>
 
-                          </div>
+                          </button>
 
                           {/* Right Actions */}
 

@@ -63,7 +63,7 @@ AppRoutes() {
           />
 
           <Route
-            path="/track/:id"
+            path="/track/:identifier"
             element={
               <TrackDetailsPage />
             }

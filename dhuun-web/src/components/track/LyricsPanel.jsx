@@ -66,108 +66,28 @@ export default function LyricsPanel({
 
       <div className="border-t border-white/5 px-6 pt-6">
 
-        {/* Controls */}
+        {!track?.lyrics?.trim() ? (
 
-        <div className="flex items-center justify-center gap-3 px-1 pb-8 pt-5">
+          <div className="flex flex-col items-center justify-center px-4 py-24 text-center">
 
-          {/* Script */}
-
-          <button
-            onClick={() =>
-              setIsScriptMenuOpen(
-                true
-              )
-            }
-
-            className="flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-medium text-white transition hover:border-white/20 hover:bg-white/[0.06]"
-          >
-
-            <Globe size={15} />
-
-            {selectedScript}
-
-            <ChevronDown
-              size={15}
-            />
-
-          </button>
-
-          {/* Meaning Toggle */}
-
-          {track?.allowMeaningGeneration
-            ?? true ? (
-
-            <button
-              onClick={
-                handleMeaningToggle
-              }
-
-              className={`flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition ${
-                meaningEnabled
-                  ? 'border-fuchsia-500/20 bg-fuchsia-500/10 text-fuchsia-100'
-                  : 'border-white/10 bg-white/[0.04] text-zinc-400'
-              }`}
-            >
+            <div className="flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-white/[0.03]">
 
               <Languages
-                size={15}
+                size={34}
+                className="text-zinc-500"
               />
-
-              {meaningEnabled
-                ? 'Meaning On'
-                : 'Meaning'}
-
-            </button>
-
-          ) : (
-
-            <div className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-sm font-medium text-zinc-500">
-
-            <Languages
-              size={15}
-            />
-
-            <span className="whitespace-nowrap">
-
-              Meaning Unavailable
-
-            </span>
-
-          </div>
-
-          )}
-
-        </div>
-
-        {convertingLyrics ? (
-
-          <div className="flex flex-col items-center justify-center py-24">
-
-            {/* Orb */}
-
-            <div className="relative">
-
-              <div className="h-20 w-20 rounded-full bg-fuchsia-500/20 blur-2xl" />
-
-              <div className="absolute inset-0 flex items-center justify-center">
-
-                <div className="h-10 w-10 animate-spin rounded-full border-2 border-fuchsia-400 border-t-transparent" />
-
-              </div>
 
             </div>
 
-            {/* Text */}
+            <h3 className="mt-8 text-2xl font-bold tracking-tight text-white">
 
-            <p className="mt-8 text-lg font-medium text-zinc-200">
+              Lyrics Unavailable
 
-              {scriptProgressText}
+            </h3>
 
-            </p>
+            <p className="mt-4 max-w-md text-sm leading-7 text-zinc-500">
 
-            <p className="mt-3 max-w-[260px] text-center text-sm leading-6 text-zinc-500">
-
-              Preserving lyrical pronunciation and emotional flow.
+              This track does not currently have lyrics available for immersive playback, script conversion, or AI meaning interpretation.
 
             </p>
 
@@ -175,97 +95,212 @@ export default function LyricsPanel({
 
         ) : (
 
-          <div className="lyrics-scroll max-h-[65vh] overflow-y-auto space-y-5 border-t border-white/5 px-1 pt-8 pb-16 pr-2">
+          <>
 
-            {(
-              convertedLyrics ||
-              track.lyrics
-            )
-            .split('\n')
-            .map(
+            {/* Controls */}
 
-              (
-                line,
-                index
-              ) => {
+            <div className="flex items-center justify-center gap-3 px-1 pb-8 pt-5">
 
-                const meaningLines =
+              {/* Script */}
 
-                  translatedMeaning
-                    ? translatedMeaning
-                        .replace(/\r/g, '')
-                        .split('\n')
-                    : [];
+              <button
+                onClick={() =>
+                  setIsScriptMenuOpen(
+                    true
+                  )
+                }
 
-                return (
+                className="flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-medium text-white transition hover:border-white/20 hover:bg-white/[0.06]"
+              >
 
-                  <div
-                    key={index}
-                    className="group"
-                  >
+                <Globe size={15} />
 
-                    {/* Original / Transliterated */}
+                {selectedScript}
 
-                    <p className="font-['Noto_Sans'] text-[18px] font-medium leading-[1.75] tracking-[-0.01em] text-zinc-100 transition duration-300 group-hover:text-white">
+                <ChevronDown
+                  size={15}
+                />
 
-                      {line.trim()
-                        ? line
-                        : '\u00A0'}
+              </button>
 
-                    </p>
+              {/* Meaning Toggle */}
 
-                    {/* Meaning Translation */}
+              {track?.allowMeaningGeneration
+                ?? true ? (
 
-                    {meaningEnabled && (
+                <button
+                  onClick={
+                    handleMeaningToggle
+                  }
 
-                      <div className="mt-1.5 pl-1">
+                  className={`flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition ${
+                    meaningEnabled
+                      ? 'border-fuchsia-500/20 bg-fuchsia-500/10 text-fuchsia-100'
+                      : 'border-white/10 bg-white/[0.04] text-zinc-400'
+                  }`}
+                >
 
-                        {meaningLoading ? (
+                  <Languages
+                    size={15}
+                  />
 
-                          <div className="flex items-center gap-3 pt-1">
+                  {meaningEnabled
+                    ? 'Meaning On'
+                    : 'Meaning'}
 
-                            <div className="h-2 w-2 animate-pulse rounded-full bg-fuchsia-400" />
+                </button>
 
-                            <p className="text-sm italic text-zinc-500">
+              ) : (
 
-                              {meaningProgressText}
+                <div className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-sm font-medium text-zinc-500">
 
-                            </p>
+                  <Languages
+                    size={15}
+                  />
+
+                  <span className="whitespace-nowrap">
+
+                    Meaning Unavailable
+
+                  </span>
+
+                </div>
+
+              )}
+
+            </div>
+
+            {convertingLyrics ? (
+
+              <div className="flex flex-col items-center justify-center py-24">
+
+                {/* Orb */}
+
+                <div className="relative">
+
+                  <div className="h-20 w-20 rounded-full bg-fuchsia-500/20 blur-2xl" />
+
+                  <div className="absolute inset-0 flex items-center justify-center">
+
+                    <div className="h-10 w-10 animate-spin rounded-full border-2 border-fuchsia-400 border-t-transparent" />
+
+                  </div>
+
+                </div>
+
+                {/* Text */}
+
+                <p className="mt-8 text-lg font-medium text-zinc-200">
+
+                  {scriptProgressText}
+
+                </p>
+
+                <p className="mt-3 max-w-[260px] text-center text-sm leading-6 text-zinc-500">
+
+                  Preserving lyrical pronunciation and emotional flow.
+
+                </p>
+
+              </div>
+
+            ) : (
+
+              <div className="lyrics-scroll max-h-[65vh] overflow-y-auto space-y-5 border-t border-white/5 px-1 pb-16 pr-2 pt-8">
+
+                {(
+                  convertedLyrics ||
+                  track.lyrics
+                )
+                .split('\n')
+                .map(
+
+                  (
+                    line,
+                    index
+                  ) => {
+
+                    const meaningLines =
+
+                      translatedMeaning
+                        ? translatedMeaning
+                            .replace(/\r/g, '')
+                            .split('\n')
+                        : [];
+
+                    return (
+
+                      <div
+                        key={index}
+                        className="group"
+                      >
+
+                        {/* Original / Transliterated */}
+
+                        <p className="font-['Noto_Sans'] text-[18px] font-medium leading-[1.75] tracking-[-0.01em] text-zinc-100 transition duration-300 group-hover:text-white">
+
+                          {line.trim()
+                            ? line
+                            : '\u00A0'}
+
+                        </p>
+
+                        {/* Meaning Translation */}
+
+                        {meaningEnabled && (
+
+                          <div className="mt-1.5 pl-1">
+
+                            {meaningLoading ? (
+
+                              <div className="flex items-center gap-3 pt-1">
+
+                                <div className="h-2 w-2 animate-pulse rounded-full bg-fuchsia-400" />
+
+                                <p className="text-sm italic text-zinc-500">
+
+                                  {meaningProgressText}
+
+                                </p>
+
+                              </div>
+
+                            ) : (
+
+                              meaningLines[
+                                index
+                              ] && (
+
+                                <p className="animate-in fade-in duration-500 text-[15px] italic leading-7 text-zinc-300/90 drop-shadow-[0_1px_1px_rgba(0,0,0,0.45)]">
+
+                                  {
+                                    meaningLines[
+                                      index
+                                    ]
+                                  }
+
+                                </p>
+
+                              )
+
+                            )}
 
                           </div>
-
-                        ) : (
-
-                          meaningLines[
-                            index
-                          ] && (
-
-                            <p className="animate-in fade-in duration-500 text-[15px] italic leading-7 text-zinc-300/90 drop-shadow-[0_1px_1px_rgba(0,0,0,0.45)]">
-
-                              {
-                                meaningLines[
-                                  index
-                                ]
-                              }
-
-                            </p>
-
-                          )
 
                         )}
 
                       </div>
 
-                    )}
+                    );
+                  }
 
-                  </div>
+                )}
 
-                );
-              }
+              </div>
 
             )}
 
-          </div>
+          </>
 
         )}
 

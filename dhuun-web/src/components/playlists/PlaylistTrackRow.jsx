@@ -3,6 +3,10 @@ import {
   Pause,
 } from 'lucide-react';
 
+import {
+  useNavigate,
+} from 'react-router-dom';
+
 import usePlayerStore
   from '../../store/playerStore';
 
@@ -16,6 +20,10 @@ PlaylistTrackRow({
   index,
   queue = [],
 }) {
+
+  const navigate =
+    useNavigate();
+
   const {
     currentTrack,
     isPlaying,
@@ -37,15 +45,18 @@ PlaylistTrackRow({
 
   const handlePlay =
     async () => {
+
       // Toggle Existing Track
 
       if (isActive) {
+
         togglePlayPause();
 
         return;
       }
 
       try {
+
         const response =
           await loadPlaybackQueue(
             track.id
@@ -68,6 +79,7 @@ PlaylistTrackRow({
         });
 
       } catch (error) {
+
         console.error(error);
 
         playTrack({
@@ -79,8 +91,36 @@ PlaylistTrackRow({
       }
     };
 
+  // -----------------------------------
+  // Navigation
+  // -----------------------------------
+
+  const handleNavigate =
+    (event) => {
+
+      event.stopPropagation();
+
+      const slug =
+        track.slug;
+
+      const trackId =
+        track.id ||
+        track._id;
+
+      if (!slug && !trackId) {
+        return;
+      }
+
+      navigate(
+        slug
+          ? `/track/${slug}`
+          : `/track/${trackId}`
+      );
+    };
+
   return (
-    <div className="group flex items-center gap-4 rounded-2xl px-3 py-3 hover:bg-white/[0.04] transition-colors">
+
+    <div className="group flex items-center gap-4 rounded-2xl px-3 py-3 transition-colors hover:bg-white/[0.04]">
 
       {/* -------------------------------- */}
       {/* Index / Playback */}
@@ -88,8 +128,9 @@ PlaylistTrackRow({
 
       <button
         onClick={handlePlay}
-        className="w-10 h-10 rounded-full bg-white/[0.04] border border-white/5 flex items-center justify-center flex-shrink-0"
+        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-white/5 bg-white/[0.04]"
       >
+
         {isActive &&
         isPlaying ? (
 
@@ -104,14 +145,25 @@ PlaylistTrackRow({
             fill="currentColor"
             className="ml-0.5"
           />
+
         )}
+
       </button>
 
       {/* -------------------------------- */}
       {/* Artwork */}
       {/* -------------------------------- */}
 
-      <div className="w-14 h-14 rounded-2xl overflow-hidden bg-white/5 flex-shrink-0">
+      <button
+
+        type="button"
+
+        onClick={
+          handleNavigate
+        }
+
+        className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-2xl bg-white/5 transition-opacity hover:opacity-80"
+      >
 
         {track.coverImage ? (
 
@@ -119,22 +171,34 @@ PlaylistTrackRow({
             src={
               track.coverImage
             }
-            alt={track.title}
-            className="w-full h-full object-cover"
+            alt={
+              track.title
+            }
+            className="h-full w-full object-cover"
           />
 
         ) : (
 
-          <div className="w-full h-full bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500" />
+          <div className="h-full w-full bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500" />
 
         )}
-      </div>
+
+      </button>
 
       {/* -------------------------------- */}
       {/* Meta */}
       {/* -------------------------------- */}
 
-      <div className="min-w-0 flex-1">
+      <button
+
+        type="button"
+
+        onClick={
+          handleNavigate
+        }
+
+        className="min-w-0 flex-1 text-left transition-opacity hover:opacity-80"
+      >
 
         <h3
           className={`truncate font-medium ${
@@ -143,17 +207,20 @@ PlaylistTrackRow({
               : 'text-white'
           }`}
         >
+
           {track.title}
+
         </h3>
 
-        <p className="text-sm text-white/45 truncate mt-1">
+        <p className="mt-1 truncate text-sm text-white/45">
 
           {track.primaryArtist
             ?.stageName ||
             'Unknown Artist'}
 
         </p>
-      </div>
+
+      </button>
 
       {/* -------------------------------- */}
       {/* Duration */}
@@ -177,6 +244,7 @@ PlaylistTrackRow({
           : '--:--'}
 
       </div>
+
     </div>
   );
 }

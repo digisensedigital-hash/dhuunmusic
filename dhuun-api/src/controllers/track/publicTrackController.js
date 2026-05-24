@@ -1,5 +1,8 @@
 import Track from '../../models/Track.js';
 
+import mongoose
+  from 'mongoose';
+
 import TrackAnalytics
   from '../../models/TrackAnalytics.js';
 
@@ -13,12 +16,23 @@ export const getPublicTrackDetails =
   async (req, res) => {
     try {
 
-      const { id } =
+      const { identifier } =
         req.params;
+
+      const query =
+
+        mongoose.Types.ObjectId.isValid(
+          identifier
+        )
+
+          ? { _id: identifier }
+
+          : { slug: identifier };
 
       const track =
         await Track.findOne({
-          _id: id,
+
+          ...query,
 
           /*
           |--------------------------------------------------------------------------

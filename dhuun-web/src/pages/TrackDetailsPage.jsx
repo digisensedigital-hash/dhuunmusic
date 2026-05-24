@@ -64,8 +64,8 @@ import {
 export default function
 TrackDetailsPage() {
 
-  const { id } =
-    useParams();
+  const { identifier } =
+  useParams();
 
   const navigate =
     useNavigate();
@@ -559,7 +559,7 @@ const handleMeaningToggle =
 
           const response =
             await getTrackDetails(
-              id
+              identifier
             );
 
           setTrack(
@@ -622,7 +622,7 @@ const handleMeaningToggle =
 
     fetchTrack();
 
-  }, [id]);
+  }, [identifier]);
 
   useEffect(() => {
 

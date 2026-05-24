@@ -84,7 +84,7 @@ router.get(
 
 // Public Track Details
 router.get(
-  '/:id',
+  '/:identifier',
   getPublicTrackDetails
 );
 
