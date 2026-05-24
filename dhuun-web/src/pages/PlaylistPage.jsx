@@ -19,6 +19,10 @@ import PlaylistTrackRow
 import usePlayerStore
   from '../store/playerStore';
 
+import {
+  getMediaUrl,
+} from '../utils/media';
+
 export default function
 PlaylistPage() {
   const { id } =
@@ -182,9 +186,11 @@ PlaylistPage() {
                 ?.coverImage ? (
                 <img
                   src={
-                    playlist
-                      .tracks[0]
-                      .coverImage
+                    getMediaUrl(
+                      playlist
+                        .tracks[0]
+                        .coverImage
+                    )
                   }
                   alt={
                     playlist.title

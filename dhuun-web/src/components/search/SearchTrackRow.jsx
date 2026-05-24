@@ -14,6 +14,10 @@ import {
   loadPlaybackQueue,
 } from '../../lib/player';
 
+import {
+  getMediaUrl,
+} from '../../utils/media';
+
 export default function
 SearchTrackRow({
   track,
@@ -106,8 +110,8 @@ SearchTrackRow({
 
       navigate(
         slug
-          ? `/track/${slug}`
-          : `/track/${trackId}`
+          ? `/app/track/${slug}`
+          : `/app/track/${trackId}`
       );
     };
 
@@ -134,7 +138,9 @@ SearchTrackRow({
 
           <img
             src={
-              track.coverImage
+              getMediaUrl(
+                track.coverImage
+              )
             }
             alt={
               track.title

@@ -26,7 +26,7 @@ BottomNav() {
 
       icon: Home,
 
-      path: '/',
+      path: '/app',
     },
 
     {
@@ -34,7 +34,7 @@ BottomNav() {
 
       icon: Search,
 
-      path: '/search',
+      path: '/app/search',
     },
 
     {
@@ -42,7 +42,7 @@ BottomNav() {
 
       icon: Library,
 
-      path: '/library',
+      path: '/app/library',
     },
 
     {
@@ -50,13 +50,15 @@ BottomNav() {
 
       icon: User,
 
-      path: '/profile',
+      path: '/app/profile',
     },
   ];
 
   return (
-    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md border-t border-white/10 bg-[#11111A]/95 backdrop-blur-xl z-50">
-      <div className="flex items-center justify-around h-20">
+    <div className="fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-white/10 bg-[#11111A]/95 backdrop-blur-xl">
+
+      <div className="flex h-20 items-center justify-around">
+
         {navItems.map(
           (item) => {
             const Icon =
@@ -72,13 +74,18 @@ BottomNav() {
                 key={
                   item.path
                 }
-                to={item.path}
+
+                to={
+                  item.path
+                }
+
                 className={`flex flex-col items-center gap-1 transition-colors ${
                   active
                     ? 'text-[#A855F7]'
                     : 'text-white/60'
                 }`}
               >
+
                 <Icon size={22} />
 
                 <span className="text-xs font-medium">
@@ -86,11 +93,14 @@ BottomNav() {
                     item.label
                   }
                 </span>
+
               </Link>
             );
           }
         )}
+
       </div>
+
     </div>
   );
 }

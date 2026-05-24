@@ -160,7 +160,7 @@ LyricsQuoteCard({
       onClick={() => {
 
         navigate(
-          `/track/${
+          `/app/track/${
             track.slug ||
             track.id
           }`

@@ -54,7 +54,7 @@ export default function SimilarTracksTab({
 
                 onClick={() =>
                   navigate(
-                    `/track/${similarTrack._id}`
+                    `/app/track/${similarTrack._id}`
                   )
                 }
 

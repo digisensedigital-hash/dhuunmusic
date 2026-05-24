@@ -507,7 +507,7 @@ SearchPage() {
                   onClick={() => {
 
                     navigate(
-                      `/track/${
+                      `/app/track/${
                         topResult.slug ||
                         topResult.id
                       }`

@@ -55,7 +55,7 @@ HorizontalTrackRail({
           onClick={() => {
 
             navigate(
-              '/search'
+              '/app/search'
             );
           }}
 

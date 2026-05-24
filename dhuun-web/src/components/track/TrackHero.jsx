@@ -63,10 +63,10 @@ export default function TrackHero({
                     }`,
 
                   url:
-                    `${window.location.origin}/track/${
-                      track.slug ||
-                      track.id
-                    }`,
+                  `${window.location.origin}/app/track/${
+                    track.slug ||
+                    track.id
+                  }`,
                 });
 
               } catch (error) {

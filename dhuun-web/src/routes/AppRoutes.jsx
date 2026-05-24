@@ -2,10 +2,14 @@ import {
   BrowserRouter,
   Routes,
   Route,
+  Navigate,
 } from 'react-router-dom';
 
 import MainLayout
   from '../layouts/MainLayout';
+
+import LandingPage
+  from '../pages/LandingPage';
 
 import HomePage
   from '../pages/HomePage';
@@ -30,55 +34,89 @@ AppRoutes() {
   return (
     <BrowserRouter>
 
-      <MainLayout>
+      <Routes>
 
-        <Routes>
+        {/* ------------------ */}
+        {/* Landing Experience */}
+        {/* ------------------ */}
+
+        <Route
+          path="/"
+          element={
+            <LandingPage />
+          }
+        />
+
+        {/* ------------------ */}
+        {/* Streaming App */}
+        {/* ------------------ */}
+
+        <Route
+          path="/app"
+          element={
+            <MainLayout />
+          }
+        >
 
           <Route
-            path="/"
+            index
             element={
               <HomePage />
             }
           />
 
           <Route
-            path="/playlist/:id"
+            path="playlist/:id"
             element={
               <PlaylistPage />
             }
           />
 
           <Route
-            path="/search"
+            path="search"
             element={
               <SearchPage />
             }
           />
 
           <Route
-            path="/artist/:id"
+            path="artist/:id"
             element={
               <ArtistPage />
             }
           />
 
           <Route
-            path="/track/:identifier"
+            path="track/:identifier"
             element={
               <TrackDetailsPage />
             }
           />
 
           <Route
-            path="/library"
+            path="library"
             element={
               <LibraryPage />
             }
           />
 
-        </Routes>
+        </Route>
 
-      </MainLayout>
+        {/* ------------------ */}
+        {/* Fallback */}
+        {/* ------------------ */}
+
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to="/"
+              replace
+            />
+          }
+        />
+
+      </Routes>
 
     </BrowserRouter>
   );

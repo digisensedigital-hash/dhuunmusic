@@ -105,7 +105,7 @@ TrackCard({
     () => {
 
       navigate(
-        `/track/${track.id}`
+        `/app/track/${track.id}`
       );
     };
 
@@ -318,7 +318,7 @@ TrackCard({
 
             to={
               track.primaryArtist?.id
-                ? `/artist/${track.primaryArtist.id}`
+                ? `/app/artist/${track.primaryArtist.id}`
                 : '#'
             }
 

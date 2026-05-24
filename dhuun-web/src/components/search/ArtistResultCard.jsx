@@ -2,6 +2,10 @@ import {
   Link,
 } from 'react-router-dom';
 
+import {
+  getMediaUrl,
+} from '../../utils/media';
+
 export default function
 ArtistResultCard({
   artist,
@@ -12,7 +16,7 @@ ArtistResultCard({
 
   return (
     <Link
-      to={`/artist/${artist.id}`}
+      to={`/app/artist/${artist.id}`}
       className="group relative overflow-hidden rounded-[30px] border border-white/10 bg-white/[0.03] backdrop-blur-xl p-5 min-w-[180px] max-w-[180px] block transition-transform duration-300 hover:scale-[1.02]"
     >
       {/* -------------------------------- */}
@@ -31,7 +35,9 @@ ArtistResultCard({
         {artist.profileImage ? (
           <img
             src={
-              artist.profileImage
+              getMediaUrl(
+                artist.profileImage
+              )
             }
             alt={
               artist.stageName

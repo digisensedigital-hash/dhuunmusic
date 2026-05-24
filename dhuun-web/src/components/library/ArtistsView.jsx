@@ -179,7 +179,7 @@ ArtistsView({
               onClick={() =>
 
                 navigate(
-                  `/artist/${
+                  `/app/artist/${
                     artist.slug ||
                     artist.id
                   }`

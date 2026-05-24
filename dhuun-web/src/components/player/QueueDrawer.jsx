@@ -397,8 +397,8 @@ QueueDrawer() {
 
                                 navigate(
                                   slug
-                                    ? `/track/${slug}`
-                                    : `/track/${trackId}`
+                                    ? `/app/track/${slug}`
+                                    : `/app/track/${trackId}`
                                 );
 
                               }, 150);

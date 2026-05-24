@@ -91,7 +91,7 @@ ArtistBubbleRail({
               onClick={() => {
 
                 navigate(
-                  `/artist/${artist.id}`
+                  `/app/artist/${artist.id}`
                 );
               }}
 

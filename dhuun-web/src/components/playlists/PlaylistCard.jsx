@@ -6,6 +6,10 @@ import {
   Link,
 } from 'react-router-dom';
 
+import {
+  getMediaUrl,
+} from '../../utils/media';
+
 export default function
 PlaylistCard({
   playlist,
@@ -16,7 +20,7 @@ PlaylistCard({
 
   return (
     <Link
-    to={`/playlist/${playlist.id}`}
+    to={`/app/playlist/${playlist.id}`}
     className="group relative overflow-hidden rounded-[34px] border border-white/10 bg-[#14141B] min-w-[240px] max-w-[240px] shadow-2xl">
       {/* -------------------------------- */}
       {/* Artwork Grid */}
@@ -36,7 +40,11 @@ PlaylistCard({
               >
                 {image ? (
                   <img
-                    src={image}
+                    src={
+                      getMediaUrl(
+                        image
+                      )
+                    }
                     alt=""
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />

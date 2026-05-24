@@ -71,7 +71,7 @@ export default function DetailsTab({
 
                           onClick={() =>
                             navigate(
-                              `/track/${variant._id}`
+                              `/app/track/${variant._id}`
                             )
                           }
 
