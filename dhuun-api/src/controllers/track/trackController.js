@@ -1218,27 +1218,20 @@ export const createTrack =
         /* ----------------------------------- */
 
         export const getAllTracks =
-          async (req, res) => {
-            try {
+              async (req, res) => {
+                try {
+
                   const tracks =
-                  await Track.find({
+                    await Track.find()
 
-                    publishingStatus:
-                      'PUBLISHED',
+                      .populate(
+                        'primaryArtist',
+                        'stageName'
+                      )
 
-                    processingStatus:
-                      'READY',
-
-                    isActive: true,
-
-                  })
-                  .populate(
-                    'primaryArtist',
-                    'stageName'
-                  )
-                  .sort({
-                    createdAt: -1,
-                  });
+                      .sort({
+                        createdAt: -1,
+                      });
 
               res.json({
                 success: true,
