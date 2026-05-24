@@ -20,6 +20,21 @@ export default defineConfig({
         'favicon.svg'
       ],
 
+      workbox: {
+        skipWaiting:
+          true,
+
+        clientsClaim:
+          true,
+
+        cleanupOutdatedCaches:
+          true,
+
+        globPatterns: [
+          '**/*.{js,css,html,png,svg,ico,json}'
+        ]
+      },
+
       manifest: {
         name:
           'Dhuun Music',
@@ -48,6 +63,7 @@ export default defineConfig({
         icons: [
           {
             src: '/Dhuun.png',
+
             sizes:
               '192x192',
 
@@ -60,6 +76,7 @@ export default defineConfig({
 
           {
             src: '/Dhuun.png',
+
             sizes:
               '512x512',
 
