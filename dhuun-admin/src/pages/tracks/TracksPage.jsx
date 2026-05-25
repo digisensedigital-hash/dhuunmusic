@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 
@@ -127,62 +128,71 @@ export default function TracksPage() {
   /* ----------------------------------- */
 
   const fetchTracks =
-    async () => {
-      try {
-        setLoading(true);
+  async () => {
 
-        setError('');
+    try {
 
-        const data =
-          await getTracks();
+      setLoading(true);
 
-        setTracks(
-          data?.tracks || []
-        );
-      } catch (err) {
-        console.error(err);
+      setError('');
 
-        setError(
-          'Failed to load tracks'
-        );
+      const data =
+        await getTracks();
+
+      setTracks(
+        data?.tracks || []
+      );
+
+    } catch (err) {
+
+      console.error(err);
+
+      setError(
+        'Failed to load tracks'
+      );
+
+      if (tracks.length > 0) {
 
         toast.error(
           'Failed to fetch tracks'
         );
-      } finally {
-        setLoading(false);
+
       }
-    };
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  };
+
+  /* ----------------------------------- */
+  /* Fetch Tracks */
+  /* ----------------------------------- */
 
   useEffect(() => {
 
-  fetchTracks();
-
-  /*
-  |--------------------------------------------------------------------------
-  | Auto Refresh
-  |--------------------------------------------------------------------------
-  */
-
-  const interval =
-    setInterval(() => {
-
-      fetchTracks();
-
-    }, 30000);
-
-  return () => {
-    clearInterval(interval);
-  };
+    fetchTracks();
 
   }, []);
+
+  /* ----------------------------------- */
+  /* Reset Page On Search */
+  /* ----------------------------------- */
+
+  useEffect(() => {
+
+    setCurrentPage(1);
+
+  }, [search]);
 
   /* ----------------------------------- */
   /* Search Filtering */
   /* ----------------------------------- */
 
-  const filteredTracks =
-    tracks.filter((track) => {
+  const filteredTracks = useMemo(() => {
+
+    return tracks.filter((track) => {
 
       if (!search) {
         return true;
@@ -219,6 +229,8 @@ export default function TracksPage() {
           .includes(search)
       );
     });
+
+  }, [tracks, search]);
 
   /* ----------------------------------- */
   /* Pagination */
@@ -332,7 +344,7 @@ export default function TracksPage() {
     };
 
   return (
-    <div>
+<div>
 
       {/* ----------------------------------- */}
       {/* Header */}
@@ -360,24 +372,22 @@ export default function TracksPage() {
         </button>
       </div>
 
-      {/* ----------------------------------- */}
       {/* Track Table */}
-      {/* ----------------------------------- */}
 
-      <TrackTable
-        tracks={paginatedTracks}
-        loading={loading}
-        error={error}
-        onView={
-          handleViewTrack
-        }
-        onEdit={
-          handleEditTrack
-        }
-        onDelete={
-          handleDeleteTrack
-        }
-      />
+        <TrackTable
+          tracks={paginatedTracks}
+          loading={loading}
+          error={error}
+          onView={
+            handleViewTrack
+          }
+          onEdit={
+            handleEditTrack
+          }
+          onDelete={
+            handleDeleteTrack
+          }
+        />
 
       {/* ----------------------------------- */}
       {/* Page Size */}
@@ -450,7 +460,7 @@ export default function TracksPage() {
 
         <button
           disabled={
-            currentPage === totalPages ||
+            currentPage >= totalPages ||
             totalPages <= 1
           }
           onClick={() =>
@@ -524,13 +534,7 @@ export default function TracksPage() {
 
                     {selectedTrack.coverImage ? (
                       <img
-                        src={
-                          selectedTrack.coverImage
-                            ? getMediaUrl(
-                                selectedTrack.coverImage
-                              )
-                            : undefined
-                        }
+                        src={getMediaUrl(selectedTrack.coverImage)}
                         alt={
                           selectedTrack.title
                         }
@@ -751,13 +755,7 @@ export default function TracksPage() {
 
                     {selectedTrack.coverImage ? (
                       <img
-                        src={
-                          selectedTrack.coverImage
-                            ? getMediaUrl(
-                                selectedTrack.coverImage
-                              )
-                            : undefined
-                        }
+                        src={getMediaUrl(selectedTrack.coverImage)}
                         alt={
                           selectedTrack.title
                         }

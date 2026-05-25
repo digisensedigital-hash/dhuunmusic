@@ -55,13 +55,13 @@ export default function TrackTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-950">
+    <div className="rounded-3xl border border-zinc-800 bg-zinc-950">
 
       {/* ----------------------------------- */}
       {/* Header */}
       {/* ----------------------------------- */}
 
-      <div className="grid grid-cols-8 border-b border-zinc-800 bg-black/30 px-6 py-4 text-sm font-semibold text-zinc-400">
+      <div className="grid grid-cols-8 border-b border-zinc-800 bg-zinc-950 px-6 py-4 text-sm font-semibold text-zinc-400">
 
         <div className="col-span-3">
           Track
@@ -88,11 +88,11 @@ export default function TrackTable({
         </div>
       </div>
 
-      {/* ----------------------------------- */}
-      {/* Rows */}
-      {/* ----------------------------------- */}
+      /* ----------------------------------- */
+      /* Rows */
+      /* ----------------------------------- */
 
-      {tracks.map((track) => (
+        {tracks.map((track) => (
         <div
           key={track._id}
           className="grid grid-cols-8 items-center border-b border-zinc-900 px-6 py-5 transition hover:bg-zinc-900/40"
@@ -374,6 +374,7 @@ export default function TrackTable({
           </div>
         </div>
       ))}
+      
     </div>
   );
 }
