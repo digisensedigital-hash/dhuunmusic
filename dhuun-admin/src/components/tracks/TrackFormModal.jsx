@@ -1339,9 +1339,17 @@ const handleUpload =
 
           </div>
 
-          /* ----------------------------------- */
-          /* Publishing Workflow */
-          /* ----------------------------------- */
+          <div className="flex items-center gap-4 py-2">
+
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-zinc-700 to-zinc-900" />
+
+            <span className="text-[11px] font-medium uppercase tracking-[0.4em] text-zinc-600">
+              Publishing Workflow
+            </span>
+
+            <div className="h-px flex-1 bg-gradient-to-l from-transparent via-zinc-700 to-zinc-900" />
+
+          </div>
 
           <div className="rounded-3xl border border-zinc-800 bg-black p-6">
 
