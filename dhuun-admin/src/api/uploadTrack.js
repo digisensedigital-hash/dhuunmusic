@@ -3,16 +3,11 @@ import client
 
 export const uploadTrack =
   async (formData) => {
+
     const response =
       await client.post(
         '/tracks',
-        formData,
-        {
-          headers: {
-            'Content-Type':
-              'multipart/form-data',
-          },
-        }
+        formData
       );
 
     return response.data;
