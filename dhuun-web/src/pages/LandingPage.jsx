@@ -47,8 +47,17 @@ LandingPage() {
 
   ] = useState(false);
 
+  // -----------------------------------
+  // Platform Detection
+  // -----------------------------------
+
   const isIOS =
     /iPad|iPhone|iPod/.test(
+      navigator.userAgent
+    );
+
+  const isAndroid =
+    /Android/.test(
       navigator.userAgent
     );
 
@@ -125,11 +134,15 @@ LandingPage() {
         {/* Brand */}
 
         <h1 className="text-5xl font-black tracking-tight">
+
           Dhuun
+
         </h1>
 
         <p className="mt-3 text-lg text-white/70">
+
           Music for the soul.
+
         </p>
 
         {/* Description */}
@@ -147,7 +160,9 @@ LandingPage() {
 
         <div className="mt-12 flex w-full max-w-sm flex-col gap-4">
 
+          {/* -------------------------------- */}
           {/* Android Install */}
+          {/* -------------------------------- */}
 
           {isInstallable && (
 
@@ -166,27 +181,64 @@ LandingPage() {
 
           )}
 
-          {/* iPhone Install */}
+          {/* -------------------------------- */}
+          {/* Android Installed */}
+          {/* -------------------------------- */}
 
           {!isInstallable &&
-            isIOS && (
+            isAndroid &&
+            !isStandalone && (
+
+            <button
+
+              onClick={() => {
+
+                navigate('/app');
+              }}
+
+              className="flex items-center justify-center gap-3 rounded-2xl bg-white px-6 py-4 font-semibold text-black transition active:scale-[0.98]"
+            >
+
+              <PlayCircle size={20} />
+
+              Open App
+
+            </button>
+
+          )}
+
+          {/* -------------------------------- */}
+          {/* iPhone Install */}
+          {/* -------------------------------- */}
+
+          {!isInstallable &&
+            isIOS &&
+            !isStandalone && (
 
             <IOSInstallSheet />
 
           )}
 
-          {/* Browser Continue */}
+          {/* -------------------------------- */}
+          {/* Continue In Browser */}
+          {/* -------------------------------- */}
 
-          <Link
-            to="/app"
-            className="flex items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-6 py-4 font-medium text-white/90 backdrop-blur-xl transition active:scale-[0.98]"
-          >
+          {!isStandalone && (
 
-            <PlayCircle size={20} />
+            <Link
 
-            Continue in Browser
+              to="/app"
 
-          </Link>
+              className="flex items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-6 py-4 font-medium text-white/90 backdrop-blur-xl transition active:scale-[0.98]"
+            >
+
+              <PlayCircle size={20} />
+
+              Continue in Browser
+
+            </Link>
+
+          )}
 
         </div>
 
