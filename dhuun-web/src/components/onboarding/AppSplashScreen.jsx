@@ -1,5 +1,4 @@
 import {
-  Music4,
   Smartphone,
   PlayCircle,
 } from 'lucide-react';
@@ -23,8 +22,6 @@ import useStandaloneMode
 import IOSInstallSheet
   from '../components/onboarding/IOSInstallSheet';
 
-import AppSplashScreen
-  from '../components/onboarding/AppSplashScreen';
 
 export default function
 LandingPage() {
@@ -127,7 +124,11 @@ LandingPage() {
 
         <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
 
-          <Music4 size={42} />
+          <img
+            src="/Dhuun.png"
+            alt="Dhuun"
+            className="h-14 w-14 object-contain"
+            />
 
         </div>
 
