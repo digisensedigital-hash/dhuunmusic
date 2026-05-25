@@ -189,21 +189,41 @@ LandingPage() {
             isAndroid &&
             !isStandalone && (
 
-            <button
+            <div className="rounded-[28px] border border-white/10 bg-white/[0.04] px-6 py-6 text-left backdrop-blur-xl">
 
-              onClick={() => {
+              <div className="flex items-center gap-3">
 
-                navigate('/app');
-              }}
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05]">
 
-              className="flex items-center justify-center gap-3 rounded-2xl bg-white px-6 py-4 font-semibold text-black transition active:scale-[0.98]"
-            >
+                  <img
+                    src="/DhuunMusic_Logo.png"
+                    alt="Dhuun"
+                    className="h-7 w-7 object-contain"
+                  />
 
-              <PlayCircle size={20} />
+                </div>
 
-              Open App
+                <div>
 
-            </button>
+                  <p className="text-sm font-semibold text-white">
+
+                    Dhuun Is Already Installed
+
+                  </p>
+
+                  <p className="mt-1 text-sm leading-6 text-white/55">
+
+                    Open Dhuun directly from your
+                    phone’s home screen for the
+                    immersive app experience.
+
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
 
           )}
 

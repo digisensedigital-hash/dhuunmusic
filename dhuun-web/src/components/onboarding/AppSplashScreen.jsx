@@ -63,7 +63,7 @@ AppSplashScreen() {
         >
 
           <img
-            src="/Dhuun.png"
+            src="/DhuunMusic_Logo.png"
             alt="Dhuun"
             className="h-16 w-16 object-contain"
           />

@@ -16,7 +16,7 @@ export default defineConfig({
         'autoUpdate',
 
       includeAssets: [
-        'Dhuun.png',
+        'DhuunMusic_Logo.png',
         'favicon.svg'
       ],
 
@@ -62,7 +62,7 @@ export default defineConfig({
 
         icons: [
           {
-            src: '/Dhuun.png',
+            src: '/DhuunMusic_Logo.png',
 
             sizes:
               '192x192',
@@ -75,7 +75,7 @@ export default defineConfig({
           },
 
           {
-            src: '/Dhuun.png',
+            src: '/DhuunMusic_Logo.png',
 
             sizes:
               '512x512',
