@@ -133,22 +133,6 @@ LyricsStripCarousel({
     );
 
   // -----------------------------------
-  // Split Rows
-  // -----------------------------------
-
-  const topRow =
-    lyricalTracks.slice(
-      0,
-      6
-    );
-
-  const bottomRow =
-    lyricalTracks.slice(
-      6,
-      12
-    );
-
-  // -----------------------------------
   // Play Handler
   // -----------------------------------
 
@@ -254,7 +238,26 @@ LyricsStripCarousel({
                   );
                 }}
 
-                className="group relative flex h-[104px] min-w-[460px] cursor-pointer items-center gap-5 overflow-hidden rounded-2xl border border-white/10 bg-[#13131A]/90 px-4 backdrop-blur-2xl"
+                className="
+                  group
+                  relative
+                  flex
+                  h-[96px]
+                  w-[88vw]
+                  sm:w-[420px]
+                  md:w-[440px]
+                  flex-shrink-0
+                  cursor-pointer
+                  items-center
+                  gap-4
+                  overflow-hidden
+                  rounded-2xl
+                  border
+                  border-white/10
+                  bg-[#13131A]/90
+                  px-4
+                  backdrop-blur-2xl
+                  "
               >
 
                 {/* Ambient */}
@@ -293,7 +296,7 @@ LyricsStripCarousel({
 
                 <div className="relative z-10 min-w-0 flex-1">
 
-                  <p className="line-clamp-2 text-[17px] font-semibold leading-relaxed tracking-tight text-white">
+                  <p className="line-clamp-2 text-[15px] sm:text-[17px] font-semibold leading-relaxed tracking-tight text-white">
 
                     “{
                       quotesMapRef.current.get(
@@ -396,17 +399,8 @@ LyricsStripCarousel({
         <div className="overflow-hidden">
 
           {renderRow(
-            topRow,
+            lyricalTracks,
             'left'
-          )}
-
-        </div>
-
-        <div className="overflow-hidden">
-
-          {renderRow(
-            bottomRow,
-            'right'
           )}
 
         </div>
