@@ -595,7 +595,7 @@ const handleUpload =
 
       formData.append(
         'allowMeaningGeneration',
-        form.allowMeaningGeneration
+        String(form.allowMeaningGeneration)
       );
 
       formData.append(
@@ -610,7 +610,7 @@ const handleUpload =
 
       formData.append(
         'isExplicit',
-        form.isExplicit
+        String(form.isExplicit)
       );
 
       formData.append(
@@ -624,7 +624,7 @@ const handleUpload =
 
       formData.append(
         'isMasterTrack',
-        form.isMasterTrack
+        String(form.isMasterTrack)
       );
 
       if (form.masterTrackId) {
@@ -637,7 +637,7 @@ const handleUpload =
 
       formData.append(
         'isVariant',
-        !!form.masterTrackId
+        String(!!form.masterTrackId)
       );
 
       if (form.masterTrackId) {
@@ -766,6 +766,12 @@ const handleUpload =
       /* ----------------------------------- */
       /* Create vs Edit */
       /* ----------------------------------- */
+
+      console.log('FORMDATA DEBUG');
+
+      for (const pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
 
       const actionPromise =
         mode === 'edit'
