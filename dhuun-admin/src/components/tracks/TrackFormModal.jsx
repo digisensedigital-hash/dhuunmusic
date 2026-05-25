@@ -588,10 +588,10 @@ const handleUpload =
         form.language
       );
 
-      formData.append(
-        'lyrics',
-        form.lyrics
-      );
+      //formData.append(
+      //  'lyrics',
+      //  form.lyrics
+      //);
 
       formData.append(
         'allowMeaningGeneration',
