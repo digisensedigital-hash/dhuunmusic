@@ -1,4 +1,5 @@
 import {
+  Music4,
   Smartphone,
   PlayCircle,
 } from 'lucide-react';
@@ -126,11 +127,7 @@ LandingPage() {
 
         <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
 
-          <img
-            src="/Dhuun.png"
-            alt="Dhuun"
-            className="h-14 w-14 object-contain"
-          />
+          <Music4 size={42} />
 
         </div>
 
