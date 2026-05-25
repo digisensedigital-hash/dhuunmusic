@@ -189,11 +189,6 @@ export default function TrackFormModal({
 
   useEffect(() => {
 
-    console.log(
-      'INITIAL DATA',
-      initialData
-    );
-
     if (
       mode !== 'edit' ||
       !initialData
@@ -766,12 +761,6 @@ const handleUpload =
       /* ----------------------------------- */
       /* Create vs Edit */
       /* ----------------------------------- */
-
-      console.log('FORMDATA DEBUG');
-
-      for (const pair of formData.entries()) {
-        console.log(pair[0], pair[1]);
-      }
 
       const actionPromise =
         mode === 'edit'
