@@ -588,10 +588,10 @@ const handleUpload =
         form.language
       );
 
-      //formData.append(
-      //  'lyrics',
-      //  form.lyrics
-      //);
+      formData.append(
+        'lyrics',
+        form.lyrics
+      );
 
       formData.append(
         'allowMeaningGeneration',
@@ -674,24 +674,24 @@ const handleUpload =
       formData.append(
         'moods',
         JSON.stringify(
-          form.moods
-            .split(',')
-            .map((m) =>
-              m.trim()
-            )
-            .filter(Boolean)
-            )
+          Array.isArray(form.moods)
+            ? form.moods
+            : form.moods
+                .split(',')
+                .map((m) => m.trim())
+                .filter(Boolean)
+        )
       );
 
       formData.append(
         'tags',
         JSON.stringify(
-          form.tags
-            .split(',')
-            .map((t) =>
-              t.trim()
-            )
-            .filter(Boolean)
+          Array.isArray(form.tags)
+            ? form.tags
+            : form.tags
+                .split(',')
+                .map((t) => t.trim())
+                .filter(Boolean)
         )
       );
 
