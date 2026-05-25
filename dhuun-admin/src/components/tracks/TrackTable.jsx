@@ -88,10 +88,7 @@ export default function TrackTable({
         </div>
       </div>
 
-      /* ----------------------------------- */
-      /* Rows */
-      /* ----------------------------------- */
-
+      {/* Rows */}
         {tracks.map((track) => (
         <div
           key={track._id}
@@ -374,7 +371,7 @@ export default function TrackTable({
           </div>
         </div>
       ))}
-      
+
     </div>
   );
 }
