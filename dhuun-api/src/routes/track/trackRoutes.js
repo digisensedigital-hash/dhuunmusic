@@ -68,6 +68,24 @@ router.put(
   updateTrack
 );
 
+router.post(
+  '/:id',
+  authMiddleware,
+
+  upload.fields([
+    {
+      name: 'audio',
+      maxCount: 1
+    },
+    {
+      name: 'coverImage',
+      maxCount: 1
+    }
+  ]),
+
+  updateTrack
+);
+
 router.delete(
   '/:id',
   authMiddleware,

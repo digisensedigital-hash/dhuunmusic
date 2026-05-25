@@ -12,7 +12,7 @@ export const updateTrack =
   ) => {
 
     const response =
-      await client.put(
+      await client.post(
         `/tracks/${trackId}`,
         formData
       );
