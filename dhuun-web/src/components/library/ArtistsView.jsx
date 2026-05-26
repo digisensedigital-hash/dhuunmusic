@@ -165,10 +165,47 @@ ArtistsView({
       <div className="flex flex-col gap-2">
 
         {artists.map(
-          ({
-            artist,
-            trackCount,
-          }) => (
+        ({
+          artist,
+          trackCount,
+        }) => {
+
+          const profileImage =
+            artist?.profileImage;
+
+          const imageUrl =
+
+            typeof profileImage ===
+            'string'
+
+              &&
+
+              profileImage.trim()
+
+                ? (
+
+                    profileImage.startsWith(
+                      'http'
+                    )
+
+                      ? profileImage
+
+                      : `${
+                          import.meta.env.VITE_API_URL
+                            .replace('/api', '')
+                        }${profileImage}`
+
+                  )
+
+                : null;
+
+          console.log(
+          'FINAL IMAGE URL:',
+          imageUrl
+          );
+
+
+          return (
 
             <button
 
@@ -190,14 +227,44 @@ ArtistsView({
 
             >
 
-              {/* Artist Icon */}
+              {/* Artist Artwork */}
 
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04]">
+              <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/[0.04]">
 
-                <Disc3
-                  size={22}
-                  className="text-white/40"
-                />
+                {imageUrl ? (
+
+                  <img
+
+                    src={imageUrl}
+
+                    alt={
+                      artist.stageName ||
+                      artist.name
+                    }
+
+                    className="h-full w-full object-cover"
+
+                    onError={(e) => {
+
+                      e.currentTarget.style.display =
+                        'none';
+
+                    }}
+
+                  />
+
+                ) : (
+
+                  <div className="flex h-full w-full items-center justify-center">
+
+                    <Disc3
+                      size={22}
+                      className="text-white/40"
+                    />
+
+                  </div>
+
+                )}
 
               </div>
 
@@ -234,8 +301,11 @@ ArtistsView({
               />
 
             </button>
-          )
-        )}
+
+          );
+
+        }
+      )}
 
       </div>
 

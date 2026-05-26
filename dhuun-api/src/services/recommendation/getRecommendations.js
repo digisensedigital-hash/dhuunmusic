@@ -26,18 +26,34 @@ getRecommendations({
   }
 
   const savedTracks =
-    userId
-      ? await SavedTrack.find({
+  userId
+    ? (
+        await SavedTrack.find({
           userId,
-        }).populate('trackId')
-      : [];
+        }).populate({
+          path: 'trackId',
+          match: {
+            publishingStatus: 'PUBLISHED',
+            isActive: true,
+          },
+        })
+      ).filter(item => item.trackId)
+    : [];
 
   const recentlyPlayed =
-    userId
-      ? await RecentlyPlayed.find({
+  userId
+    ? (
+        await RecentlyPlayed.find({
           userId,
-        }).populate('trackId')
-      : [];
+        }).populate({
+          path: 'trackId',
+          match: {
+            publishingStatus: 'PUBLISHED',
+            isActive: true,
+          },
+        })
+      ).filter(item => item.trackId)
+    : [];
 
   // -----------------------------------
   // Seed Track
@@ -119,11 +135,13 @@ getRecommendations({
   // -----------------------------------
 
   for (const trending of trendingTracks) {
-    const track =
-      await Track.findById(
-        trending.trackId
-      ).populate(
-        'primaryArtist',
+       const track =
+        await Track.findOne({
+          _id: trending.trackId,
+          publishingStatus: 'PUBLISHED',
+          isActive: true,
+        }).populate(
+              'primaryArtist',
         'stageName profileImage'
       );
 

@@ -1,8 +1,15 @@
 import {
+  useState,
+} from 'react';
+
+import {
   ChevronDown,
   Globe,
   Languages,
 } from 'lucide-react';
+
+import useCapabilities
+  from '../../hooks/capabilities/useCapabilities';
 
 export default function LyricsPanel({
 
@@ -29,6 +36,18 @@ export default function LyricsPanel({
   meaningProgressText,
 
 }) {
+
+  const {
+  canUseMeanings,
+  canPreviewMeanings,
+  requiresRegistrationForMeanings,
+  requiresPremiumForMeanings,
+  } = useCapabilities();
+
+  const [
+  showMeaningInfo,
+  setShowMeaningInfo,
+  ] = useState(false);
 
   return (
 
@@ -129,13 +148,32 @@ export default function LyricsPanel({
                 ?? true ? (
 
                 <button
-                  onClick={
-                    handleMeaningToggle
-                  }
+
+                  onClick={() => {
+
+                    if (!canUseMeanings) {
+
+                      setShowMeaningInfo(
+                        true
+                      );
+
+                      return;
+
+                    }
+
+                    handleMeaningToggle();
+
+                  }}
 
                   className={`flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition ${
-                    meaningEnabled
+                    !canUseMeanings
+
+                    ? 'border-amber-500/20 bg-amber-500/10 text-amber-200'
+
+                    : meaningEnabled
+
                       ? 'border-fuchsia-500/20 bg-fuchsia-500/10 text-fuchsia-100'
+
                       : 'border-white/10 bg-white/[0.04] text-zinc-400'
                   }`}
                 >
@@ -144,9 +182,11 @@ export default function LyricsPanel({
                     size={15}
                   />
 
-                  {meaningEnabled
-                    ? 'Meaning On'
-                    : 'Meaning'}
+                  {!canUseMeanings
+                    ? 'AI Meanings'
+                    : meaningEnabled
+                      ? 'Meaning On'
+                      : 'Meaning'}
 
                 </button>
 
@@ -169,6 +209,98 @@ export default function LyricsPanel({
               )}
 
             </div>
+
+            {showMeaningInfo
+              &&
+
+              !canUseMeanings
+              &&
+
+              canPreviewMeanings && (
+
+              <div className="mb-8 overflow-hidden rounded-[28px] border border-amber-500/10 bg-gradient-to-b from-amber-500/[0.08] to-transparent">
+
+                <div className="px-5 py-5">
+
+                  <div className="flex items-center justify-between">
+
+                    <div>
+
+                      <p className="text-xs uppercase tracking-[0.28em] text-amber-200/50">
+
+                        Dhuun Intelligence
+
+                      </p>
+
+                      <h3 className="mt-2 text-xl font-bold text-amber-50">
+
+                        AI Meaning Interpretation
+
+                      </h3>
+
+                    </div>
+
+                    <button
+
+                      onClick={() =>
+                        setShowMeaningInfo(
+                          false
+                        )
+                      }
+
+                      className="text-sm text-amber-200/50 transition hover:text-amber-100"
+
+                    >
+
+                      Close
+
+                    </button>
+
+                  </div>
+
+                  <p className="mt-5 text-sm leading-7 text-amber-100/75">
+
+                    {requiresRegistrationForMeanings
+                      ? `Create your Dhuun account to unlock immersive lyrical interpretation, emotional understanding, and AI-powered meaning layers.`
+                      : `Your trial has ended. Upgrade to Dhuun Premium to continue accessing immersive AI meaning interpretation.`}
+
+                  </p>
+
+                  <div className="mt-6 flex items-center gap-3">
+
+                    {requiresRegistrationForMeanings ? (
+
+                      <button
+
+                        className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black"
+
+                      >
+
+                        Create Account
+
+                      </button>
+
+                    ) : (
+
+                      <button
+
+                        className="rounded-full bg-amber-400 px-5 py-3 text-sm font-semibold text-black"
+
+                      >
+
+                        Upgrade Premium
+
+                      </button>
+
+                    )}
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            )}
 
             {convertingLyrics ? (
 

@@ -13,16 +13,21 @@ import serializeTrack
 
 export const getPublicArtistProfile =
   async (req, res) => {
+
     try {
+
       const { id } = req.params;
 
       const artist =
         await Artist.findById(id);
 
       if (!artist) {
+
         return res.status(404).json({
           success: false,
-          message: 'Artist not found'
+
+          message:
+            'Artist not found'
         });
       }
 
@@ -31,13 +36,23 @@ export const getPublicArtistProfile =
           artistId: artist._id
         });
 
+      // -----------------------------------
+      // Public Top Tracks
+      // -----------------------------------
+
       const topTracksRaw =
         await Track.find({
+
           primaryArtist:
             artist._id,
 
+          publishingStatus:
+            'PUBLISHED',
+
           processingStatus:
-            'READY'
+            'READY',
+
+          isActive: true,
         })
           .populate(
             'primaryArtist'
@@ -47,18 +62,47 @@ export const getPublicArtistProfile =
           })
           .limit(10);
 
+      // -----------------------------------
+      // Trending Tracks
+      // -----------------------------------
+
       const trendingTracksRaw =
         await TrendingTrack.find()
           .sort({ rank: 1 })
           .populate({
             path: 'trackId',
+
+            match: {
+
+              publishingStatus:
+                'PUBLISHED',
+
+              processingStatus:
+                'READY',
+
+              isActive: true,
+            },
+
             populate: {
               path: 'primaryArtist'
             }
           });
 
+      // -----------------------------------
+      // Remove Null Hydrated Tracks
+      // -----------------------------------
+
+      const visibleTrendingTracks =
+        trendingTracksRaw.filter(
+          (item) => item.trackId
+        );
+
+      // -----------------------------------
+      // Artist Trending Tracks
+      // -----------------------------------
+
       const artistTrendingTracks =
-        trendingTracksRaw
+        visibleTrendingTracks
           .filter(
             (item) =>
               item.trackId
@@ -73,15 +117,34 @@ export const getPublicArtistProfile =
             )
           );
 
+      // -----------------------------------
+      // Serialize Top Tracks
+      // -----------------------------------
+
       const topTracks =
-        topTracksRaw.map(
-          serializeTrack
-        );
+        topTracksRaw
+          .filter(
+            (track) =>
+
+              track &&
+
+              track.publishingStatus ===
+                'PUBLISHED' &&
+
+              track.processingStatus ===
+                'READY' &&
+
+              track.isActive === true
+          )
+          .map(
+            serializeTrack
+          );
 
       res.json({
         success: true,
 
         artist: {
+
           id: artist._id,
 
           stageName:
@@ -120,11 +183,14 @@ export const getPublicArtistProfile =
         trendingTracks:
           artistTrendingTracks
       });
+
     } catch (error) {
+
       console.error(error);
 
       res.status(500).json({
         success: false,
+
         message:
           'Failed to fetch artist profile'
       });

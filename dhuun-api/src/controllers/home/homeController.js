@@ -34,8 +34,9 @@ import serializePlaylist
 export const getHomeFeed =
   async (req, res) => {
     try {
+
       const userId =
-  req.user?.id || null;
+        req.user?.id || null;
 
       // -----------------------------------
       // Trending Runtime
@@ -51,6 +52,7 @@ export const getHomeFeed =
             path: 'trackId',
 
             match: {
+
               publishingStatus:
                 'PUBLISHED',
 
@@ -73,7 +75,9 @@ export const getHomeFeed =
       // -----------------------------------
 
       for (const item of trending) {
+
         if (item.trackId) {
+
           await item.trackId.populate(
             'primaryArtist',
             'stageName profileImage'
@@ -81,9 +85,14 @@ export const getHomeFeed =
         }
       }
 
-      trending = trending.filter(
-        (item) => item.trackId
-      );
+      // -----------------------------------
+      // Remove Null Hydrated Tracks
+      // -----------------------------------
+
+      trending =
+        trending.filter(
+          (item) => item.trackId
+        );
 
       // -----------------------------------
       // Sparse Catalog Fallback
@@ -92,6 +101,7 @@ export const getHomeFeed =
       if (
         trending.length < 10
       ) {
+
         const existingIds =
           trending.map(
             (item) =>
@@ -99,30 +109,31 @@ export const getHomeFeed =
           );
 
         const fallbackTracks =
-        await Track.find({
+          await Track.find({
 
-          _id: {
-            $nin: existingIds
-          },
+            _id: {
+              $nin: existingIds
+            },
 
-          publishingStatus:
-            'PUBLISHED',
+            publishingStatus:
+              'PUBLISHED',
 
-          processingStatus:
-            'READY',
+            processingStatus:
+              'READY',
 
-          isActive: true,
-        })
+            isActive: true,
+          })
             .sort({
               createdAt: -1
             })
             .limit(
               10 -
-                trending.length
+              trending.length
             )
             .populate({
               path:
                 'primaryArtist',
+
               select:
                 'stageName profileImage'
             });
@@ -155,100 +166,140 @@ export const getHomeFeed =
       // -----------------------------------
 
       const recommended =
-      userId
-        ? await getRecommendations({
-            userId
-          })
-        : [];
+        userId
+          ? await getRecommendations({
+              userId
+            })
+          : [];
 
       // -----------------------------------
-        // Recently Played
-        // -----------------------------------
+      // Recently Played
+      // -----------------------------------
 
-        const recentlyPlayed =
+      const recentlyPlayed =
         userId
-            ? await RecentlyPlayed.find({
+          ? (
+              await RecentlyPlayed.find({
                 userId
-            })
+              })
                 .sort({
-                playedAt: -1
+                  playedAt: -1
                 })
                 .limit(50)
                 .populate({
-                path: 'trackId',
+                  path: 'trackId',
 
-                match: {
-                  publishingStatus:
-                    'PUBLISHED',
+                  match: {
 
-                  processingStatus:
-                    'READY',
+                    publishingStatus:
+                      'PUBLISHED',
 
-                  isActive: true,
-                },
-                populate: {
+                    processingStatus:
+                      'READY',
+
+                    isActive: true,
+                  },
+
+                  populate: {
                     path: 'primaryArtist',
+
                     select:
-                    'stageName profileImage'
-                }
+                      'stageName profileImage'
+                  }
                 })
-            : [];
+            ).filter(
+              (item) => item.trackId
+            )
+          : [];
 
-        // -----------------------------------
-        // Saved Tracks
-        // -----------------------------------
+      // -----------------------------------
+      // Saved Tracks
+      // -----------------------------------
 
-        const savedTracks =
+      const savedTracks =
         userId
-            ? await SavedTrack.find({
+          ? (
+              await SavedTrack.find({
                 userId
-            })
+              })
                 .sort({
-                savedAt: -1
+                  savedAt: -1
                 })
                 .limit(50)
                 .populate({
-                path: 'trackId',
+                  path: 'trackId',
 
-                match: {
-                  publishingStatus:
-                    'PUBLISHED',
+                  match: {
 
-                  processingStatus:
-                    'READY',
+                    publishingStatus:
+                      'PUBLISHED',
 
-                  isActive: true,
-                },
-                populate: {
+                    processingStatus:
+                      'READY',
+
+                    isActive: true,
+                  },
+
+                  populate: {
                     path: 'primaryArtist',
+
                     select:
-                    'stageName profileImage'
-                }
+                      'stageName profileImage'
+                  }
                 })
-            : [];
+            ).filter(
+              (item) => item.trackId
+            )
+          : [];
 
-        // -----------------------------------
-        // Playlists
-        // -----------------------------------
+      // -----------------------------------
+      // Playlists
+      // -----------------------------------
 
-        const playlists =
+      const playlists =
         userId
-            ? await Playlist.find({
-                ownerId: userId
+          ? await Playlist.find({
+              ownerId: userId
             })
-                .sort({
+              .sort({
                 updatedAt: -1
-                })
-                .limit(10)
-                .populate({
+              })
+              .limit(10)
+              .populate({
                 path: 'tracks.trackId',
+
+                match: {
+
+                  publishingStatus:
+                    'PUBLISHED',
+
+                  processingStatus:
+                    'READY',
+
+                  isActive: true,
+                },
+
                 populate: {
-                    path: 'primaryArtist',
-                    select:
+                  path: 'primaryArtist',
+
+                  select:
                     'stageName profileImage'
                 }
-                })
-            : [];
+              })
+          : [];
+
+      // -----------------------------------
+      // Remove Null Playlist Tracks
+      // -----------------------------------
+
+      for (const playlist of playlists) {
+
+        playlist.tracks =
+          playlist.tracks.filter(
+            (item) => item.trackId
+          );
+      }
+
       // -----------------------------------
       // Response
       // -----------------------------------
@@ -257,6 +308,7 @@ export const getHomeFeed =
         success: true,
 
         home: {
+
           trending:
             trending
               .filter(
@@ -278,29 +330,36 @@ export const getHomeFeed =
               ),
 
           recommended:
-            recommended.map(
-              serializeRecommendation
-            ),
+            recommended
+              .filter(
+                (item) =>
+                  item.track &&
+                  item.track
+                    .publishingStatus ===
+                    'PUBLISHED' &&
+                  item.track
+                    .processingStatus ===
+                    'READY' &&
+                  item.track
+                    .isActive === true
+              )
+              .map(
+                serializeRecommendation
+              ),
 
           recentlyPlayed:
-          recentlyPlayed
-            .filter(
-              (item) => item.trackId
-            )
-            .slice(0, 10)
-            .map(
-              serializeRecentlyPlayed
-            ),
+            recentlyPlayed
+              .slice(0, 10)
+              .map(
+                serializeRecentlyPlayed
+              ),
 
           savedTracks:
-          savedTracks
-            .filter(
-              (item) => item.trackId
-            )
-            .slice(0, 10)
-            .map(
-              serializeSavedTrack
-            ),
+            savedTracks
+              .slice(0, 10)
+              .map(
+                serializeSavedTrack
+              ),
 
           playlists:
             playlists.map(
@@ -308,11 +367,14 @@ export const getHomeFeed =
             )
         }
       });
+
     } catch (error) {
+
       console.error(error);
 
       res.status(500).json({
         success: false,
+
         message:
           'Failed to load home feed'
       });

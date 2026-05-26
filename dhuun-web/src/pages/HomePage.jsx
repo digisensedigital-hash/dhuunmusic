@@ -324,24 +324,46 @@ HomePage() {
         {(
           data?.home
             ?.recentlyPlayed
+            ?.filter(
+              (item) => item?.track
+            )
             ?.length > 0 ||
-          recentlyPlayed.length >
-            0
+
+          recentlyPlayed
+            .filter(Boolean)
+            .length > 0
         ) && (
+
           <HorizontalTrackRail
             title="Recently Played"
+
             items={
               data?.home
                 ?.recentlyPlayed
+                ?.filter(
+                  (item) => item?.track
+                )
                 ?.length > 0
-                ? data.home.recentlyPlayed
-                : recentlyPlayed.map(
-                    (
-                      track
-                    ) => ({
-                      track,
-                    })
+
+                ? data.home.recentlyPlayed.filter(
+                    (item) => item?.track
                   )
+
+                : recentlyPlayed
+
+                .filter(
+                  (track) =>
+
+                    track &&
+
+                    track.streamUrl
+                )
+
+                .map(
+                  (track) => ({
+                    track,
+                  })
+                )
             }
           />
         )}

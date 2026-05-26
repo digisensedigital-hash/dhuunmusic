@@ -4,7 +4,24 @@ import getPublicFileUrl
 export default function
 serializeTrack(track) {
 
-  if (!track) {
+  /* ---------------------------------------------------------------------- */
+  /* Final Catalog Visibility Guard */
+  /* ---------------------------------------------------------------------- */
+
+  if (
+
+    !track ||
+
+    track.publishingStatus !==
+      'PUBLISHED' ||
+
+    track.processingStatus !==
+      'READY' ||
+
+    track.isActive !== true
+
+  ) {
+
     return null;
   }
 
@@ -35,7 +52,7 @@ serializeTrack(track) {
     lyrics: track.lyrics,
 
     allowMeaningGeneration:
-    track.allowMeaningGeneration,
+      track.allowMeaningGeneration,
 
     syncedLyrics:
       track.syncedLyrics || [],
@@ -50,7 +67,8 @@ serializeTrack(track) {
     isExplicit:
       track.isExplicit,
 
-    duration: track.duration,
+    duration:
+      track.duration,
 
     /*
     |--------------------------------------------------------------------------
@@ -94,24 +112,24 @@ serializeTrack(track) {
     /* ----------------------------------- */
 
     primaryArtist:
-    track.primaryArtist
-      ? {
+      track.primaryArtist
+        ? {
 
-          id:
-            track.primaryArtist._id,
+            id:
+              track.primaryArtist._id,
 
-          slug:
-            track.primaryArtist.slug,
+            slug:
+              track.primaryArtist.slug,
 
-          stageName:
-            track.primaryArtist
-              .stageName,
+            stageName:
+              track.primaryArtist
+                .stageName,
 
-          profileImage:
-            track.primaryArtist
-              ?.profileImage || ''
+            profileImage:
+              track.primaryArtist
+                ?.profileImage || ''
 
-        }
-      : null
+          }
+        : null
   };
 }

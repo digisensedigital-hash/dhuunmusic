@@ -8,36 +8,88 @@ import Artist from '../../models/Artist.js';
 
 export const createArtist =
   async (req, res) => {
+
     try {
 
       const {
         stageName,
+        realName,
         bio,
+        artistType,
         isVerified,
       } = req.body;
 
-      const existingArtist =
-        await Artist.findOne({
-          userId:
-            req.user.id,
-        });
+      /* ----------------------------------- */
+      /* Validate Stage Name */
+      /* ----------------------------------- */
 
-      if (existingArtist) {
+      if (
+        !stageName?.trim()
+      ) {
+
         return res.status(400).json({
+
           success: false,
+
           message:
-            'Artist profile already exists',
+            'Stage name is required',
+
         });
       }
 
+      /* ----------------------------------- */
+      /* Prevent Duplicate Stage Names */
+      /* ----------------------------------- */
+
+      const existingArtist =
+        await Artist.findOne({
+
+          stageName: {
+
+            $regex:
+              new RegExp(
+                `^${stageName.trim()}$`,
+                'i'
+              ),
+
+          },
+
+        });
+
+      if (existingArtist) {
+
+        return res.status(400).json({
+
+          success: false,
+
+          message:
+            'Artist with this stage name already exists',
+
+        });
+      }
+
+      /* ----------------------------------- */
+      /* Create Artist */
+      /* ----------------------------------- */
+
       const artist =
         await Artist.create({
+
           userId:
             req.user.id,
 
-          stageName,
+          stageName:
+            stageName.trim(),
 
-          bio,
+          realName:
+            realName || '',
+
+          bio:
+            bio || '',
+
+          artistType:
+            artistType ||
+            'INDIE',
 
           isVerified:
             isVerified === true ||
@@ -47,21 +99,30 @@ export const createArtist =
             req.file
               ? `/uploads/${req.file.filename}`
               : '',
+
         });
 
       res.status(201).json({
+
         success: true,
+
         artist,
+
       });
 
     } catch (error) {
+
       console.error(error);
 
       res.status(500).json({
+
         success: false,
+
         message:
           'Failed to create artist',
+
       });
+
     }
   };
 
@@ -71,6 +132,7 @@ export const createArtist =
 
 export const getArtists =
   async (req, res) => {
+
     try {
 
       const artists =
@@ -80,18 +142,26 @@ export const getArtists =
           });
 
       res.status(200).json({
+
         success: true,
+
         artists,
+
       });
 
     } catch (error) {
+
       console.error(error);
 
       res.status(500).json({
+
         success: false,
+
         message:
           'Failed to fetch artists',
+
       });
+
     }
   };
 
@@ -101,6 +171,7 @@ export const getArtists =
 
 export const updateArtist =
   async (req, res) => {
+
     try {
 
       const {
@@ -117,15 +188,66 @@ export const updateArtist =
         );
 
       if (!artist) {
+
         return res.status(404).json({
+
           success: false,
+
           message:
             'Artist not found',
+
         });
       }
 
+      /* ----------------------------------- */
+      /* Prevent Duplicate Stage Names */
+      /* ----------------------------------- */
+
+      if (
+        stageName &&
+        stageName.trim() !==
+          artist.stageName
+      ) {
+
+        const existingArtist =
+          await Artist.findOne({
+
+            _id: {
+              $ne:
+                artist._id,
+            },
+
+            stageName: {
+
+              $regex:
+                new RegExp(
+                  `^${stageName.trim()}$`,
+                  'i'
+                ),
+
+            },
+
+          });
+
+        if (existingArtist) {
+
+          return res.status(400).json({
+
+            success: false,
+
+            message:
+              'Artist with this stage name already exists',
+
+          });
+        }
+      }
+
+      /* ----------------------------------- */
+      /* Update Artist */
+      /* ----------------------------------- */
+
       artist.stageName =
-        stageName ||
+        stageName?.trim() ||
         artist.stageName;
 
       artist.realName =
@@ -151,6 +273,7 @@ export const updateArtist =
       }
 
       if (req.file) {
+
         artist.profileImage =
           `/uploads/${req.file.filename}`;
       }
@@ -158,18 +281,26 @@ export const updateArtist =
       await artist.save();
 
       res.status(200).json({
+
         success: true,
+
         artist,
+
       });
 
     } catch (error) {
+
       console.error(error);
 
       res.status(500).json({
+
         success: false,
+
         message:
           'Failed to update artist',
+
       });
+
     }
   };
 
@@ -179,6 +310,7 @@ export const updateArtist =
 
 export const deleteArtist =
   async (req, res) => {
+
     try {
 
       const artist =
@@ -187,28 +319,40 @@ export const deleteArtist =
         );
 
       if (!artist) {
+
         return res.status(404).json({
+
           success: false,
+
           message:
             'Artist not found',
+
         });
       }
 
       await artist.deleteOne();
 
       res.status(200).json({
+
         success: true,
+
         message:
           'Artist deleted successfully',
+
       });
 
     } catch (error) {
+
       console.error(error);
 
       res.status(500).json({
+
         success: false,
+
         message:
           'Failed to delete artist',
+
       });
+
     }
   };

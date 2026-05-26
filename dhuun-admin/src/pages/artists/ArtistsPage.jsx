@@ -67,6 +67,7 @@ export default function ArtistsPage() {
         );
 
       } catch (error) {
+
         console.error(error);
 
         toast.error(
@@ -74,12 +75,16 @@ export default function ArtistsPage() {
         );
 
       } finally {
+
         setLoading(false);
+
       }
     };
 
   useEffect(() => {
+
     fetchArtists();
+
   }, []);
 
   /* ----------------------------------- */
@@ -112,11 +117,13 @@ export default function ArtistsPage() {
         fetchArtists();
 
       } catch (error) {
+
         console.error(error);
 
         toast.error(
           'Failed to delete artist'
         );
+
       }
     };
 
@@ -144,13 +151,22 @@ export default function ArtistsPage() {
         </div>
 
         <button
-          onClick={() =>
-            setCreateOpen(true)
-          }
+          onClick={() => {
+
+            setSelectedArtist(
+              null
+            );
+
+            setEditOpen(false);
+
+            setCreateOpen(true);
+
+          }}
           className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90"
         >
           Create Artist
         </button>
+
       </div>
 
       {/* ----------------------------------- */}
@@ -204,17 +220,23 @@ export default function ArtistsPage() {
                     </h2>
 
                     {artist.isVerified && (
+
                       <span className="rounded-full bg-blue-500/20 px-2 py-1 text-xs font-medium text-blue-400">
                         Verified
                       </span>
+
                     )}
+
                   </div>
 
                   {artist.realName && (
+
                     <p className="mt-1 text-sm text-zinc-500">
                       {artist.realName}
                     </p>
+
                   )}
+
                 </div>
 
                 <span className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-400">
@@ -242,12 +264,14 @@ export default function ArtistsPage() {
 
                 {artist.genres?.map(
                   (genre) => (
+
                     <span
                       key={genre}
                       className="rounded-full bg-zinc-900 px-3 py-1 text-xs text-zinc-400"
                     >
                       {genre}
                     </span>
+
                   )
                 )}
 
@@ -272,11 +296,14 @@ export default function ArtistsPage() {
                   <button
                     onClick={() => {
 
+                      setCreateOpen(false);
+
                       setSelectedArtist(
                         artist
                       );
 
                       setEditOpen(true);
+
                     }}
                     className="text-sm font-medium text-zinc-400 transition hover:text-white"
                   >
@@ -297,43 +324,56 @@ export default function ArtistsPage() {
                 </div>
 
               </div>
+
             </div>
+
           ))}
+
         </div>
+
       )}
 
       {/* ----------------------------------- */}
-      {/* Create Artist Modal */}
+      {/* Unified Artist Modal */}
       {/* ----------------------------------- */}
 
       <ArtistFormModal
-        open={createOpen}
-        onClose={() =>
-          setCreateOpen(false)
-        }
-        onSuccess={
-          fetchArtists
-        }
-      />
 
-      {/* ----------------------------------- */}
-      {/* Edit Artist Modal */}
-      {/* ----------------------------------- */}
+        key={
+          createOpen
+            ? 'create-artist-modal'
+            : `edit-${selectedArtist?._id || 'none'}`
+        }
 
-      <ArtistFormModal
-        mode="edit"
-        open={editOpen}
+        mode={
+          createOpen
+            ? 'create'
+            : 'edit'
+        }
+
+        open={
+          createOpen ||
+          editOpen
+        }
+
         initialData={
-          selectedArtist
+          editOpen
+            ? selectedArtist
+            : null
         }
+
         onClose={() => {
+
+          setCreateOpen(false);
 
           setEditOpen(false);
 
           setSelectedArtist(
             null
           );
+
         }}
+
         onSuccess={
           fetchArtists
         }

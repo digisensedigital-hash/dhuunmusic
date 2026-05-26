@@ -21,10 +21,22 @@ generateQueue({
   userId
 }) {
 
+  // -----------------------------------
+  // Load Current Track
+  // -----------------------------------
+
   const currentTrack =
-    await Track.findById(
-      trackId
-    ).populate(
+    await Track.findOne({
+      _id: trackId,
+
+      processingStatus:
+        'READY',
+
+      publishingStatus:
+        'PUBLISHED',
+
+      isActive: true,
+    }).populate(
       'primaryArtist',
       'stageName profileImage'
     );
@@ -37,10 +49,35 @@ generateQueue({
   // Contextual Continuation
   // -----------------------------------
 
-  const related =
-    await getRelatedTracks(
-      trackId
+  let related = {
+
+    relatedTracks: [],
+
+  };
+
+  try {
+
+    const relatedResult =
+      await getRelatedTracks(
+        trackId
+      );
+
+    if (
+      relatedResult?.relatedTracks
+    ) {
+
+      related =
+        relatedResult;
+    }
+
+  } catch (error) {
+
+    console.error(
+      '[RELATED_TRACKS_FAILED]',
+      error
     );
+
+  }
 
   // -----------------------------------
   // Personalized Recommendations
@@ -66,6 +103,17 @@ generateQueue({
       .populate({
         path: 'trackId',
 
+        match: {
+
+          processingStatus:
+            'READY',
+
+          publishingStatus:
+            'PUBLISHED',
+
+          isActive: true,
+        },
+
         populate: {
           path: 'primaryArtist',
 
@@ -84,7 +132,11 @@ generateQueue({
   // Related Tracks First
   // -----------------------------------
 
-  for (const item of related.relatedTracks) {
+  for (
+    const item of (
+      related?.relatedTracks || []
+    )
+  ) {
 
     if (
       item.id?.toString() ===

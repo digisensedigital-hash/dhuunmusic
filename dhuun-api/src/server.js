@@ -12,24 +12,48 @@ import connectDB from './config/db.js';
 /* Routes */
 /* -------------------------------------------------------------------------- */
 
-import authRoutes from './routes/auth/authRoutes.js';
-import artistRoutes from './routes/artist/artistRoutes.js';
-import trackRoutes from './routes/track/trackRoutes.js';
-import listenRoutes from './routes/listen/listenRoutes.js';
-import analyticsRoutes from './routes/analytics/analyticsRoutes.js';
-import discoveryRoutes from './routes/discovery/discoveryRoutes.js';
-import playlistRoutes from './routes/playlist/playlistRoutes.js';
-import libraryRoutes from './routes/library/libraryRoutes.js';
-import homeRoutes from './routes/home/homeRoutes.js';
-import playerRoutes from './routes/player/playerRoutes.js';
-import aiRoutes from './routes/ai.routes.js';
-import recommendationRoutes from './routes/recommendation/recommendationRoutes.js';
+import authRoutes
+  from './routes/auth/authRoutes.js';
+
+import artistRoutes
+  from './routes/artist/artistRoutes.js';
+
+import trackRoutes
+  from './routes/track/trackRoutes.js';
+
+import listenRoutes
+  from './routes/listen/listenRoutes.js';
+
+import analyticsRoutes
+  from './routes/analytics/analyticsRoutes.js';
+
+import discoveryRoutes
+  from './routes/discovery/discoveryRoutes.js';
+
+import playlistRoutes
+  from './routes/playlist/playlistRoutes.js';
+
+import libraryRoutes
+  from './routes/library/libraryRoutes.js';
+
+import homeRoutes
+  from './routes/home/homeRoutes.js';
+
+import playerRoutes
+  from './routes/player/playerRoutes.js';
+
+import aiRoutes
+  from './routes/ai.routes.js';
+
+import recommendationRoutes
+  from './routes/recommendation/recommendationRoutes.js';
 
 /* -------------------------------------------------------------------------- */
 /* Jobs */
 /* -------------------------------------------------------------------------- */
 
-import startPublishingScheduler from './jobs/publishingScheduler.js';
+import startPublishingScheduler
+  from './jobs/publishingScheduler.js';
 
 /* -------------------------------------------------------------------------- */
 /* Environment */
@@ -56,7 +80,16 @@ connectDB();
 
 app.use(
   cors({
-    origin: true,
+    origin: [
+      'http://127.0.0.1:5199',
+      'http://localhost:5199',
+
+      'http://127.0.0.1:5180',
+      'http://localhost:5180',
+
+      'http://127.0.0.1:5197',
+      'http://localhost:5197',
+    ],
 
     credentials: true,
 
@@ -69,37 +102,15 @@ app.use(
 
 app.use(express.json());
 
-/* -------------------------------------------------------------------------- */
-/* Upload Serving */
-/* -------------------------------------------------------------------------- */
-
 app.use(
-  '/uploads',
 
-  express.static(
-    process.env.NODE_ENV ===
-      'production'
+  helmet({
 
-      ? '/var/www/dhuunmusic/storage/temp'
+    crossOriginResourcePolicy: false,
 
-      : path.resolve(
-          '../storage/temp'
-        )
-  )
+  })
+
 );
-
-app.use(
-  '/tracks',
-
-  express.static(
-    path.join(
-      process.cwd(),
-      'uploads/tracks'
-    )
-  )
-);
-
-app.use(helmet());
 
 app.use(morgan('dev'));
 
@@ -117,7 +128,54 @@ app.use((req, res, next) => {
   );
 
   next();
+
 });
+
+/* -------------------------------------------------------------------------- */
+/* Upload Serving */
+/* -------------------------------------------------------------------------- */
+
+app.use(
+  '/uploads',
+
+  express.static(
+    process.env.NODE_ENV ===
+      'production'
+
+      ? '/var/www/dhuunmusic/storage/temp'
+
+      : path.join(
+          process.cwd(),
+          'storage/temp'
+        )
+  )
+);
+
+app.use(
+  '/dhuun-media',
+
+  express.static(
+    process.env.NODE_ENV ===
+      'production'
+
+      ? '/var/www/dhuunmusic/storage/media'
+
+      : path.resolve(
+          '../storage/media'
+        )
+  )
+);
+
+app.use(
+  '/tracks',
+
+  express.static(
+    path.join(
+      process.cwd(),
+      'uploads/tracks'
+    )
+  )
+);
 
 /* -------------------------------------------------------------------------- */
 /* Health */
@@ -131,6 +189,7 @@ app.get('/', (req, res) => {
     message:
       'Dhuun API Running',
   });
+
 });
 
 /* -------------------------------------------------------------------------- */
@@ -210,8 +269,9 @@ app.use((err, req, res, next) => {
 
   return res.status(500).json({
     success: false,
-    error: err.message
+    error: err.message,
   });
+
 });
 
 /* -------------------------------------------------------------------------- */
@@ -227,9 +287,6 @@ app.listen(PORT, () => {
     `Server running on port ${PORT}`
   );
 
-  /* ---------------------------------------------------------------------- */
-  /* Background Jobs */
-  /* ---------------------------------------------------------------------- */
-
   startPublishingScheduler();
+
 });

@@ -148,8 +148,9 @@ LyricsStripCarousel({
 
         const response =
           await loadPlaybackQueue(
-            track.id
-          );
+            track.id ||
+            track._id
+          )
 
         const queue = [
 

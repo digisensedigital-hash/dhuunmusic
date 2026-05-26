@@ -128,7 +128,6 @@ export default function Topbar() {
                   : {}
               );
             }}
-ƒ
             placeholder="Search tracks"
 
             className="w-72 bg-transparent text-sm text-white outline-none placeholder:text-zinc-500"

@@ -37,11 +37,17 @@ export default async function getRelatedTracks(
   // ---------------------------------------------------
 
   const sourceTrack =
-    await Track.findOne({
-      _id: trackId,
-      processingStatus:
-      'READY'
-    })
+  await Track.findOne({
+    _id: trackId,
+
+    processingStatus:
+      'READY',
+
+    publishingStatus:
+      'PUBLISHED',
+
+    isActive: true,
+  })
       .populate(
         'primaryArtist',
         'stageName profileImage'
@@ -73,7 +79,12 @@ export default async function getRelatedTracks(
       },
 
       processingStatus:
-      'READY'
+        'READY',
+
+      publishingStatus:
+        'PUBLISHED',
+
+      isActive: true,
     })
       .populate(
         'primaryArtist',
@@ -86,17 +97,21 @@ export default async function getRelatedTracks(
     sourceTrack.primaryArtist?._id
 
       ? Track.find({
+        primaryArtist:
+          sourceTrack.primaryArtist._id,
 
-          primaryArtist:
-            sourceTrack.primaryArtist._id,
+        _id: {
+          $ne: sourceTrack._id
+        },
 
-          _id: {
-            $ne: sourceTrack._id
-          },
+        processingStatus:
+          'READY',
 
-          processingStatus:
-            'READY'
-        })
+        publishingStatus:
+          'PUBLISHED',
+
+        isActive: true,
+      })
           .populate(
             'primaryArtist',
             'stageName profileImage'
@@ -122,8 +137,13 @@ export default async function getRelatedTracks(
         path: 'trackId',
 
         match: {
-          processingStatus:
-           'READY'
+        processingStatus:
+          'READY',
+
+        publishingStatus:
+          'PUBLISHED',
+
+        isActive: true,
         },
 
         populate: {
@@ -326,8 +346,17 @@ export default async function getRelatedTracks(
   // Limit Results
   // ---------------------------------------------------
 
+  const visibleScoredTracks =
+  scoredTracks.filter(
+    item =>
+      item.track &&
+      item.track.publishingStatus ===
+        'PUBLISHED' &&
+      item.track.isActive === true
+  );
+
   const finalTracks =
-    scoredTracks
+    visibleScoredTracks
       .slice(
         0,
         MAX_RESULTS

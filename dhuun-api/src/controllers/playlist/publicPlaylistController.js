@@ -5,7 +5,9 @@ import serializePlaylist
 
 export const getPublicPlaylist =
   async (req, res) => {
+
     try {
+
       const { id } = req.params;
 
       const playlist =
@@ -16,20 +18,44 @@ export const getPublicPlaylist =
           )
           .populate({
             path: 'tracks.trackId',
+
+            match: {
+
+              publishingStatus:
+                'PUBLISHED',
+
+              processingStatus:
+                'READY',
+
+              isActive: true,
+            },
+
             populate: {
               path: 'primaryArtist',
+
               select:
                 'stageName profileImage'
             }
           });
 
       if (!playlist) {
+
         return res.status(404).json({
           success: false,
+
           message:
             'Playlist not found'
         });
       }
+
+      // -----------------------------------
+      // Remove Null Hydrated Tracks
+      // -----------------------------------
+
+      playlist.tracks =
+        playlist.tracks.filter(
+          (item) => item.trackId
+        );
 
       res.json({
         success: true,
@@ -39,11 +65,14 @@ export const getPublicPlaylist =
             playlist
           )
       });
+
     } catch (error) {
+
       console.error(error);
 
       res.status(500).json({
         success: false,
+
         message:
           'Failed to fetch playlist'
       });

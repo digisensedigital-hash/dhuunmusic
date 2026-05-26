@@ -209,7 +209,8 @@ export default function TrackHero({
 
                     const response =
                       await loadPlaybackQueue(
-                        track.id
+                        track.id ||
+                        track._id
                       );
 
                     const normalizedQueue = [

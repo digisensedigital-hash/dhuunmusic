@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
 
+import PUBLIC_TRACK_FILTER
+  from '../constants/publicTrackFilter.js';
+
 /* -------------------------------------------------------------------------- */
 /* Contributor Schema */
 /* -------------------------------------------------------------------------- */
@@ -573,6 +576,18 @@ const trackSchema = new mongoose.Schema(
 );
 
 /* -------------------------------------------------------------------------- */
+/* Public Visibility Query Helper */
+/* -------------------------------------------------------------------------- */
+
+trackSchema.query.publicOnly =
+  function () {
+
+    return this.where({
+      ...PUBLIC_TRACK_FILTER
+    });
+  };
+
+/* -------------------------------------------------------------------------- */
 /* Text Search Index */
 /* -------------------------------------------------------------------------- */
 
@@ -588,6 +603,10 @@ trackSchema.index({
 /* Model */
 /* -------------------------------------------------------------------------- */
 
-const Track = mongoose.model('Track', trackSchema);
+const Track =
+  mongoose.model(
+    'Track',
+    trackSchema
+  );
 
 export default Track;

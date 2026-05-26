@@ -29,7 +29,23 @@ export const getTrackStream =
           isActive: true,
         });
 
-      if (!track) {
+      /* ------------------------------------------------------------------ */
+      /* Final Defensive Visibility Check */
+      /* ------------------------------------------------------------------ */
+
+      if (
+
+        !track ||
+
+        track.publishingStatus !==
+          'PUBLISHED' ||
+
+        track.processingStatus !==
+          'READY' ||
+
+        track.isActive !== true
+
+      ) {
 
         return res.status(404)
           .json({

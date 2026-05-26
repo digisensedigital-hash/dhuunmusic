@@ -66,6 +66,7 @@ export const getPublicTracks =
 
 export const getPublicTrackDetails =
   async (req, res) => {
+
     try {
 
       const { identifier } =
@@ -241,7 +242,7 @@ export const getPublicTrackDetails =
       }
 
       /* ----------------------------------- */
-      /* Analytics */
+      /* Analytics
       /* ----------------------------------- */
 
       const analytics =
@@ -251,7 +252,7 @@ export const getPublicTrackDetails =
         });
 
       /* ----------------------------------- */
-      /* Trending */
+      /* Trending
       /* ----------------------------------- */
 
       const trending =
@@ -263,7 +264,33 @@ export const getPublicTrackDetails =
             'DAILY'
         });
 
+      /* ----------------------------------- */
+      /* Final Defensive Visibility Check
+      /* ----------------------------------- */
+
+      if (
+
+        track.publishingStatus !==
+          'PUBLISHED' ||
+
+        track.processingStatus !==
+          'READY' ||
+
+        track.isActive !== true
+
+      ) {
+
+        return res.status(404)
+          .json({
+            success: false,
+
+            message:
+              'Track not found'
+          });
+      }
+
       return res.json({
+
         success: true,
 
         track:

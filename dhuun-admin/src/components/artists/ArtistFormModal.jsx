@@ -66,44 +66,85 @@ export default function ArtistFormModal({
 
   useEffect(() => {
 
-    if (
-      mode !== 'edit' ||
-      !initialData
-    ) {
-      return;
-    }
+  /* ----------------------------------- */
+  /* Reset Create Mode */
+  /* ----------------------------------- */
+
+  if (
+    mode === 'create'
+  ) {
 
     setForm({
-      stageName:
-        initialData.stageName || '',
-
-      realName:
-        initialData.realName || '',
-
-      bio:
-        initialData.bio || '',
+      stageName: '',
+      realName: '',
+      bio: '',
 
       artistType:
-        initialData.artistType ||
         'INDIE',
 
       isVerified:
-        initialData.isVerified ||
-        false,      
-
+        false,
     });
 
-    setPreview(
-      initialData.profileImage
-        ? getMediaUrl(
-            initialData.profileImage
-          )
-        : ''
-    );
+    setImage(null);
+
+    setPreview('');
+
+    return;
+  }
+
+  /* ----------------------------------- */
+  /* Hydrate Edit Mode */
+  /* ----------------------------------- */
+
+  if (
+    mode !== 'edit' ||
+    !initialData
+  ) {
+    return;
+  }
+
+  setForm({
+    stageName:
+      initialData.stageName || '',
+
+    realName:
+      initialData.realName || '',
+
+    bio:
+      initialData.bio || '',
+
+    artistType:
+      initialData.artistType ||
+      'INDIE',
+
+    isVerified:
+      initialData.isVerified ||
+      false,
+  });
+
+  const resolvedImage =
+    initialData?.profileImage
+      ? getMediaUrl(
+          initialData.profileImage
+        )
+      : '';
+
+  console.log(
+    'RESOLVED MODAL IMAGE:',
+    resolvedImage
+  );
+
+  setPreview(
+    resolvedImage
+  );
+
+  setImage(null);
 
   }, [
     mode,
-    initialData,
+    initialData?._id,
+    initialData?.profileImage,
   ]);
 
   /* ----------------------------------- */
@@ -376,19 +417,54 @@ export default function ArtistFormModal({
 
             {preview && (
 
-              <img
-                src={preview}
-                alt="Artist Preview"
-                className="
-                  mt-4
-                  h-32
-                  w-32
-                  rounded-2xl
-                  object-cover
-                  border
-                  border-zinc-800
-                "
-              />
+              <div className="mt-4 flex justify-center">
+
+                <div
+                  className="
+                    h-40
+                    w-40
+                    overflow-hidden
+                    rounded-2xl
+                    border
+                    border-zinc-800
+                    bg-zinc-900
+                    shadow-lg
+                  "
+                >
+
+                  <img
+                    key={preview}
+                    src={`${preview}?t=${Date.now()}`}
+                    alt="Artist Preview"
+
+                    onLoad={() => {
+
+                      console.log(
+                        'IMAGE LOADED:',
+                        preview
+                      );
+
+                    }}
+
+                    onError={() => {
+
+                      console.error(
+                        'IMAGE FAILED:',
+                        preview
+                      );
+
+                    }}
+
+                    className="
+                      h-full
+                      w-full
+                      object-cover
+                    "
+                  />
+
+                </div>
+
+              </div>
 
             )}
 

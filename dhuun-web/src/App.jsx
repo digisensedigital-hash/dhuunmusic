@@ -4,11 +4,22 @@ import AppRoutes
 import usePlayerStore
   from './store/playerStore';
 
+import useHydrateAuth
+  from './hooks/auth/useHydrateAuth';
+
+import useHydrateCapabilities
+  from './hooks/capabilities/useHydrateCapabilities';
+
 export default function App() {
+
   const {
     setCurrentTrack,
     setIsPlaying,
   } = usePlayerStore();
+
+  useHydrateAuth();
+
+  useHydrateCapabilities();
 
   // -----------------------------------
   // Temporary Playback Debug
@@ -16,6 +27,7 @@ export default function App() {
 
   window.playTrack =
     (track) => {
+
       console.log(
         'Playing track:',
         track
@@ -24,7 +36,9 @@ export default function App() {
       setCurrentTrack(track);
 
       setIsPlaying(true);
+
     };
 
   return <AppRoutes />;
+
 }

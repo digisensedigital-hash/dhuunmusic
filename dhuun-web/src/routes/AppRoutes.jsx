@@ -29,21 +29,50 @@ import TrackDetailsPage
 import LibraryPage
   from '../pages/LibraryPage';
 
+import LoginPage
+  from '../pages/LoginPage';
+
+import RegisterPage
+  from '../pages/RegisterPage';
+
+import ProtectedRoute
+  from '../components/auth/ProtectedRoute';
+
 export default function
 AppRoutes() {
+
   return (
+
     <BrowserRouter>
 
       <Routes>
 
         {/* ------------------ */}
-        {/* Landing Experience */}
+        {/* Landing */}
         {/* ------------------ */}
 
         <Route
           path="/"
           element={
             <LandingPage />
+          }
+        />
+
+        {/* ------------------ */}
+        {/* Standalone Auth */}
+        {/* ------------------ */}
+
+        <Route
+          path="/app/login"
+          element={
+            <LoginPage />
+          }
+        />
+
+        <Route
+          path="/app/register"
+          element={
+            <RegisterPage />
           }
         />
 
@@ -96,7 +125,13 @@ AppRoutes() {
           <Route
             path="library"
             element={
-              <LibraryPage />
+
+              <ProtectedRoute>
+
+                <LibraryPage />
+
+              </ProtectedRoute>
+
             }
           />
 
@@ -119,5 +154,7 @@ AppRoutes() {
       </Routes>
 
     </BrowserRouter>
+
   );
+
 }

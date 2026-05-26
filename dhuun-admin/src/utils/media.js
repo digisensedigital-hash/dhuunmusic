@@ -1,12 +1,32 @@
+const IS_LOCAL =
+  window.location.hostname ===
+    'localhost' ||
+
+  window.location.hostname ===
+    '127.0.0.1';
+
+/* ----------------------------------- */
+/* Media Server */
+/* ----------------------------------- */
+
 const MEDIA_BASE_URL =
   import.meta.env
     .VITE_MEDIA_BASE_URL ||
+
   (
-    window.location.hostname ===
-    'localhost'
-      ? 'http://127.0.0.1:9000'
+    IS_LOCAL
+      ? 'http://localhost:9000'
       : 'https://media.dhuunmusic.in'
   );
+
+/* ----------------------------------- */
+/* API Server */
+/* ----------------------------------- */
+
+const API_BASE_URL =
+  IS_LOCAL
+    ? 'http://localhost:8000'
+    : 'https://api.dhuunmusic.in';
 
 export function getMediaUrl(
   path
@@ -16,57 +36,35 @@ export function getMediaUrl(
     return '';
   }
 
-  // -----------------------------------
-  // Already Absolute URL
-  // -----------------------------------
+  /* ----------------------------------- */
+  /* Already Absolute URL */
+  /* ----------------------------------- */
 
   if (
     path.startsWith('http')
   ) {
 
-    // Local Development
-    if (
-      window.location.hostname ===
-      'localhost'
-    ) {
-
-      return path
+    return encodeURI(
+      path
         .replace(
           '127.0.0.1',
           'localhost'
         )
-        .replace(
-          'media.dhuunmusic.in',
-          'localhost:9000'
-        );
-    }
-
-    // Production
-    return path
-      .replace(
-        '127.0.0.1:9000',
-        'media.dhuunmusic.in'
-      )
-      .replace(
-        'http://',
-        'https://'
-      );
+    );
   }
 
-  // -----------------------------------
-  // Normalize Relative Path
-  // -----------------------------------
+  /* ----------------------------------- */
+  /* Normalize */
+  /* ----------------------------------- */
 
   const normalizedPath =
     path.startsWith('/')
       ? path.slice(1)
       : path;
 
-  /*
-  |--------------------------------------------------------------------------
-  | Legacy Express Uploads
-  |--------------------------------------------------------------------------
-  */
+  /* ----------------------------------- */
+  /* Legacy Express Uploads */
+  /* ----------------------------------- */
 
   if (
     normalizedPath.startsWith(
@@ -75,20 +73,22 @@ export function getMediaUrl(
   ) {
 
     return encodeURI(
-      window.location.hostname ===
-        'localhost'
-          ? `http://localhost:8000/${normalizedPath}`
-          : `https://api.dhuunmusic.in/${normalizedPath}`
+      `${API_BASE_URL}/${normalizedPath}`
     );
   }
 
-  /*
-  |--------------------------------------------------------------------------
-  | MinIO Media
-  |--------------------------------------------------------------------------
-  */
+  /* ----------------------------------- */
+  /* MinIO Media */
+  /* ----------------------------------- */
+
+  const finalPath =
+    normalizedPath.startsWith(
+      'dhuun-media/'
+    )
+      ? normalizedPath
+      : `dhuun-media/${normalizedPath}`;
 
   return encodeURI(
-    `${MEDIA_BASE_URL}/dhuun-media/${normalizedPath}`
+    `${MEDIA_BASE_URL}/${finalPath}`
   );
 }
