@@ -6,23 +6,30 @@ import axios
 // -----------------------------------
 
 const API_BASE =
+
   import.meta.env
     .VITE_API_URL ||
-  'http://localhost:9000/api';
+
+  '/api';
 
 // -----------------------------------
 // Auth Headers
 // -----------------------------------
 
 function getAuthHeaders() {
+
   const token =
+
     localStorage.getItem(
       'token'
     );
 
   return {
+
     headers: {
-      Authorization: `Bearer ${token}`,
+
+      Authorization:
+        `Bearer ${token}`,
     },
   };
 }
@@ -35,20 +42,28 @@ export async function
 startListenSession(
   trackId
 ) {
+
   try {
+
     const response =
+
       await axios.post(
+
         `${API_BASE}/listens/start`,
+
         {
           trackId,
         },
+
         getAuthHeaders()
       );
 
     return (
       response.data || null
     );
+
   } catch (error) {
+
     console.error(
       'Failed to start listen session:',
       error
@@ -66,15 +81,22 @@ export async function
 sendListenHeartbeat({
   sessionId,
 }) {
+
   try {
+
     await axios.post(
+
       `${API_BASE}/listens/heartbeat`,
+
       {
         sessionId,
       },
+
       getAuthHeaders()
     );
+
   } catch (error) {
+
     console.error(
       'Heartbeat failed:',
       error
@@ -90,15 +112,22 @@ export async function
 completeListenSession({
   sessionId,
 }) {
+
   try {
+
     await axios.post(
+
       `${API_BASE}/listens/complete`,
+
       {
         sessionId,
       },
+
       getAuthHeaders()
     );
+
   } catch (error) {
+
     console.error(
       'Failed to complete session:',
       error
