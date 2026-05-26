@@ -56,19 +56,33 @@ HomePage() {
   // -----------------------------------
 
   const trending =
-  data?.home?.trending
-    ?.filter(
-      (item) => item.track
-    ) || [];
 
-  const recommended =
-    (
-      data?.home
-        ?.recommended || []
-    ).map((item) => ({
-      track:
-        item.track,
-    }));
+  (
+    data?.home
+      ?.trending || []
+  )
+
+    .filter(
+      (item) => item?.track
+    );
+
+const recommended =
+
+  (
+    data?.home
+      ?.recommended || []
+  )
+
+    .filter(
+      (item) => item?.track
+    )
+
+    .map(
+      (item) => ({
+        track:
+          item.track,
+      })
+    );
   
   const [
   featuredTrack,
