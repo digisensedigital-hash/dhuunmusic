@@ -346,15 +346,79 @@ GlobalPlayer() {
       () => {
     };
 
+    const handleAudioError =
+    () => {
+
+      console.error(
+        '[AUDIO_PLAYBACK_FAILED]',
+        currentTrack?.id
+      );
+
+      // -----------------------------------
+      // Stop Recovery Loops
+      // -----------------------------------
+
+      if (
+        heartbeatRef.current
+      ) {
+
+        clearInterval(
+          heartbeatRef.current
+        );
+
+        heartbeatRef.current =
+          null;
+      }
+
+      // -----------------------------------
+      // Cleanup HLS
+      // -----------------------------------
+
+      if (hlsRef.current) {
+
+        hlsRef.current.destroy();
+
+        hlsRef.current =
+          null;
+      }
+
+      // -----------------------------------
+      // Reset Failed Session
+      // -----------------------------------
+
+      sessionRef.current =
+        null;
+
+      activeTrackSessionRef.current =
+        null;
+
+      // -----------------------------------
+      // Skip Dead Track
+      // -----------------------------------
+
+      playNextTrack();
+    };
+
     // -----------------------------------
     // Visibility Recovery
     // -----------------------------------
 
       const handleVisibilityChange =
       () => {
+
         if (
           document.visibilityState !==
           'visible'
+        ) {
+          return;
+        }
+
+        // -----------------------------------
+        // Invalid / Removed Track
+        // -----------------------------------
+
+        if (
+          !currentTrack?.streamUrl
         ) {
           return;
         }
@@ -370,13 +434,17 @@ GlobalPlayer() {
         const retryInterval =
           setInterval(
             async () => {
+
               attempts++;
 
-              // Playback already recovered
+              // -----------------------------------
+              // Playback Already Recovered
+              // -----------------------------------
 
               if (
                 !audio.paused
               ) {
+
                 clearInterval(
                   retryInterval
                 );
@@ -384,12 +452,30 @@ GlobalPlayer() {
                 return;
               }
 
-              // Stop retry loop
+              // -----------------------------------
+              // Invalid Stream During Retry
+              // -----------------------------------
+
+              if (
+                !currentTrack?.streamUrl
+              ) {
+
+                clearInterval(
+                  retryInterval
+                );
+
+                return;
+              }
+
+              // -----------------------------------
+              // Stop Retry Loop
+              // -----------------------------------
 
               if (
                 attempts >=
                 maxAttempts
               ) {
+
                 clearInterval(
                   retryInterval
                 );
@@ -397,11 +483,16 @@ GlobalPlayer() {
                 return;
               }
 
-              // Retry playback
+              // -----------------------------------
+              // Retry Playback
+              // -----------------------------------
 
               try {
+
                 await audio.play();
+
               } catch (error) {
+
                 console.error(
                   '[AUDIO_RESUME_FAILED]',
                   error
@@ -445,6 +536,11 @@ GlobalPlayer() {
     audio.addEventListener(
       'canplay',
       handleCanPlay
+    );
+
+    audio.addEventListener(
+      'error',
+      handleAudioError
     );
 
     document.addEventListener(
@@ -520,6 +616,11 @@ GlobalPlayer() {
       audio.removeEventListener(
         'canplay',
         handleCanPlay
+      );
+
+      audio.removeEventListener(
+        'error',
+        handleAudioError
       );
 
       document.removeEventListener(
