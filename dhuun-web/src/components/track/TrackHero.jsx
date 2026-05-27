@@ -13,6 +13,15 @@ export default function TrackHero({
   loadPlaybackQueue,
 }) {
 
+  // -----------------------------------
+  // Primary Artist
+  // -----------------------------------
+
+  const primaryArtist =
+    track
+      ?.primaryArtists?.[0] ||
+    null;
+
   return (
 
     <>
@@ -57,7 +66,7 @@ export default function TrackHero({
 
                   text:
                     `${track.title} by ${
-                      track.primaryArtist
+                      primaryArtist
                         ?.stageName ||
                       'Unknown Artist'
                     }`,
@@ -128,16 +137,16 @@ export default function TrackHero({
 
             <div className="mt-4 flex items-center gap-3">
 
-              {track.primaryArtist
+              {primaryArtist
                 ?.profileImage && (
 
                 <img
                   src={getMediaUrl(
-                    track.primaryArtist
+                    primaryArtist
                       .profileImage
                   )}
                   alt={
-                    track.primaryArtist
+                    primaryArtist
                       ?.stageName
                   }
                   className="h-10 w-10 rounded-full object-cover"
@@ -150,8 +159,9 @@ export default function TrackHero({
                 <p className="font-semibold text-white">
 
                   {
-                    track.primaryArtist
-                      ?.stageName
+                    primaryArtist
+                      ?.stageName ||
+                    'Unknown Artist'
                   }
 
                 </p>
@@ -178,7 +188,11 @@ export default function TrackHero({
 
               <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
 
-                {track.language}
+                {
+                  track.language ||
+                  track.trackLanguage ||
+                  'Unknown'
+                }
 
               </div>
 

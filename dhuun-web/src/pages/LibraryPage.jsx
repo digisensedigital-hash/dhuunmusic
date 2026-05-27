@@ -13,6 +13,9 @@ import {
   Play,
   Pause,
   LogOut,
+  Crown,
+  UserPlus,
+  Trash2,
 } from 'lucide-react';
 
 import {
@@ -41,11 +44,12 @@ export default function
 LibraryPage() {
 
   const {
-    savedTracks,
-    currentTrack,
-    isPlaying,
-    togglePlayPause,
-    playTrack,
+  savedTracks,
+  currentTrack,
+  isPlaying,
+  togglePlayPause,
+  playTrack,
+  toggleSaveTrack,
   } = usePlayerStore();
 
   const {
@@ -233,23 +237,58 @@ LibraryPage() {
 
             {user && (
 
-              <div className="mt-3 max-w-[180px]">
+            <div className="mt-3 max-w-[220px]">
 
-                <p className="text-sm text-white/45">
+            <p className="text-sm text-white/45">
 
-                  Logged in as
+              {user
+                ? 'Logged in as'
+                : 'Exploring as'}
 
-                </p>
+            </p>
 
-                <p className="break-words text-sm text-white/70">
+            <div className="mt-1 flex items-center gap-2">
 
-                  {user.email}
+              <p className="break-words text-sm text-white/70">
 
-                </p>
+                {user
+                  ? user.email
+                  : 'Guest Listener'}
 
-              </div>
+              </p>
 
-            )}
+              {user && [
+                'PRO',
+                'BUSINESS',
+                'ENTERPRISE',
+              ].includes(
+                user.subscriptionStatus
+              ) && (
+
+                <div className="relative flex items-center justify-center">
+
+                  <div className="absolute inset-0 rounded-full bg-yellow-400/20 blur-md" />
+
+                  <Crown
+                    size={15}
+                    className="
+                      relative
+                      fill-yellow-400
+                      text-yellow-200
+                      drop-shadow-[0_2px_10px_rgba(251,191,36,0.7)]
+                      rotate-[-10deg]
+                    "
+                  />
+
+                </div>
+
+              )}
+
+            </div>
+
+          </div>
+
+          )}
 
           </div>
 
@@ -317,17 +356,37 @@ LibraryPage() {
 
             )}
 
-            <button
+            {user ? (
 
-              onClick={handleLogout}
+              <button
 
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white/60 backdrop-blur-xl transition-all duration-200 hover:bg-white/[0.08] hover:text-white"
+                onClick={handleLogout}
 
-            >
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white/60 backdrop-blur-xl transition-all duration-200 hover:bg-white/[0.08] hover:text-white"
 
-              <LogOut size={18} />
+              >
 
-            </button>
+                <LogOut size={15} />
+
+              </button>
+
+            ) : (
+
+              <button
+
+                onClick={() =>
+                  navigate('/app/register')
+                }
+
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white/60 backdrop-blur-xl transition-all duration-200 hover:bg-white/[0.08] hover:text-white"
+
+              >
+
+                <UserPlus size={15} />
+
+              </button>
+
+            )}
 
           </div>
 
@@ -472,12 +531,53 @@ LibraryPage() {
                     index
                   ) => (
 
-                    <PlaylistTrackRow
+                    <div
                       key={track.id}
-                      track={track}
-                      index={index}
-                      queue={savedTracks}
-                    />
+                      className="group flex items-center gap-3"
+                    >
+
+                      <div className="min-w-0 flex-1">
+
+                        <PlaylistTrackRow
+                          track={track}
+                          index={index}
+                          queue={savedTracks}
+                        />
+
+                      </div>
+
+                      <button
+
+                        onClick={() =>
+                          toggleSaveTrack(track)
+                        }
+
+                        className="
+                          mr-2
+                          flex
+                          h-10
+                          w-10
+                          flex-shrink-0
+                          items-center
+                          justify-center
+                          rounded-full
+                          border
+                          border-white/10
+                          bg-white/[0.04]
+                          text-white/45
+                          transition-all
+                          hover:border-red-500/20
+                          hover:bg-red-500/10
+                          hover:text-red-400
+                        "
+
+                      >
+
+                        <Trash2 size={15} />
+
+                      </button>
+
+                    </div>
 
                   )
                 )}

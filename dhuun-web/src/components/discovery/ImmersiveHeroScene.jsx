@@ -297,7 +297,7 @@ ImmersiveHeroScene({
             <p className="mt-5 text-xl text-white/60">
 
               {
-                track.primaryArtist
+                track.primaryArtists?.[0]
                   ?.stageName
               }
 

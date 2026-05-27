@@ -145,7 +145,7 @@ export default function TrackTable({
                 <span>•</span>
 
                 <span>
-                  {track.language}
+                  {track.trackLanguage}
                 </span>
 
                 <span>•</span>
@@ -209,9 +209,11 @@ export default function TrackTable({
           <div>
 
             <p className="font-medium text-zinc-200">
-              {track.primaryArtist
-              ?.stageName ||
-              'Unknown Artist'}
+              {
+                track.primaryArtists?.[0]
+                  ?.stageName ||
+                'Unknown Artist'
+              }
             </p>
 
             <p className="mt-1 text-xs text-zinc-500">

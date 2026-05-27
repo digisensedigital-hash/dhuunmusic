@@ -1,38 +1,5 @@
-import axios
-  from 'axios';
-
-// -----------------------------------
-// API Base
-// -----------------------------------
-
-const API_BASE =
-
-  import.meta.env
-    .VITE_API_URL ||
-
-  '/api';
-
-// -----------------------------------
-// Auth Headers
-// -----------------------------------
-
-function getAuthHeaders() {
-
-  const token =
-
-    localStorage.getItem(
-      'token'
-    );
-
-  return {
-
-    headers: {
-
-      Authorization:
-        `Bearer ${token}`,
-    },
-  };
-}
+import client
+  from '../api/client';
 
 // -----------------------------------
 // Start Listen Session
@@ -47,15 +14,13 @@ startListenSession(
 
     const response =
 
-      await axios.post(
+      await client.post(
 
-        `${API_BASE}/listens/start`,
+        '/listens/start',
 
         {
           trackId,
-        },
-
-        getAuthHeaders()
+        }
       );
 
     return (
@@ -84,15 +49,13 @@ sendListenHeartbeat({
 
   try {
 
-    await axios.post(
+    await client.post(
 
-      `${API_BASE}/listens/heartbeat`,
+      '/listens/heartbeat',
 
       {
         sessionId,
-      },
-
-      getAuthHeaders()
+      }
     );
 
   } catch (error) {
@@ -115,15 +78,13 @@ completeListenSession({
 
   try {
 
-    await axios.post(
+    await client.post(
 
-      `${API_BASE}/listens/complete`,
+      '/listens/complete',
 
       {
         sessionId,
-      },
-
-      getAuthHeaders()
+      }
     );
 
   } catch (error) {

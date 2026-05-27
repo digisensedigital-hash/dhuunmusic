@@ -47,6 +47,19 @@ TrackCard({
     return null;
   }
 
+  // -----------------------------------
+  // Primary Artist
+  // -----------------------------------
+
+  const primaryArtist =
+    track
+      ?.primaryArtists?.[0] ||
+    null;
+
+  const primaryArtistId =
+    primaryArtist?._id ||
+    primaryArtist?.id;
+
   const isSaved =
     isTrackSaved(
       track.id
@@ -110,6 +123,7 @@ TrackCard({
     };
 
   return (
+
     <motion.div
 
       whileTap={{
@@ -317,8 +331,8 @@ TrackCard({
           <Link
 
             to={
-              track.primaryArtist?.id
-                ? `/app/artist/${track.primaryArtist.id}`
+              primaryArtistId
+                ? `/app/artist/${primaryArtistId}`
                 : '#'
             }
 
@@ -331,20 +345,20 @@ TrackCard({
 
             {/* Avatar */}
 
-            {track.primaryArtist
+            {primaryArtist
               ?.profileImage ? (
 
               <img
 
                 src={
                   getMediaUrl(
-                    track.primaryArtist
+                    primaryArtist
                       ?.profileImage
                   )
                 }
 
                 alt={
-                  track.primaryArtist
+                  primaryArtist
                     ?.stageName
                 }
 
@@ -356,7 +370,7 @@ TrackCard({
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-[10px] font-bold text-white">
 
                 {(
-                  track.primaryArtist
+                  primaryArtist
                     ?.stageName ||
                   'U'
                 )
@@ -377,9 +391,11 @@ TrackCard({
 
                   <p className="truncate text-sm text-white/70 transition-colors group-hover/artist:text-white">
 
-                    {track.primaryArtist
-                      ?.stageName ||
-                      'Unknown Artist'}
+                    {
+                      primaryArtist
+                        ?.stageName ||
+                      'Unknown Artist'
+                    }
 
                   </p>
 

@@ -8,6 +8,9 @@ import getMe
 import authStore
   from '../../store/auth/authStore';
 
+import usePlayerStore
+  from '../../store/playerStore';
+
 const useHydrateAuth =
   () => {
 
@@ -17,6 +20,10 @@ const useHydrateAuth =
       logout,
       setHydrating,
     } = authStore();
+
+    const {
+      hydrateSavedTracks,
+    } = usePlayerStore();
 
     useEffect(() => {
 
@@ -44,6 +51,12 @@ const useHydrateAuth =
               response.user
             );
 
+            localStorage.removeItem(
+              'guest-saved-tracks'
+            );
+
+            await hydrateSavedTracks();
+
           } catch (error) {
 
             console.error(error);
@@ -58,13 +71,14 @@ const useHydrateAuth =
 
         };
 
-      hydrate();
+    hydrate();
 
     }, [
       token,
       setUser,
       logout,
       setHydrating,
+      hydrateSavedTracks,
     ]);
 
   };

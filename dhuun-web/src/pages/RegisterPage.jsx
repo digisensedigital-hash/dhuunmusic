@@ -50,41 +50,105 @@ export default function RegisterPage() {
 
       e.preventDefault();
 
+      console.log(
+        'STEP 1 → Submit triggered'
+      );
+
+      console.log({
+        name,
+        email,
+        passwordLength:
+          password.length,
+      });
+
       try {
 
+        console.log(
+          'STEP 2 → Setting loading true'
+        );
+
         setLoading(true);
+
+        console.log(
+          'STEP 3 → Calling register API'
+        );
+
+        const response =
+          await register({
+
+            name,
+            email,
+            password,
+
+          });
+
+        console.log(
+          'STEP 4 → API response received'
+        );
+
+        console.log(response);
 
         const {
           token,
           user,
-        } = await register({
+        } = response;
 
-          name,
-          email,
-          password,
-
-        });
+        console.log(
+          'STEP 5 → Setting auth state'
+        );
 
         setToken(token);
 
         setUser(user);
 
+        console.log(
+          'STEP 6 → Showing success toast'
+        );
+
         toast.success(
           'Welcome to Dhuun'
         );
 
-        navigate('/app');
+        console.log(
+          'STEP 7 → Navigating to /app'
+        );
+
+        console.log('NAVIGATION SKIPPED');
 
       } catch (error) {
 
+        console.log(
+          'STEP ERROR → Registration failed'
+        );
+
         console.error(error);
+
+        console.log(
+          'ERROR RESPONSE:',
+          error?.response
+        );
+
+        console.log(
+          'ERROR DATA:',
+          error?.response?.data
+        );
+
+        console.log(
+          'ERROR MESSAGE:',
+          error?.message
+        );
 
         toast.error(
           error?.response?.data?.message ||
+          error?.message ||
           'Registration failed'
         );
 
       } finally {
+
+        console.log(
+          'STEP FINAL → Reset loading'
+        );
 
         setLoading(false);
 

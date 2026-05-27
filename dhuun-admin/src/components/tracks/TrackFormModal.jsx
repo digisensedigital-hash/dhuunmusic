@@ -86,7 +86,7 @@ export default function TrackFormModal({
     setForm,
   ] = useState({
     title: '',
-    primaryArtist: '',
+    primaryArtists: [],
     genre: '',
     genre: '',
     language: '',
@@ -200,10 +200,11 @@ export default function TrackFormModal({
     title:
       initialData.title || '',
 
-    primaryArtist:
-    initialData.primaryArtist?._id ||
-    initialData.primaryArtist ||
-    '',
+    primaryArtists:
+    initialData.primaryArtists?.map(
+      (artist) =>
+        artist?._id || artist
+    ) || [],
 
     genre:
       initialData.genre || '',
@@ -569,8 +570,10 @@ const handleUpload =
       );
 
       formData.append(
-        'primaryArtist',
-        form.primaryArtist
+        'primaryArtists',
+        JSON.stringify(
+          form.primaryArtists
+        )
       );
 
       formData.append(
@@ -887,13 +890,15 @@ const handleUpload =
 
               <select
                 value={
-                  form.primaryArtist
+                  form.primaryArtists?.[0] || ''
                 }
                 onChange={(e) =>
                   setForm({
                     ...form,
-                    primaryArtist:
-                      e.target.value,
+                    primaryArtists:
+                      e.target.value
+                        ? [e.target.value]
+                        : [],
                   })
                 }
                 className="w-full rounded-2xl border border-zinc-800 bg-black px-4 py-4 text-white outline-none"

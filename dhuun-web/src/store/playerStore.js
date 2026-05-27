@@ -5,6 +5,19 @@ import {
   persist,
 } from 'zustand/middleware';
 
+import authStore
+  from './auth/authStore';
+
+import {
+
+  getSavedTracks,
+
+  saveTrack as saveTrackApi,
+
+  removeSavedTrack as removeSavedTrackApi,
+
+} from '../api/library';
+
 const usePlayerStore =
   create(
     persist(
@@ -737,50 +750,215 @@ const usePlayerStore =
     // Saved Tracks
     // -----------------------------------
 
-    toggleSaveTrack:
-      (track) => {
-        const {
-          savedTracks,
-        } = get();
+    hydrateSavedTracks:
+      async () => {
 
-        const exists =
-          savedTracks.some(
-            (item) =>
-              item.id ===
-              track.id
-          );
+        try {
 
-        if (exists) {
+          const user =
+            authStore
+              .getState()
+              ?.user;
+
+          // -----------------------------------
+          // Guest User
+          // -----------------------------------
+
+          if (!user) {
+
+            const guestTracks =
+              JSON.parse(
+
+                localStorage.getItem(
+                  'guest-saved-tracks'
+                ) || '[]'
+              );
+
+            set({
+              savedTracks:
+                guestTracks,
+            });
+
+            return;
+          }
+
+          // -----------------------------------
+          // Authenticated User
+          // -----------------------------------
+
+          const response =
+            await getSavedTracks();
+
           set({
+
             savedTracks:
-              savedTracks.filter(
-                (
-                  item
-                ) =>
-                  item.id !==
-                  track.id
-              ),
+              response.tracks || [],
           });
 
-          return;
-        }
+        } catch (error) {
 
-        set({
-          savedTracks: [
-            track,
-            ...savedTracks,
-          ],
-        });
+          console.error(error);
+        }
+      },
+
+    toggleSaveTrack:
+      async (track) => {
+
+        try {
+
+          const user =
+            authStore
+              .getState()
+              ?.user;
+
+          const {
+            savedTracks,
+          } = get();
+
+          const trackId =
+
+            track.id ||
+            track._id;
+
+          const exists =
+            savedTracks.some(
+
+              (item) =>
+
+                (
+                  item.id ||
+                  item._id
+                ) === trackId
+            );
+
+          // -----------------------------------
+          // Remove Saved Track
+          // -----------------------------------
+
+          if (exists) {
+
+            // Guest
+
+            if (!user) {
+
+              const updated =
+                savedTracks.filter(
+
+                  (item) =>
+
+                    (
+                      item.id ||
+                      item._id
+                    ) !== trackId
+                );
+
+              localStorage.setItem(
+
+                'guest-saved-tracks',
+
+                JSON.stringify(
+                  updated
+                )
+              );
+
+              set({
+                savedTracks:
+                  updated,
+              });
+
+              return;
+            }
+
+            // Authenticated
+
+            await removeSavedTrackApi(
+              trackId
+            );
+
+            set({
+
+              savedTracks:
+                savedTracks.filter(
+
+                  (item) =>
+
+                    (
+                      item.id ||
+                      item._id
+                    ) !== trackId
+                ),
+            });
+
+            return;
+          }
+
+          // -----------------------------------
+          // Add Saved Track
+          // -----------------------------------
+
+          // Guest
+
+          if (!user) {
+
+            const updated = [
+
+              track,
+              ...savedTracks,
+            ];
+
+            localStorage.setItem(
+
+              'guest-saved-tracks',
+
+              JSON.stringify(
+                updated
+              )
+            );
+
+            set({
+              savedTracks:
+                updated,
+            });
+
+            return;
+          }
+
+          // Authenticated
+
+          await saveTrackApi(
+            trackId
+          );
+
+          set({
+
+            savedTracks: [
+
+              track,
+              ...savedTracks,
+            ],
+          });
+
+        } catch (error) {
+
+          console.error(error);
+        }
       },
 
     isTrackSaved:
       (trackId) => {
-        return get().savedTracks.some(
-          (track) =>
-            track.id ===
-            trackId
-        );
-      },
+
+    return get()
+      .savedTracks
+      .some(
+
+        (track) =>
+
+          (
+            track.id ||
+            track._id
+          ) === trackId
+      );
+  },
     
     // -----------------------------------
     // Continue Listening
@@ -853,7 +1031,9 @@ const usePlayerStore =
         }),
       {
       name:
-      'dhuun-player-store',
+        'dhuun-player-store',
+
+      version: 2,
       
 
   partialize:

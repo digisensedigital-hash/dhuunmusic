@@ -1,13 +1,23 @@
 import axios from 'axios';
 
+const API_BASE_URL =
+
+  import.meta.env
+    .VITE_API_URL ||
+
+  (
+    window.location.hostname ===
+    'localhost'
+
+      ? 'http://localhost:8000/api'
+
+      : '/api'
+  );
+
 const client = axios.create({
 
   baseURL:
-
-    import.meta.env
-      .VITE_API_URL ||
-
-    '/api',
+    API_BASE_URL,
 });
 
 client.interceptors.request.use(

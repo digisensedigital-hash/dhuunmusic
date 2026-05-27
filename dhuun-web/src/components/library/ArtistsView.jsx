@@ -36,7 +36,7 @@ ArtistsView({
 
           const artist =
 
-            track.primaryArtist ||
+            track.primaryArtists?.[0] ||
 
             track.artist;
 

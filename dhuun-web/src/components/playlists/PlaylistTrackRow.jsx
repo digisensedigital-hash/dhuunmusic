@@ -36,12 +36,27 @@ PlaylistTrackRow({
   } = usePlayerStore();
 
   // -----------------------------------
+  // Primary Artist
+  // -----------------------------------
+
+  const primaryArtist =
+    track
+      ?.primaryArtists?.[0] ||
+    null;
+
+  // -----------------------------------
   // Active State
   // -----------------------------------
 
   const isActive =
-    currentTrack?.id ===
-    track.id;
+    (
+      currentTrack?.id ||
+      currentTrack?._id
+    ) ===
+    (
+      track.id ||
+      track._id
+    );
 
   // -----------------------------------
   // Play Handler
@@ -223,9 +238,11 @@ PlaylistTrackRow({
 
         <p className="mt-1 truncate text-sm text-white/45">
 
-          {track.primaryArtist
-            ?.stageName ||
-            'Unknown Artist'}
+          {
+            primaryArtist
+              ?.stageName ||
+            'Unknown Artist'
+          }
 
         </p>
 

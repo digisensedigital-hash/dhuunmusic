@@ -184,29 +184,32 @@ const recommended =
 
   const featuredArtists = [
 
-    ...new Map(
+  ...new Map(
 
-      trending
-        .filter(
-          (item) =>
-            item.track
-              ?.primaryArtist
-        )
+    trending
 
-        .map(
-          (item) => [
+      .filter(
+        (item) =>
 
-            item.track
-              .primaryArtist.id,
+          item.track
+            ?.primaryArtists?.[0]
+      )
 
-            item.track
-              .primaryArtist,
-          ]
-        )
+      .map(
+        (item) => [
 
-    ).values(),
+          item.track
+            .primaryArtists?.[0]
+            ?.id,
 
-  ].slice(0, 12);
+          item.track
+            .primaryArtists?.[0],
+        ]
+      )
+
+  ).values(),
+
+].slice(0, 12);
 
   const playlists = [
   {
@@ -300,14 +303,22 @@ const recommended =
           queue={trending}
         />
 
-        <ArtistBubbleRail
-          title="Featured Artists"
-          artists={featuredArtists}
-        />
+        {featuredArtists.length > 0 && (
 
-        <LyricsStripCarousel
-          items={trending}
-        />
+          <ArtistBubbleRail
+            title="Featured Artists"
+            artists={featuredArtists}
+          />
+
+        )}
+
+        {trending.length > 0 && (
+
+          <LyricsStripCarousel
+            items={trending}
+          />
+
+        )}
 
         {/* -------------------------------- */}
         {/* Continue Listening */}
@@ -386,10 +397,14 @@ const recommended =
         {/* Trending */}
         {/* -------------------------------- */}
 
-        <HorizontalTrackRail
-          title="Trending"
-          items={trending}
-        />
+        {trending.length > 0 && (
+
+          <HorizontalTrackRail
+            title="Trending"
+            items={trending}
+          />
+
+        )}
 
         {/* -------------------------------- */}
         {/* Recommended */}
@@ -408,41 +423,61 @@ const recommended =
           />
         )}
 
-        <HorizontalTrackRail
-          title="New Releases"
-          items={newReleases}
-        />
+        {newReleases.length > 0 && (
 
-        <WideMoodRail
+          <HorizontalTrackRail
+            title="New Releases"
+            items={newReleases}
+          />
 
-          title="Mood Picks"
+        )}
 
-          subtitle="Immersive Discovery"
+        {moodPicks.length > 0 && (
 
-          items={moodPicks}
+          <WideMoodRail
 
-        />
+            title="Mood Picks"
 
-        <HorizontalTrackRail
-          title="Hindi Pop"
-          items={hindiPop}
-        />
+            subtitle="Immersive Discovery"
 
-        <WideMoodRail
+            items={moodPicks}
 
-          title="Night Vibes"
+          />
 
-          subtitle="After Dark"
+        )}
 
-          items={nightVibes}
+        {hindiPop.length > 0 && (
 
-        />
+          <HorizontalTrackRail
+            title="Hindi Pop"
+            items={hindiPop}
+          />
 
-        <PlaylistRail
-          title="Curated Playlists"
-          items={playlists}
-        />
-        
+        )}
+
+        {nightVibes.length > 0 && (
+
+          <WideMoodRail
+
+            title="Night Vibes"
+
+            subtitle="After Dark"
+
+            items={nightVibes}
+
+          />
+
+        )}
+
+        {playlists.length > 0 && (
+
+          <PlaylistRail
+            title="Curated Playlists"
+            items={playlists}
+          />
+
+        )}
+
       </div>
     </div>
   );

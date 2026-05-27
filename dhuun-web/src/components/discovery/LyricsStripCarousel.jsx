@@ -313,8 +313,8 @@ LyricsStripCarousel({
 
                       {
                         track
-                          .primaryArtist
-                          ?.stageName
+                        .primaryArtists?.[0]
+                        ?.stageName
                       }
 
                     </span>

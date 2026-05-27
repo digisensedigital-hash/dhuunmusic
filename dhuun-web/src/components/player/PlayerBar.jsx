@@ -52,6 +52,15 @@ PlayerBar() {
   }
 
   // -----------------------------------
+  // Primary Artist
+  // -----------------------------------
+
+  const primaryArtist =
+    currentTrack
+      ?.primaryArtists?.[0] ||
+    null;
+
+  // -----------------------------------
   // Progress
   // -----------------------------------
 
@@ -140,10 +149,11 @@ PlayerBar() {
 
             <p className="mt-1 truncate text-sm text-white/50">
 
-              {currentTrack
-                .primaryArtist
-                ?.stageName ||
-                'Unknown Artist'}
+              {
+                primaryArtist
+                  ?.stageName ||
+                'Unknown Artist'
+              }
 
             </p>
 

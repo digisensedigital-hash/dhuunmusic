@@ -274,6 +274,11 @@ QueueDrawer() {
                       playbackIndex ===
                       currentIndex;
 
+                    const primaryArtist =
+                      track
+                        ?.primaryArtists?.[0] ||
+                      null;
+
                     return (
 
                       <Reorder.Item
@@ -423,10 +428,11 @@ QueueDrawer() {
 
                             <p className="mt-1 truncate text-sm text-white/40">
 
-                              {track
-                                .primaryArtist
-                                ?.stageName ||
-                                'Unknown Artist'}
+                              {
+                                primaryArtist
+                                  ?.stageName ||
+                                'Unknown Artist'
+                              }
 
                             </p>
 

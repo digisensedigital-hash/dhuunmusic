@@ -125,13 +125,7 @@ AppRoutes() {
           <Route
             path="library"
             element={
-
-              <ProtectedRoute>
-
-                <LibraryPage />
-
-              </ProtectedRoute>
-
+              <LibraryPage />
             }
           />
 

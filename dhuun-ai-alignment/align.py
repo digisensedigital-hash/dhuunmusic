@@ -1,189 +1,274 @@
-from faster_whisper import WhisperModel
-
-from utils.load_lyrics import (
-    load_lyrics_file
-)
-
-from services.build_synced_lyrics import (
-    build_synced_lyrics,
-    export_synced_lyrics
-)
+from rapidfuzz import fuzz
 
 # -----------------------------------
-# Config
+# Normalize Lyrics
 # -----------------------------------
 
-AUDIO_FILE = "./samples/waadi-ye-kashmir.mp3"
+def normalize_lyrics(
+    lyrics_text
+):
 
-LYRICS_FILE = "./samples/waadi-ye-kashmir.txt"
+    if not lyrics_text:
+        return []
 
-OUTPUT_FILE = (
-    "./output/aligned/"
-    "waadi-ye-kashmir.json"
-)
+    return [
 
-MODEL_SIZE = "base"
+        line.strip()
 
-DEVICE = "cpu"
+        for line in (
+            lyrics_text
+                .replace('\r', '')
+                .splitlines()
+        )
 
-# -----------------------------------
-# Load Whisper Model
-# -----------------------------------
-
-print(
-    "\nLoading Faster-Whisper model...\n"
-)
-
-model = WhisperModel(
-    MODEL_SIZE,
-    device=DEVICE,
-    compute_type="int8"
-)
-
-# -----------------------------------
-# Transcribe Audio
-# -----------------------------------
-
-print(
-    "\nTranscribing audio...\n"
-)
-
-segments, info = model.transcribe(
-
-    AUDIO_FILE,
-
-    beam_size=5,
-
-    condition_on_previous_text=False,
-
-    word_timestamps=True
-)
-
-print(
-    f"\nDetected language: "
-    f"{info.language}\n"
-)
-
-# -----------------------------------
-# Convert Segments
-# -----------------------------------
-
-transcript_segments = []
-
-for segment in segments:
-
-    segment_text = (
-        segment.text.strip()
-    )
-
-    if not segment_text:
-        continue
-
-    transcript_segments.append({
-
-        "start": round(
-            segment.start,
-            2
-        ),
-
-        "end": round(
-            segment.end,
-            2
-        ),
-
-        "text":
-            segment_text,
-
-        "words": [
-
-            {
-
-                "word":
-                    word.word,
-
-                "start":
-                    round(
-                        word.start,
-                        2
-                    ) if word.start
-                    else None,
-
-                "end":
-                    round(
-                        word.end,
-                        2
-                    ) if word.end
-                    else None
-
-            }
-
-            for word in (
-                segment.words or []
-            )
-
-        ]
-
-    })
-
-# -----------------------------------
-# Print Transcript
-# -----------------------------------
-
-print(
-    "\nTRANSCRIPTION RESULT:\n"
-)
-
-for segment in transcript_segments:
-
-    print(
-
-        f"[{segment['start']}s "
-        f"→ {segment['end']}s] "
-
-        f"{segment['text']}"
-    )
-
-# -----------------------------------
-# Load Original Lyrics
-# -----------------------------------
-
-lyrics_text = load_lyrics_file(
-    LYRICS_FILE
-)
+        if line.strip()
+    ]
 
 # -----------------------------------
 # Build Synced Lyrics
 # -----------------------------------
 
-print(
-    "\nBuilding synced lyrics...\n"
-)
+def build_synced_lyrics(
 
-synced_lyrics = build_synced_lyrics(
     transcript_segments,
+
     lyrics_text
-)
+):
 
-# -----------------------------------
-# Print Synced Lyrics
-# -----------------------------------
+    # -----------------------------------
+    # Normalize Lyrics
+    # -----------------------------------
 
-print(
-    "\nSYNCED LYRICS:\n"
-)
-
-for line in synced_lyrics:
-
-    print(
-        f"[{line['startTime']}s] "
-        f"{line['text']}"
+    lyric_lines = normalize_lyrics(
+        lyrics_text
     )
 
+    # -----------------------------------
+    # Defensive Guard
+    # -----------------------------------
+
+    if not lyric_lines:
+        return []
+
+    if not transcript_segments:
+        return []
+
+    # -----------------------------------
+    # Normalize Transcript
+    # -----------------------------------
+
+    cleaned_segments = []
+
+    for segment in transcript_segments:
+
+        text = (
+            segment.get(
+                'text',
+                ''
+            )
+            .strip()
+        )
+
+        if not text:
+            continue
+
+        cleaned_segments.append({
+
+            "start":
+                segment.get(
+                    "start",
+                    0
+                ),
+
+            "end":
+                segment.get(
+                    "end",
+                    0
+                ),
+
+            "text":
+                text,
+        })
+
+    if not cleaned_segments:
+        return []
+
+    # -----------------------------------
+    # Sequential Alignment
+    # -----------------------------------
+
+    synced_lyrics = []
+
+    segment_index = 0
+
+    for lyric_line in lyric_lines:
+
+        best_match = None
+
+        best_score = 0
+
+        best_index = None
+
+        # -----------------------------------
+        # Forward Search Window
+        # -----------------------------------
+
+        search_window = cleaned_segments[
+            segment_index:
+            segment_index + 8
+        ]
+
+        for idx, segment in enumerate(
+            search_window
+        ):
+
+            score = fuzz.partial_ratio(
+
+                lyric_line.lower(),
+
+                segment["text"]
+                    .lower()
+            )
+
+            if score > best_score:
+
+                best_score = score
+
+                best_match = segment
+
+                best_index = (
+                    segment_index + idx
+                )
+
+        # -----------------------------------
+        # Strong Match
+        # -----------------------------------
+
+        if (
+            best_match and
+            best_score >= 45
+        ):
+
+            synced_lyrics.append({
+
+                "text":
+                    lyric_line,
+
+                "startTime":
+                    round(
+                        best_match[
+                            "start"
+                        ],
+                        2
+                    ),
+
+                "endTime":
+                    round(
+                        best_match[
+                            "end"
+                        ],
+                        2
+                    ),
+            })
+
+            # -----------------------------------
+            # Move Forward
+            # Prevent Random Jumping
+            # -----------------------------------
+
+            segment_index = (
+                best_index + 1
+            )
+
+        # -----------------------------------
+        # Fallback Approximation
+        # -----------------------------------
+
+        else:
+
+            fallback_start = 0
+
+            fallback_end = 0
+
+            if synced_lyrics:
+
+                fallback_start = (
+                    synced_lyrics[-1]
+                    ["endTime"]
+                )
+
+                fallback_end = (
+                    fallback_start + 3
+                )
+
+            synced_lyrics.append({
+
+                "text":
+                    lyric_line,
+
+                "startTime":
+                    round(
+                        fallback_start,
+                        2
+                    ),
+
+                "endTime":
+                    round(
+                        fallback_end,
+                        2
+                    ),
+            })
+
+    # -----------------------------------
+    # Final Sort Safety
+    # -----------------------------------
+
+    synced_lyrics.sort(
+        key=lambda x:
+            x["startTime"]
+    )
+
+    return synced_lyrics
+
 # -----------------------------------
-# Export JSON
+# Export Synced Lyrics
 # -----------------------------------
 
-export_synced_lyrics(
+def export_synced_lyrics(
     synced_lyrics,
-    OUTPUT_FILE
-)
+    output_path
+):
+
+    import os
+    import json
+
+    os.makedirs(
+
+        os.path.dirname(
+            output_path
+        ),
+
+        exist_ok=True
+    )
+
+    with open(
+        output_path,
+        "w",
+        encoding="utf-8"
+    ) as file:
+
+        json.dump(
+
+            synced_lyrics,
+
+            file,
+
+            ensure_ascii=False,
+
+            indent=2
+        )
+
+    print(
+        f"\n✅ Synced lyrics exported: "
+        f"{output_path}\n"
+    )

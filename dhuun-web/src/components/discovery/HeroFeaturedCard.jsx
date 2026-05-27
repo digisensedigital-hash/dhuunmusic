@@ -10,6 +10,7 @@ HeroFeaturedCard({
   track,
   queue = [],
 }) {
+
   const {
     playTrack,
   } = usePlayerStore();
@@ -18,8 +19,18 @@ HeroFeaturedCard({
     return null;
   }
 
+  // -----------------------------------
+  // Primary Artist
+  // -----------------------------------
+
+  const primaryArtist =
+    track
+      ?.primaryArtists?.[0] ||
+    null;
+
   return (
-    <div className="relative overflow-hidden rounded-[36px] h-[420px] bg-[#15151D] border border-white/10">
+
+    <div className="relative h-[420px] overflow-hidden rounded-[36px] border border-white/10 bg-[#15151D]">
 
       {/* -------------------------------- */}
       {/* Background Artwork */}
@@ -30,7 +41,7 @@ HeroFeaturedCard({
         <img
           src={track.coverImage}
           alt={track.title}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
         />
 
       ) : (
@@ -49,35 +60,43 @@ HeroFeaturedCard({
       {/* Ambient Glow */}
       {/* -------------------------------- */}
 
-      <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-[320px] h-[320px] bg-fuchsia-500/30 blur-[120px] rounded-full" />
+      <div className="absolute -bottom-20 left-1/2 h-[320px] w-[320px] -translate-x-1/2 rounded-full bg-fuchsia-500/30 blur-[120px]" />
 
       {/* -------------------------------- */}
       {/* Content */}
       {/* -------------------------------- */}
 
-      <div className="relative z-10 h-full flex flex-col justify-end p-7">
+      <div className="relative z-10 flex h-full flex-col justify-end p-7">
 
         {/* Label */}
 
         <div className="mb-4">
-          <span className="inline-flex items-center rounded-full border border-white/15 bg-white/10 backdrop-blur px-4 py-1.5 text-xs uppercase tracking-[0.25em] text-white/70">
+
+          <span className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs uppercase tracking-[0.25em] text-white/70 backdrop-blur">
+
             Featured Track
+
           </span>
+
         </div>
 
         {/* Title */}
 
         <h2 className="text-4xl font-black leading-none tracking-tight">
+
           {track.title}
+
         </h2>
 
         {/* Artist */}
 
         <p className="mt-3 text-lg text-white/70">
 
-          {track.primaryArtist
-            ?.stageName ||
-            'Unknown Artist'}
+          {
+            primaryArtist
+              ?.stageName ||
+            'Unknown Artist'
+          }
 
         </p>
 
@@ -97,20 +116,23 @@ HeroFeaturedCard({
                     track._id,
                 },
 
-                queue: [
-                  {
-                    ...track,
+                queue:
+                  queue.length
+                    ? queue
+                    : [
+                        {
+                          ...track,
 
-                    id:
-                      track.id ||
-                      track._id,
-                  },
-                ],
+                          id:
+                            track.id ||
+                            track._id,
+                        },
+                      ],
 
                 startIndex: 0,
               })
             }
-            className="h-14 px-7 rounded-full bg-white text-black flex items-center gap-3 font-semibold shadow-2xl active:scale-95 transition-transform"
+            className="flex h-14 items-center gap-3 rounded-full bg-white px-7 font-semibold text-black shadow-2xl transition-transform active:scale-95"
           >
 
             <Play
@@ -123,10 +145,15 @@ HeroFeaturedCard({
           </button>
 
           <div className="text-sm text-white/50">
+
             Feel the music.
+
           </div>
+
         </div>
+
       </div>
+
     </div>
   );
 }

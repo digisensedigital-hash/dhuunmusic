@@ -125,7 +125,7 @@ SearchPage() {
                 search
               ) ||
 
-            track?.primaryArtist?.stageName
+            track?.primaryArtists?.[0]?.stageName
               ?.toLowerCase()
               .includes(
                 search
@@ -158,7 +158,7 @@ SearchPage() {
 
           const artist =
             item.track
-              ?.primaryArtist;
+              ?.primaryArtists?.[0]
 
           if (
             artist?.id &&
@@ -565,7 +565,7 @@ SearchPage() {
 
                       <p className="mt-3 text-white/60">
 
-                        {topResult.primaryArtist
+                        {topResult.primaryArtists?.[0]
                           ?.stageName ||
                           'Unknown Artist'}
 

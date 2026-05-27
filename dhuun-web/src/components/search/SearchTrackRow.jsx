@@ -186,9 +186,12 @@ SearchTrackRow({
 
         <p className="mt-1 truncate text-sm text-white/45">
 
-          {track.primaryArtist
-            ?.stageName ||
-            'Unknown Artist'}
+          {
+            track
+              ?.primaryArtists?.[0]
+              ?.stageName ||
+            'Unknown Artist'
+          }
 
         </p>
 

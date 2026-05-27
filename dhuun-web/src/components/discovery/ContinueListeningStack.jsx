@@ -117,6 +117,15 @@ ContinueListeningStack({
               const track =
                 item.track;
 
+              // -----------------------------------
+              // Primary Artist
+              // -----------------------------------
+
+              const primaryArtist =
+                track
+                  ?.primaryArtists?.[0] ||
+                null;
+
               const offset =
                 index * 38;
 
@@ -142,9 +151,9 @@ ContinueListeningStack({
 
                     const response =
                       await loadPlaybackQueue(
-                      track.id ||
-                      track._id
-                    )
+                        track.id ||
+                        track._id
+                      );
 
                     const queue = [
 
@@ -330,9 +339,11 @@ ContinueListeningStack({
 
                         <p className="mt-3 truncate text-sm text-white/60">
 
-                          {track.primaryArtist
-                            ?.stageName ||
-                            'Unknown Artist'}
+                          {
+                            primaryArtist
+                              ?.stageName ||
+                            'Unknown Artist'
+                          }
 
                         </p>
 

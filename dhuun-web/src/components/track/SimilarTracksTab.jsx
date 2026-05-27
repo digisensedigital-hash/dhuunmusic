@@ -38,109 +38,126 @@ export default function SimilarTracksTab({
 
       {/* Tracks */}
 
-      <div className="space-y-4 p-6">
+      <div className="space-y-4 overflow-y-auto p-6">
 
         {similarTracks.length > 0 ? (
 
           similarTracks.map(
             (
               similarTrack
-            ) => (
+            ) => {
 
-              <button
-                key={
-                  similarTrack._id
-                }
+              // -----------------------------------
+              // Primary Artist
+              // -----------------------------------
 
-                onClick={() =>
-                  navigate(
-                    `/app/track/${similarTrack._id}`
-                  )
-                }
+              const primaryArtist =
+                similarTrack
+                  ?.primaryArtists?.[0] ||
+                null;
 
-                className="group flex w-full items-center gap-4 rounded-[28px] border border-white/10 bg-white/[0.03] p-4 text-left transition-all hover:border-white/20 hover:bg-white/[0.05]"
-              >
+              return (
 
-                {/* Artwork */}
-
-                <img
-                  src={getMediaUrl(
-                    similarTrack.coverImage
-                  )}
-                  alt={
-                    similarTrack.title
+                <button
+                  key={
+                    similarTrack._id
                   }
-                  className="h-24 w-24 rounded-[22px] object-cover shadow-xl"
-                />
 
-                {/* Content */}
+                  onClick={() =>
+                    navigate(
+                      `/app/track/${
+                        similarTrack.slug ||
+                        similarTrack._id
+                      }`
+                    )
+                  }
 
-                <div className="min-w-0 flex-1">
+                  className="group flex w-full items-center gap-4 rounded-[28px] border border-white/10 bg-white/[0.03] p-4 text-left transition-all hover:border-white/20 hover:bg-white/[0.05]"
+                >
 
-                  <p className="text-xl font-bold text-white transition group-hover:text-fuchsia-100">
+                  {/* Artwork */}
 
-                    {
+                  <img
+                    src={getMediaUrl(
+                      similarTrack.coverImage
+                    )}
+
+                    alt={
                       similarTrack.title
                     }
 
-                  </p>
+                    className="h-24 w-24 rounded-[22px] object-cover shadow-xl"
+                  />
 
-                  <p className="mt-2 text-sm text-zinc-400">
+                  {/* Content */}
 
-                    {
-                      similarTrack
-                        .primaryArtist
-                        ?.stageName
-                    }
+                  <div className="min-w-0 flex-1">
 
-                  </p>
+                    <p className="text-xl font-bold text-white transition group-hover:text-fuchsia-100">
 
-                  {/* Mood Tags */}
+                      {
+                        similarTrack.title
+                      }
 
-                  <div className="mt-4 flex flex-wrap gap-2">
+                    </p>
 
-                    {similarTrack.genre && (
+                    <p className="mt-2 text-sm text-zinc-400">
 
-                      <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-zinc-400">
+                      {
+                        primaryArtist
+                          ?.stageName ||
+                        'Unknown Artist'
+                      }
 
-                        {
-                          similarTrack.genre
-                        }
+                    </p>
 
-                      </div>
+                    {/* Mood Tags */}
 
-                    )}
+                    <div className="mt-4 flex flex-wrap gap-2">
 
-                    {similarTrack.language && (
+                      {similarTrack.genre && (
 
-                      <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-zinc-400">
+                        <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-zinc-400">
 
-                        {
-                          similarTrack.language
-                        }
+                          {
+                            similarTrack.genre
+                          }
 
-                      </div>
+                        </div>
 
-                    )}
+                      )}
+
+                      {similarTrack.trackLanguage && (
+
+                        <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-zinc-400">
+
+                          {
+                            similarTrack.trackLanguage
+                          }
+
+                        </div>
+
+                      )}
+
+                    </div>
 
                   </div>
 
-                </div>
+                  {/* Play */}
 
-                {/* Play */}
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-black shadow-xl transition group-hover:scale-105">
 
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-black shadow-xl transition group-hover:scale-105">
+                    <Play
+                      size={20}
+                      fill="black"
+                    />
 
-                  <Play
-                    size={20}
-                    fill="black"
-                  />
+                  </div>
 
-                </div>
+                </button>
 
-              </button>
-
-            )
+              );
+            }
           )
 
         ) : (

@@ -95,6 +95,15 @@ WideMoodRail({
             const track =
               item.track;
 
+            // -----------------------------------
+            // Primary Artist
+            // -----------------------------------
+
+            const primaryArtist =
+              track
+                ?.primaryArtists?.[0] ||
+              null;
+
             const handlePlay =
               async (
                 e
@@ -106,9 +115,9 @@ WideMoodRail({
 
                   const response =
                     await loadPlaybackQueue(
-                    track.id ||
-                    track._id
-                  )
+                      track.id ||
+                      track._id
+                    );
 
                   const queue = [
 
@@ -235,9 +244,11 @@ WideMoodRail({
 
                       <p className="mt-4 truncate text-sm text-white/70">
 
-                        {track.primaryArtist
-                          ?.stageName ||
-                          'Unknown Artist'}
+                        {
+                          primaryArtist
+                            ?.stageName ||
+                          'Unknown Artist'
+                        }
 
                       </p>
 
