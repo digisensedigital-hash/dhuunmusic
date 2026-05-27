@@ -190,22 +190,31 @@ const recommended =
 
       .filter(
         (item) =>
-
           item.track
             ?.primaryArtists?.[0]
       )
 
-      .map(
-        (item) => [
+      .map((item) => {
 
+        const artist =
           item.track
-            .primaryArtists?.[0]
-            ?.id,
+            ?.primaryArtists?.[0];
 
-          item.track
-            .primaryArtists?.[0],
-        ]
-      )
+        const artistId =
+          artist?._id ||
+          artist?.id;
+
+        if (!artistId) {
+          return null;
+        }
+
+        return [
+          artistId,
+          artist,
+        ];
+      })
+
+      .filter(Boolean)
 
   ).values(),
 
