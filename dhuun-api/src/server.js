@@ -81,6 +81,13 @@ connectDB();
 app.use(
   cors({
     origin: [
+
+      // Production
+      'https://dhuunmusic.in',
+      'https://www.dhuunmusic.in',
+      'https://admin.dhuunmusic.in',
+
+      // Local
       'http://127.0.0.1:5199',
       'http://localhost:5199',
 
