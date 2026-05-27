@@ -40,7 +40,7 @@ const generateSyncedLyrics =
       const response =
         await axios.post(
 
-          'http://127.0.0.1:9010/align',
+          `${process.env.AI_ALIGNMENT_URL}/align`,
 
           {
             audioPath,
