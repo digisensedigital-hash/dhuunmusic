@@ -11,6 +11,9 @@ import TrendingTrack
 import serializeTrack
   from '../../serializers/serializeTrack.js';
 
+import getPublicFileUrl
+  from '../../services/storage/getPublicFileUrl.js';
+
 export const getPublicArtistProfile =
   async (req, res) => {
 
@@ -43,7 +46,7 @@ export const getPublicArtistProfile =
       const topTracksRaw =
         await Track.find({
 
-          primaryArtist:
+          primaryArtists:
             artist._id,
 
           publishingStatus:
@@ -55,7 +58,7 @@ export const getPublicArtistProfile =
           isActive: true,
         })
           .populate(
-            'primaryArtist'
+            'primaryArtists'
           )
           .sort({
             createdAt: -1
@@ -84,7 +87,7 @@ export const getPublicArtistProfile =
             },
 
             populate: {
-              path: 'primaryArtist'
+              path: 'primaryArtists'
             }
           });
 
@@ -106,7 +109,7 @@ export const getPublicArtistProfile =
           .filter(
             (item) =>
               item.trackId
-                ?.primaryArtist
+                ?.primaryArtists
                 ?._id
                 ?.toString() ===
               artist._id.toString()
@@ -153,7 +156,14 @@ export const getPublicArtistProfile =
           bio: artist.bio,
 
           profileImage:
-            artist.profileImage,
+
+          artist.profileImage
+
+            ? getPublicFileUrl(
+                artist.profileImage
+              )
+
+            : '',
 
           verified:
             artist.verified

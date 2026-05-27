@@ -2,17 +2,24 @@ import serializeTrack
   from './serializeTrack.js';
 
 export default function
-serializeSavedTrack(item) {
-  if (!item) return null;
+serializeSavedTrack(
+  item
+) {
+
+  if (!item?.trackId) {
+    return null;
+  }
+
+  const track =
+    serializeTrack(
+      item.trackId
+    );
 
   return {
-    id: item._id,
 
-    savedAt: item.savedAt,
+    ...track,
 
-    track:
-      serializeTrack(
-        item.trackId
-      )
+    savedAt:
+      item.savedAt,
   };
 }

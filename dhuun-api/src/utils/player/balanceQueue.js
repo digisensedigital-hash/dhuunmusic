@@ -26,8 +26,8 @@ export default function balanceQueue(
         remaining[i];
 
       const artistId =
-        track.primaryArtist?._id?.toString?.() ||
-        track.primaryArtist?.toString?.() ||
+        track.primaryArtists?.[0]?._id?.toString?.() ||
+        track.primaryArtists?.[0]?.toString?.() ||
         null;
 
       if (
@@ -59,10 +59,10 @@ export default function balanceQueue(
 
     lastArtistId =
       selectedTrack
-        .primaryArtist?._id
+        .primaryArtists?._id
         ?.toString?.() ||
       selectedTrack
-        .primaryArtist
+        .primaryArtists
         ?.toString?.() ||
       null;
   }

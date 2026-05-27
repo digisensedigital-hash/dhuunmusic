@@ -1,6 +1,11 @@
+import fs from 'fs';
+
 import mongoose from 'mongoose';
 
 import Artist from '../../models/Artist.js';
+
+import uploadToMinio
+  from '../../services/storage/uploadToMinio.js';
 
 /* -------------------------------------------------------------------------- */
 /* Create Artist */
@@ -69,6 +74,31 @@ export const createArtist =
       }
 
       /* ----------------------------------- */
+      /* Upload Artist Image */
+      /* ----------------------------------- */
+
+      let profileImage = '';
+
+      if (req.file) {
+
+        profileImage =
+          await uploadToMinio(
+
+            req.file.path,
+
+            req.file.originalname,
+
+            req.file.mimetype,
+
+            'artists'
+          );
+
+        fs.unlinkSync(
+          req.file.path
+        );
+      }
+
+      /* ----------------------------------- */
       /* Create Artist */
       /* ----------------------------------- */
 
@@ -95,10 +125,7 @@ export const createArtist =
             isVerified === true ||
             isVerified === 'true',
 
-          profileImage:
-            req.file
-              ? `/uploads/${req.file.filename}`
-              : '',
+          profileImage,
 
         });
 
@@ -272,10 +299,31 @@ export const updateArtist =
           isVerified === 'true';
       }
 
+      /* ----------------------------------- */
+      /* Upload New Artist Image */
+      /* ----------------------------------- */
+
       if (req.file) {
 
+        const profileImage =
+
+          await uploadToMinio(
+
+            req.file.path,
+
+            req.file.originalname,
+
+            req.file.mimetype,
+
+            'artists'
+          );
+
+        fs.unlinkSync(
+          req.file.path
+        );
+
         artist.profileImage =
-          `/uploads/${req.file.filename}`;
+          profileImage;
       }
 
       await artist.save();

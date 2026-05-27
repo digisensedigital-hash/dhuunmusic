@@ -49,7 +49,7 @@ export default async function getRelatedTracks(
     isActive: true,
   })
       .populate(
-        'primaryArtist',
+        'primaryArtists',
         'stageName profileImage'
       )
       .lean();
@@ -87,18 +87,18 @@ export default async function getRelatedTracks(
       isActive: true,
     })
       .populate(
-        'primaryArtist',
+        'primaryArtists',
         'stageName profileImage'
       )
       .limit(50)
       .lean(),
 
     // Same Artist
-    sourceTrack.primaryArtist?._id
+    sourceTrack.primaryArtists?.[0]?._id
 
       ? Track.find({
-        primaryArtist:
-          sourceTrack.primaryArtist._id,
+        primaryArtists:
+          sourceTrack.primaryArtists?.[0]?._id,
 
         _id: {
           $ne: sourceTrack._id
@@ -113,7 +113,7 @@ export default async function getRelatedTracks(
         isActive: true,
       })
           .populate(
-            'primaryArtist',
+            'primaryArtists',
             'stageName profileImage'
           )
           .limit(50)
@@ -121,7 +121,7 @@ export default async function getRelatedTracks(
 
       : Promise.resolve([])
       .populate(
-        'primaryArtist',
+        'primaryArtists',
         'stageName profileImage'
       )
       .limit(50)
@@ -147,7 +147,7 @@ export default async function getRelatedTracks(
         },
 
         populate: {
-          path: 'primaryArtist',
+          path: 'primaryArtists',
 
           select:
             'stageName profileImage'

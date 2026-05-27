@@ -66,9 +66,10 @@ getRecommendations({
       await Track.findById(
         seedTrackId
       ).populate(
-        'primaryArtist',
+        'primaryArtists',
         'stageName profileImage'
       );
+
   }
 
   // -----------------------------------
@@ -90,13 +91,13 @@ getRecommendations({
 
     if (
       item.trackId
-        ?.primaryArtist
-    ) {
-      preferredArtists.add(
-        item.trackId.primaryArtist.toString()
-      );
+        ?.primaryArtists?.[0]
+      ) {
+        preferredArtists.add(
+          item.trackId.primaryArtists?.[0]?.toString?.()
+        );
+      }
     }
-  }
 
   for (const item of recentlyPlayed) {
     if (item.trackId?.genre) {
@@ -107,10 +108,10 @@ getRecommendations({
 
     if (
       item.trackId
-        ?.primaryArtist
+        ?.primaryArtists?.[0]
     ) {
       preferredArtists.add(
-        item.trackId.primaryArtist.toString()
+        item.trackId.primaryArtists?.[0]?.toString?.()
       );
     }
   }
@@ -141,9 +142,9 @@ getRecommendations({
           publishingStatus: 'PUBLISHED',
           isActive: true,
         }).populate(
-              'primaryArtist',
-        'stageName profileImage'
-      );
+          'primaryArtists',
+          'stageName profileImage'
+        );
 
     if (!track) {
       continue;
@@ -195,14 +196,14 @@ getRecommendations({
 
     if (
       preferredArtists.has(
-        track.primaryArtist
+        track.primaryArtists?.[0]
           ?._id?.toString()
       )
     ) {
       score += 40;
 
       reason =
-        `Similar to ${track.primaryArtist?.stageName}`;
+        `Similar to ${track.primaryArtists?.[0]?.stageName}`;
     }
 
     // -----------------------------------
@@ -226,15 +227,15 @@ getRecommendations({
 
     if (
       seedTrack
-        ?.primaryArtist?._id
+        ?.primaryArtists?.[0]?._id
           ?.toString() ===
-      track.primaryArtist
-        ?._id?.toString()
+      track.primaryArtists?.[0]
+          ?._id?.toString()
     ) {
       score += 80;
 
       reason =
-        `More from ${track.primaryArtist?.stageName}`;
+        `More from ${track.primaryArtists?.[0]?.stageName}`;
     }
 
     trackScores.push({

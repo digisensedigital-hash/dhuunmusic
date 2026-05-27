@@ -63,7 +63,7 @@ export const getHomeFeed =
             },
 
             populate: {
-              path: 'primaryArtist',
+              path: 'primaryArtists',
 
               select:
                 'stageName profileImage',
@@ -79,7 +79,7 @@ export const getHomeFeed =
         if (item.trackId) {
 
           await item.trackId.populate(
-            'primaryArtist',
+            'primaryArtists',
             'stageName profileImage'
           );
         }
@@ -132,7 +132,7 @@ export const getHomeFeed =
             )
             .populate({
               path:
-                'primaryArtist',
+                'primaryArtists',
 
               select:
                 'stageName profileImage'
@@ -201,7 +201,7 @@ export const getHomeFeed =
                   },
 
                   populate: {
-                    path: 'primaryArtist',
+                    path: 'primaryArtists',
 
                     select:
                       'stageName profileImage'
@@ -241,7 +241,7 @@ export const getHomeFeed =
                   },
 
                   populate: {
-                    path: 'primaryArtist',
+                    path: 'primaryArtists',
 
                     select:
                       'stageName profileImage'
@@ -280,7 +280,7 @@ export const getHomeFeed =
                 },
 
                 populate: {
-                  path: 'primaryArtist',
+                  path: 'primaryArtists',
 
                   select:
                     'stageName profileImage'

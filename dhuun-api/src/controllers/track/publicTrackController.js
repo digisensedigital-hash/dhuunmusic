@@ -12,6 +12,9 @@ import TrendingTrack
 import serializeTrack
   from '../../serializers/serializeTrack.js';
 
+import getPublicFileUrl
+  from '../../services/storage/getPublicFileUrl.js';
+
 export const getPublicTracks =
   async (req, res) => {
 
@@ -31,7 +34,7 @@ export const getPublicTracks =
         })
 
           .populate(
-            'primaryArtist',
+            'primaryArtists',
             'stageName profileImage'
           )
 
@@ -104,7 +107,7 @@ export const getPublicTrackDetails =
         })
 
           .populate(
-            'primaryArtist',
+            'primaryArtists',
             'stageName profileImage bio'
           );
 
@@ -188,7 +191,7 @@ export const getPublicTrackDetails =
           })
 
             .populate(
-              'primaryArtist',
+              'primaryArtists',
               'stageName profileImage'
             )
 
@@ -218,23 +221,32 @@ export const getPublicTrackDetails =
               coverImage:
                 variantTrack.coverImage,
 
-              primaryArtist:
-                variantTrack.primaryArtist
+              primaryArtists:
+                variantTrack.primaryArtists
                   ? {
                       _id:
                         variantTrack
-                          .primaryArtist
+                          .primaryArtists
                           ._id,
 
                       stageName:
                         variantTrack
-                          .primaryArtist
+                          .primaryArtists
                           .stageName,
 
                       profileImage:
-                        variantTrack
-                          .primaryArtist
-                          .profileImage,
+
+                      variantTrack
+                        .primaryArtists
+                        ?.profileImage
+
+                        ? getPublicFileUrl(
+                            variantTrack
+                              .primaryArtists
+                              .profileImage
+                          )
+
+                        : '',
                     }
                   : null,
             })

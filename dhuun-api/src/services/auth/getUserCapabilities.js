@@ -44,8 +44,13 @@ const getUserCapabilities = (
   /* ----------------------------------- */
 
   if (
-    user.subscriptionStatus ===
-    'PREMIUM'
+    [
+      'PRO',
+      'BUSINESS',
+      'ENTERPRISE',
+    ].includes(
+      user.subscriptionStatus
+    )
   ) {
 
     return {

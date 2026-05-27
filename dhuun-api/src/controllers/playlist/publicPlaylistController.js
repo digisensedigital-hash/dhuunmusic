@@ -31,7 +31,7 @@ export const getPublicPlaylist =
             },
 
             populate: {
-              path: 'primaryArtist',
+              path: 'primaryArtists',
 
               select:
                 'stageName profileImage'

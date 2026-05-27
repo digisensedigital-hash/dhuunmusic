@@ -30,10 +30,13 @@ export const saveTrack =
         });
 
       if (existingSave) {
-        return res.status(400).json({
-          success: false,
-          message:
-            'Track already saved'
+
+        return res.json({
+
+          success: true,
+
+          savedTrack:
+            existingSave,
         });
       }
 
@@ -97,7 +100,7 @@ export const getSavedTracks =
           .populate({
             path: 'trackId',
             populate: {
-              path: 'primaryArtist',
+              path: 'primaryArtists',
               select:
                 'stageName profileImage'
             }
@@ -136,7 +139,7 @@ export const getRecentlyPlayed =
           .populate({
             path: 'trackId',
             populate: {
-              path: 'primaryArtist',
+              path: 'primaryArtists',
               select:
                 'stageName profileImage'
             }

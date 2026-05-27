@@ -37,7 +37,7 @@ generateQueue({
 
       isActive: true,
     }).populate(
-      'primaryArtist',
+      'primaryArtists',
       'stageName profileImage'
     );
 
@@ -115,7 +115,7 @@ generateQueue({
         },
 
         populate: {
-          path: 'primaryArtist',
+          path: 'primaryArtists',
 
           select:
             'stageName profileImage'

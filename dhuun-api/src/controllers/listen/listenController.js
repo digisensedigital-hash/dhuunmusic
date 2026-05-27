@@ -220,24 +220,24 @@ export const completeListenSession =
             listenSession.trackId
         );
 
-        if (track?.primaryArtist) {
+        if (track?.primaryArtists?.[0]) {
         let artistAnalytics =
             await ArtistAnalytics.findOne({
             artistId:
-                track.primaryArtist
+                track.primaryArtists
             });
 
         if (!artistAnalytics) {
             const totalTracks =
             await Track.countDocuments({
-                primaryArtist:
-                track.primaryArtist
+                primaryArtists:
+                track.primaryArtists
             });
 
             artistAnalytics =
             await ArtistAnalytics.create({
                 artistId:
-                track.primaryArtist,
+                track.primaryArtists,
 
                 totalTracks
             });

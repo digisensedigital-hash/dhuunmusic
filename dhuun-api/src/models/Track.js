@@ -164,25 +164,22 @@ const trackSchema = new mongoose.Schema(
     | Keep these for existing APIs & playback flows
     */
 
-    primaryArtist: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Artist',
-      required: true,
-      index: true,
-    },
-
     /*
     |--------------------------------------------------------------------------
     | Future Multi-Artist Support
     |--------------------------------------------------------------------------
     */
 
+    
     primaryArtists: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type:
+          mongoose.Schema.Types.ObjectId,
+
         ref: 'Artist',
       },
     ],
+  
 
     featuredArtists: [
       {
@@ -203,7 +200,7 @@ const trackSchema = new mongoose.Schema(
       index: true,
     },
 
-    language: {
+    trackLanguage: {
       type: String,
       default: 'Hindi',
       index: true,
@@ -591,13 +588,19 @@ trackSchema.query.publicOnly =
 /* Text Search Index */
 /* -------------------------------------------------------------------------- */
 
-trackSchema.index({
-  title: 'text',
-  genre: 'text',
-  tags: 'text',
-  moods: 'text',
-  lyrics: 'text',
-});
+trackSchema.index(
+  {
+    title: 'text',
+    genre: 'text',
+    tags: 'text',
+    moods: 'text',
+    lyrics: 'text',
+  },
+  {
+    name: 'track_search_text_v2',
+    default_language: 'english',
+  }
+);
 
 /* -------------------------------------------------------------------------- */
 /* Model */

@@ -47,7 +47,8 @@ serializeTrack(track) {
 
     genre: track.genre,
 
-    language: track.language,
+    language:
+      track.trackLanguage,
 
     lyrics: track.lyrics,
 
@@ -111,25 +112,34 @@ serializeTrack(track) {
     /* Artist */
     /* ----------------------------------- */
 
-    primaryArtist:
-      track.primaryArtist
-        ? {
+    primaryArtists:
 
-            id:
-              track.primaryArtist._id,
+  track.primaryArtists?.length
 
-            slug:
-              track.primaryArtist.slug,
+    ? track.primaryArtists.map(
+        (artist) => ({
 
-            stageName:
-              track.primaryArtist
-                .stageName,
+          id:
+            artist._id,
 
-            profileImage:
-              track.primaryArtist
-                ?.profileImage || ''
+          slug:
+            artist.slug,
 
-          }
-        : null
+          stageName:
+            artist.stageName,
+
+          profileImage:
+
+            artist?.profileImage
+
+              ? getPublicFileUrl(
+                  artist.profileImage
+                )
+
+              : ''
+        })
+      )
+
+    : [],
   };
 }

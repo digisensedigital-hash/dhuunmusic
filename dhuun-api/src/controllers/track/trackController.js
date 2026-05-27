@@ -18,6 +18,9 @@ import generateHLS from '../../services/media/generateHLS.js';
 
 import generateSyncedLyrics from '../../services/ai/generateSyncedLyrics.js';
 
+import mongoose
+  from 'mongoose';
+
 /* ----------------------------------- */
 /* Create Track */
 /* ----------------------------------- */
@@ -27,9 +30,9 @@ export const createTrack =
     try {
       const {
         title,
-        primaryArtist,
         genre,
         language,
+        trackLanguage,
         lyrics,
         releaseType,
         releaseDate,
@@ -43,6 +46,14 @@ export const createTrack =
         versionType,
         allowMeaningGeneration,
       } = req.body;
+
+      const normalizedLanguage =
+
+        language ||
+
+        trackLanguage ||
+
+        '';
 
       const artist =
         await Artist.findOne({
@@ -337,13 +348,12 @@ export const createTrack =
                 slug:
                   `${slug}-${Date.now()}`,
 
-                primaryArtist:
-                  primaryArtist ||
-                  artist._id,
+                primaryArtists,
 
                 genre,
 
-                language,
+                trackLanguage:
+                  normalizedLanguage,
 
                 /* ----------------------------------- */
                 /* Discovery */
@@ -636,9 +646,10 @@ export const createTrack =
 
               const {
                 title,
-                primaryArtist,
                 genre,
                 language,
+                trackLanguage,
+                primaryArtists,
                 lyrics,
                 releaseType,
                 releaseDate,
@@ -656,6 +667,13 @@ export const createTrack =
                 allowMeaningGeneration,
               } = req.body;
 
+              const normalizedLanguage =
+
+                language ||
+
+                trackLanguage ||
+
+                '';
               /* ----------------------------------- */
               /* Contributors */
               /* ----------------------------------- */
@@ -1061,15 +1079,71 @@ export const createTrack =
               track.title =
                 title || track.title;
 
-              track.primaryArtist =
-                primaryArtist ||
-                track.primaryArtist;
+              if (primaryArtists) {
+
+                const parsedPrimaryArtists =
+
+                  typeof primaryArtists === 'string'
+
+                    ? JSON.parse(primaryArtists)
+
+                    : primaryArtists;
+
+                if (
+                  Array.isArray(
+                    parsedPrimaryArtists
+                  )
+                ) {
+
+                  for (
+                    const artistId
+                    of parsedPrimaryArtists
+                  ) {
+
+                    if (
+                      !mongoose.Types.ObjectId.isValid(
+                        artistId
+                      )
+                    ) {
+
+                      return res.status(400)
+                        .json({
+                          success: false,
+
+                          message:
+                            'Invalid artist selected',
+                        });
+                    }
+
+                    const artistExists =
+
+                      await Artist.findById(
+                        artistId
+                      );
+
+                    if (!artistExists) {
+
+                      return res.status(400)
+                        .json({
+                          success: false,
+
+                          message:
+                            'Artist not found',
+                        });
+                    }
+                  }
+
+                  track.primaryArtists =
+                    parsedPrimaryArtists;
+                }
+              }
 
               track.genre =
                 genre || track.genre;
 
-              track.language =
-                language || track.language;
+              track.trackLanguage =
+                normalizedLanguage ||
+                track.trackLanguage;
 
               /* ----------------------------------- */
               /* Lyrics Versioning */
@@ -1225,7 +1299,7 @@ export const createTrack =
                     await Track.find()
 
                       .populate(
-                        'primaryArtist',
+                        'primaryArtists',
                         'stageName'
                       )
 
@@ -1249,7 +1323,7 @@ export const createTrack =
                         track.genre,
 
                       language:
-                        track.language,
+                        track.trackLanguage,
 
                       lyrics:
                         track.lyrics,
@@ -1328,8 +1402,8 @@ export const createTrack =
                       publishedAt:
                         track.publishedAt,
 
-                      primaryArtist:
-                        track.primaryArtist,
+                      primaryArtists:
+                        track.primaryArtists,
                         
                       contributors:
                         track.contributors,

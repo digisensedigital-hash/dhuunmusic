@@ -25,7 +25,7 @@ export const getTrendingTracks =
             },
 
             populate: {
-              path: 'primaryArtist',
+              path: 'primaryArtists',
 
               select:
                 'stageName profileImage'
