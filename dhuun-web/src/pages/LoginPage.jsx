@@ -6,8 +6,9 @@ import {
   useNavigate,
 } from 'react-router-dom';
 
-import toast
-  from 'react-hot-toast';
+import {
+  toast,
+} from 'sonner';
 
 import login
   from '../api/auth/login';
@@ -59,22 +60,37 @@ export default function LoginPage() {
 
         });
 
+        /* ----------------------------------- */
+        /* Auth Hydration */
+        /* ----------------------------------- */
+
         setToken(token);
 
         setUser(user);
+
+        /* ----------------------------------- */
+        /* Success */
+        /* ----------------------------------- */
 
         toast.success(
           'Welcome back to Dhuun'
         );
 
+        /* ----------------------------------- */
+        /* Redirect */
+        /* ----------------------------------- */
+
         navigate('/app');
 
       } catch (error) {
 
-        console.error(error);
-
         toast.error(
-          error?.response?.data?.message ||
+
+          error?.response
+            ?.data?.message ||
+
+          error?.message ||
+
           'Login failed'
         );
 
@@ -92,27 +108,39 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md rounded-3xl border border-zinc-800 bg-zinc-950 p-8 shadow-2xl">
 
+        {/* Header */}
+
         <div className="mb-8 text-center">
 
           <h1 className="text-4xl font-bold text-white">
+
             Dhuun
+
           </h1>
 
           <p className="mt-3 text-sm text-zinc-500">
+
             Continue your listening journey
+
           </p>
 
         </div>
+
+        {/* Form */}
 
         <form
           onSubmit={handleLogin}
           className="space-y-5"
         >
 
+          {/* Email */}
+
           <div>
 
             <label className="mb-2 block text-sm font-medium text-zinc-300">
+
               Email
+
             </label>
 
             <input
@@ -130,10 +158,14 @@ export default function LoginPage() {
 
           </div>
 
+          {/* Password */}
+
           <div>
 
             <label className="mb-2 block text-sm font-medium text-zinc-300">
+
               Password
+
             </label>
 
             <input
@@ -151,10 +183,12 @@ export default function LoginPage() {
 
           </div>
 
+          {/* Submit */}
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-2xl bg-white px-5 py-4 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-50"
+            className="w-full rounded-2xl bg-white px-5 py-4 text-sm font-semibold text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
 
             {loading

@@ -20,6 +20,10 @@ const useCapabilities =
 
       loading,
 
+      /* ----------------------------------- */
+      /* Identity */
+      /* ----------------------------------- */
+
       isGuest:
         capabilities?.isGuest ??
         true,
@@ -43,6 +47,113 @@ const useCapabilities =
       trialDaysRemaining:
         capabilities?.trialDaysRemaining ??
         0,
+
+      /* ----------------------------------- */
+      /* Structured Feature Matrix */
+      /* ----------------------------------- */
+
+      features:
+
+        capabilities?.features ?? {
+
+          lyrics: {
+
+            meanings: false,
+
+            allScripts: false,
+
+            freeScripts: [
+
+              'Original Script',
+
+              'Hindi',
+
+              'Roman English',
+
+            ],
+
+            allowedMeaningLanguages:
+              [],
+
+          },
+
+          playback: {
+
+            shuffle: false,
+
+            repeat: false,
+
+            offline: false,
+
+            hdAudio: false,
+
+          },
+
+          library: {
+
+            maxSavedTracks: 0,
+
+            playlists: false,
+
+          },
+
+        },
+
+      /* ----------------------------------- */
+      /* Centralized Gating */
+      /* ----------------------------------- */
+
+      gating: {
+
+        lyrics: {
+
+          /* ----------------------------- */
+          /* AI Meanings */
+          /* ----------------------------- */
+
+          meanings: {
+
+            requiresRegistration:
+
+              capabilities?.requiresRegistrationForMeanings ??
+
+              !user,
+
+            requiresPremium:
+
+              capabilities?.requiresPremiumForMeanings ??
+
+              false,
+
+          },
+
+          /* ----------------------------- */
+          /* Script Selection */
+          /* ----------------------------- */
+
+          allScripts: {
+
+            requiresRegistration:
+
+              capabilities?.requiresRegistrationForScripts ??
+
+              !user,
+
+            requiresPremium:
+
+              capabilities?.requiresPremiumForScripts ??
+
+              false,
+
+          },
+
+        },
+
+      },
+
+      /* ----------------------------------- */
+      /* Legacy Backward Compatibility */
+      /* ----------------------------------- */
 
       canUseMeanings:
         capabilities?.canUseMeanings ??

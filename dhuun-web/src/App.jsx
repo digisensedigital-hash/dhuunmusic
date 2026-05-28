@@ -2,6 +2,10 @@ import {
   useEffect,
 } from 'react';
 
+import {
+  Toaster,
+} from 'sonner';
+
 import AppRoutes
   from './routes/AppRoutes';
 
@@ -26,25 +30,25 @@ export default function App() {
   } = usePlayerStore();
 
   const {
-  user,
-  hydrating,
+    user,
+    hydrating,
   } = authStore();
 
   useHydrateAuth();
 
   useHydrateCapabilities();
 
-  // -----------------------------------
-  // Hydrate Saved Tracks
-  // -----------------------------------
+  /* ----------------------------------- */
+  /* Hydrate Saved Tracks */
+  /* ----------------------------------- */
 
   useEffect(() => {
 
-  if (hydrating) {
-    return;
-  }
+    if (hydrating) {
+      return;
+    }
 
-  hydrateSavedTracks();
+    hydrateSavedTracks();
 
   }, [
     user,
@@ -52,9 +56,9 @@ export default function App() {
     hydrateSavedTracks,
   ]);
 
-  // -----------------------------------
-  // Temporary Playback Debug
-  // -----------------------------------
+  /* ----------------------------------- */
+  /* Temporary Playback Debug */
+  /* ----------------------------------- */
 
   window.playTrack =
     (track) => {
@@ -70,6 +74,65 @@ export default function App() {
 
     };
 
-  return <AppRoutes />;
+  return (
+
+    <>
+
+      {/* ----------------------------------- */}
+      {/* Global Toast System */}
+      {/* ----------------------------------- */}
+
+      <Toaster
+
+        position="top-center"
+
+        richColors
+
+        closeButton
+
+        theme="dark"
+
+        duration={3000}
+
+        expand={false}
+
+        visibleToasts={3}
+
+        toastOptions={{
+
+          style: {
+
+            background:
+              '#18181b',
+
+            color:
+              '#ffffff',
+
+            border:
+              '1px solid #27272a',
+
+            borderRadius:
+              '18px',
+
+            padding:
+              '14px 18px',
+
+            fontSize:
+              '14px',
+
+            boxShadow:
+              '0 10px 30px rgba(0,0,0,0.35)',
+
+          },
+
+        }}
+
+      />
+
+      <AppRoutes />
+
+    </>
+
+  );
 
 }

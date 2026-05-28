@@ -6,8 +6,9 @@ import {
   useNavigate,
 } from 'react-router-dom';
 
-import toast
-  from 'react-hot-toast';
+import {
+  toast,
+} from 'sonner';
 
 import register
   from '../api/auth/register';
@@ -50,28 +51,9 @@ export default function RegisterPage() {
 
       e.preventDefault();
 
-      console.log(
-        'STEP 1 → Submit triggered'
-      );
-
-      console.log({
-        name,
-        email,
-        passwordLength:
-          password.length,
-      });
-
       try {
 
-        console.log(
-          'STEP 2 → Setting loading true'
-        );
-
         setLoading(true);
-
-        console.log(
-          'STEP 3 → Calling register API'
-        );
 
         const response =
           await register({
@@ -82,73 +64,46 @@ export default function RegisterPage() {
 
           });
 
-        console.log(
-          'STEP 4 → API response received'
-        );
-
-        console.log(response);
-
         const {
           token,
           user,
         } = response;
 
-        console.log(
-          'STEP 5 → Setting auth state'
-        );
+        /* ----------------------------------- */
+        /* Auth Hydration */
+        /* ----------------------------------- */
 
         setToken(token);
 
         setUser(user);
 
-        console.log(
-          'STEP 6 → Showing success toast'
-        );
+        /* ----------------------------------- */
+        /* Success */
+        /* ----------------------------------- */
 
         toast.success(
           'Welcome to Dhuun'
         );
 
-        console.log(
-          'STEP 7 → Navigating to /app'
-        );
+        /* ----------------------------------- */
+        /* Redirect */
+        /* ----------------------------------- */
 
-        console.log('NAVIGATION SKIPPED');
+        navigate('/');
 
       } catch (error) {
 
-        console.log(
-          'STEP ERROR → Registration failed'
-        );
-
-        console.error(error);
-
-        console.log(
-          'ERROR RESPONSE:',
-          error?.response
-        );
-
-        console.log(
-          'ERROR DATA:',
-          error?.response?.data
-        );
-
-        console.log(
-          'ERROR MESSAGE:',
-          error?.message
-        );
-
         toast.error(
-          error?.response?.data?.message ||
+
+          error?.response
+            ?.data?.message ||
+
           error?.message ||
+
           'Registration failed'
         );
 
       } finally {
-
-        console.log(
-          'STEP FINAL → Reset loading'
-        );
 
         setLoading(false);
 
@@ -162,27 +117,39 @@ export default function RegisterPage() {
 
       <div className="w-full max-w-md rounded-3xl border border-zinc-800 bg-zinc-950 p-8 shadow-2xl">
 
+        {/* Header */}
+
         <div className="mb-8 text-center">
 
           <h1 className="text-4xl font-bold text-white">
+
             Join Dhuun
+
           </h1>
 
           <p className="mt-3 text-sm text-zinc-500">
+
             Unlock immersive listening features
+
           </p>
 
         </div>
+
+        {/* Form */}
 
         <form
           onSubmit={handleRegister}
           className="space-y-5"
         >
 
+          {/* Name */}
+
           <div>
 
             <label className="mb-2 block text-sm font-medium text-zinc-300">
+
               Name
+
             </label>
 
             <input
@@ -200,10 +167,14 @@ export default function RegisterPage() {
 
           </div>
 
+          {/* Email */}
+
           <div>
 
             <label className="mb-2 block text-sm font-medium text-zinc-300">
+
               Email
+
             </label>
 
             <input
@@ -221,10 +192,14 @@ export default function RegisterPage() {
 
           </div>
 
+          {/* Password */}
+
           <div>
 
             <label className="mb-2 block text-sm font-medium text-zinc-300">
+
               Password
+
             </label>
 
             <input
@@ -242,10 +217,12 @@ export default function RegisterPage() {
 
           </div>
 
+          {/* Submit */}
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-2xl bg-white px-5 py-4 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-50"
+            className="w-full rounded-2xl bg-white px-5 py-4 text-sm font-semibold text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
 
             {loading

@@ -27,11 +27,19 @@ const getUserCapabilities = (
 
       trialActive: false,
 
+      trialExpired: false,
+
       canUseMeanings: false,
+
+      canUseAllScripts: false,
 
       canPreviewMeanings: true,
 
       requiresRegistrationForMeanings: true,
+
+      requiresRegistrationForScripts: true,
+
+      requiresPremiumForScripts: false,
 
       ...GUEST_CAPABILITIES,
 
@@ -63,7 +71,17 @@ const getUserCapabilities = (
 
       trialActive: false,
 
+      trialExpired: false,
+
+      canUseMeanings: true,
+
+      canUseAllScripts: true,
+
       canPreviewMeanings: true,
+
+      requiresRegistrationForScripts: false,
+
+      requiresPremiumForScripts: false,
 
       ...PREMIUM_CAPABILITIES,
 
@@ -97,7 +115,15 @@ const getUserCapabilities = (
 
       trialDaysRemaining,
 
+      canUseMeanings: true,
+
+      canUseAllScripts: true,
+
       canPreviewMeanings: true,
+
+      requiresRegistrationForScripts: false,
+
+      requiresPremiumForScripts: false,
 
       ...TRIAL_CAPABILITIES,
 
@@ -125,9 +151,15 @@ const getUserCapabilities = (
 
     canUseMeanings: false,
 
+    canUseAllScripts: false,
+
     canPreviewMeanings: true,
 
     requiresPremiumForMeanings: true,
+
+    requiresRegistrationForScripts: false,
+
+    requiresPremiumForScripts: true,
 
     ...GUEST_CAPABILITIES,
 

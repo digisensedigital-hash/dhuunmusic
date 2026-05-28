@@ -1,7 +1,14 @@
 import {
+  useState,
+} from 'react';
+
+import {
   Globe,
   X,
 } from 'lucide-react';
+
+import useCapabilities
+  from '../../hooks/capabilities/useCapabilities';
 
 export default function ScriptSelectorSheet({
 
@@ -18,6 +25,20 @@ export default function ScriptSelectorSheet({
   scriptProgressText,
 
 }) {
+
+  const {
+    features,
+    gating,
+  } = useCapabilities();
+
+  /* ----------------------------------- */
+  /* Script Intelligence Modal */
+  /* ----------------------------------- */
+
+  const [
+    showScriptInfo,
+    setShowScriptInfo,
+  ] = useState(false);
 
   return (
 
@@ -126,6 +147,102 @@ export default function ScriptSelectorSheet({
 
         </div>
 
+        {/* ----------------------------------- */}
+        {/* Script Intelligence Upsell */}
+        {/* ----------------------------------- */}
+
+        {showScriptInfo && (
+
+          <div className="mx-6 mb-6 overflow-hidden rounded-[28px] border border-amber-500/10 bg-gradient-to-b from-amber-500/[0.08] to-transparent">
+
+            <div className="px-5 py-5">
+
+              <div className="flex items-center justify-between">
+
+                <div>
+
+                  <p className="text-xs uppercase tracking-[0.28em] text-amber-200/50">
+
+                    Dhuun Linguistics
+
+                  </p>
+
+                  <h3 className="mt-2 text-xl font-bold text-amber-50">
+
+                    Immersive Script Experience
+
+                  </h3>
+
+                </div>
+
+                <button
+
+                  onClick={() =>
+                    setShowScriptInfo(
+                      false
+                    )
+                  }
+
+                  className="text-sm text-amber-200/50 transition hover:text-amber-100"
+
+                >
+
+                  Close
+
+                </button>
+
+              </div>
+
+              <p className="mt-5 text-sm leading-7 text-amber-100/75">
+
+                {gating.lyrics
+                  .allScripts
+                  .requiresRegistration
+
+                  ? `Create your Dhuun account to unlock multilingual lyrical experiences, immersive script rendering, and personalized language exploration.`
+
+                  : `Your trial has ended. Upgrade to Dhuun Premium to continue accessing multilingual lyrical script experiences.`}
+
+              </p>
+
+              <div className="mt-6 flex items-center gap-3">
+
+                {gating.lyrics
+                  .allScripts
+                  .requiresRegistration ? (
+
+                  <button
+
+                    className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black"
+
+                  >
+
+                    Create Account
+
+                  </button>
+
+                ) : (
+
+                  <button
+
+                    className="rounded-full bg-amber-400 px-5 py-3 text-sm font-semibold text-black"
+
+                  >
+
+                    Upgrade Premium
+
+                  </button>
+
+                )}
+
+              </div>
+
+            </div>
+
+          </div>
+
+        )}
+
         {/* Script Options */}
 
         <div className="max-h-[55vh] overflow-y-auto px-6 pb-[max(2rem,env(safe-area-inset-bottom))]">
@@ -139,21 +256,55 @@ export default function ScriptSelectorSheet({
                   selectedScript ===
                   option;
 
+                /* ----------------------------------- */
+                /* Centralized Capability Access */
+                /* ----------------------------------- */
+
+                const hasAccess =
+
+                  features.lyrics
+                    .allScripts ||
+
+                  features.lyrics
+                    .freeScripts
+                    .includes(
+                      option
+                    );
+
+                const locked =
+                  !hasAccess;
+
                 return (
 
                   <button
                     key={option}
 
-                    onClick={() =>
+                    onClick={() => {
+
+                      if (locked) {
+
+                        setShowScriptInfo(
+                          true
+                        );
+
+                        return;
+                      }
+
                       handleScriptChange(
                         option
-                      )
-                    }
+                      );
+                    }}
 
                     className={`group relative flex w-full items-center justify-between overflow-hidden rounded-3xl border px-5 py-5 text-left transition-all duration-300 ${
-                      active
-                        ? 'border-fuchsia-500/30 bg-gradient-to-r from-fuchsia-500/15 to-purple-500/10'
-                        : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]'
+                      locked
+
+                        ? 'border-amber-500/20 bg-amber-500/5'
+
+                        : active
+
+                          ? 'border-fuchsia-500/30 bg-gradient-to-r from-fuchsia-500/15 to-purple-500/10'
+
+                          : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]'
                     }`}
                   >
 
@@ -165,28 +316,60 @@ export default function ScriptSelectorSheet({
 
                     <div className="relative">
 
-                      <p className={`text-lg font-semibold transition ${
-                        active
-                          ? 'text-white'
-                          : 'text-zinc-200'
-                      }`}>
+                      {/* Script Title */}
 
-                        {option}
+                      <div className="flex items-center gap-2">
 
-                      </p>
+                        <p className={`text-lg font-semibold transition ${
+                          active
+                            ? 'text-white'
+                            : locked
+                              ? 'text-amber-100'
+                              : 'text-zinc-200'
+                        }`}>
+
+                          {option}
+
+                        </p>
+
+                        {locked && (
+
+                          <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-200">
+
+                            Locked
+
+                          </span>
+
+                        )}
+
+                      </div>
+
+                      {/* Subtitle */}
 
                       <p className="mt-1 text-sm text-zinc-500">
 
-                        {convertingLyrics &&
-                        selectedScript === option
+                        {locked
 
-                          ? scriptProgressText
+                          ? gating.lyrics
+                              .allScripts
+                              .requiresRegistration
 
-                          : 'Script optimized lyrical rendering'}
+                              ? 'Register to unlock'
+
+                              : 'Upgrade to Dhuun Premium'
+
+                          : convertingLyrics &&
+                            selectedScript === option
+
+                            ? scriptProgressText
+
+                            : 'Script optimized lyrical rendering'}
 
                       </p>
 
                     </div>
+
+                    {/* Right Visual */}
 
                     <div className="relative flex items-center">
 
