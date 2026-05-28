@@ -6,6 +6,11 @@ import {
 } from 'lucide-react';
 
 import {
+  useRef,
+  useState,
+} from 'react';
+
+import {
   getMediaUrl,
 } from '../../utils/media';
 
@@ -17,6 +22,14 @@ export default function TrackTable({
   onDelete,
   onView,
 }) {
+
+const [
+  playingTrackId,
+  setPlayingTrackId,
+] = useState(null);
+
+const audioRef =
+  useRef(null);
 
   /* ----------------------------------- */
   /* Loading */
@@ -54,14 +67,97 @@ export default function TrackTable({
     );
   }
 
+  const handlePreview =
+  async (track) => {
+
+    if (!track.streamUrl) {
+      return;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Toggle Same Track
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+      playingTrackId ===
+      track._id
+    ) {
+
+      audioRef.current?.pause();
+
+      audioRef.current = null;
+
+      setPlayingTrackId(null);
+
+      return;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Stop Previous
+    |--------------------------------------------------------------------------
+    */
+
+    if (audioRef.current) {
+
+      audioRef.current.pause();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Start New Preview
+    |--------------------------------------------------------------------------
+    */
+
+    const audio =
+      new Audio(
+        track.streamUrl
+      );
+
+    audioRef.current =
+      audio;
+
+    setPlayingTrackId(
+      track._id
+    );
+
+    try {
+
+      await audio.play();
+
+    } catch (error) {
+
+      console.error(error);
+
+      setPlayingTrackId(null);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cleanup
+    |--------------------------------------------------------------------------
+    */
+
+    audio.onended =
+      () => {
+
+        setPlayingTrackId(null);
+
+        audioRef.current =
+          null;
+      };
+  };
+
   return (
-    <div className="rounded-3xl border border-zinc-800 bg-zinc-950">
+    <div className="overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-950">
 
       {/* ----------------------------------- */}
       {/* Header */}
       {/* ----------------------------------- */}
 
-      <div className="grid grid-cols-8 border-b border-zinc-800 bg-zinc-950 px-6 py-4 text-sm font-semibold text-zinc-400">
+      <div className="sticky top-0 z-20 grid grid-cols-8 border-b border-zinc-800 bg-zinc-950 px-6 py-4 text-sm font-semibold text-zinc-400 backdrop-blur">
 
         <div className="col-span-3">
           Track
@@ -89,7 +185,10 @@ export default function TrackTable({
       </div>
 
       {/* Rows */}
-        {tracks.map((track) => (
+
+    <div className="max-h-[72vh] overflow-y-auto">
+      
+      {tracks.map((track) => (
         <div
           key={track._id}
           className="grid grid-cols-8 items-center border-b border-zinc-900 px-6 py-5 transition hover:bg-zinc-900/40"
@@ -199,6 +298,51 @@ export default function TrackTable({
                   )}
                 </div>
               )}
+
+              {/* ----------------------------------- */}
+              {/* Audio Preview */}
+              {/* ----------------------------------- */}
+
+              <div className="mt-3">
+
+                <p className="mb-2 text-[10px] uppercase tracking-wide text-zinc-500">
+                  Audio Preview
+                </p>
+
+                {track.streamUrl ? (
+
+                  <button
+                    onClick={() =>
+                      handlePreview(track)
+                    }
+                    className={`rounded-full border px-4 py-2 text-xs font-medium transition ${
+                      playingTrackId ===
+                      track._id
+
+                        ? 'border-fuchsia-500 bg-fuchsia-500/15 text-fuchsia-300'
+
+                        : 'border-zinc-800 bg-black text-zinc-300 hover:border-zinc-600 hover:text-white'
+                    }`}
+                  >
+
+                    {playingTrackId ===
+                    track._id
+
+                      ? '⏸ Pause Preview'
+
+                      : '▶ Preview Audio'}
+
+                  </button>
+
+                ) : (
+
+                  <div className="rounded-xl border border-zinc-800 bg-black px-3 py-2 text-xs text-zinc-500">
+                    Preview unavailable
+                  </div>
+
+                )}
+
+              </div>
             </div>
           </div>
 
@@ -372,7 +516,9 @@ export default function TrackTable({
             </button>
           </div>
         </div>
-      ))}
+            ))}
+
+      </div>
 
     </div>
   );

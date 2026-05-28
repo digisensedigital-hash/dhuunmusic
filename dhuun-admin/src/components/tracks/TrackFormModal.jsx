@@ -1,6 +1,7 @@
 import {
   useEffect,
   useState,
+  useRef,
 } from 'react';
 
 import ContributorManager
@@ -88,7 +89,6 @@ export default function TrackFormModal({
     title: '',
     primaryArtists: [],
     genre: '',
-    genre: '',
     language: '',
 
     lyrics: '',
@@ -153,6 +153,25 @@ export default function TrackFormModal({
     uploading,
     setUploading,
   ] = useState(false);
+
+  const [
+  uploadProgress,
+  setUploadProgress,
+  ] = useState(0);
+
+  const [
+    uploadStage,
+    setUploadStage,
+  ] = useState('idle');
+
+  const uploadIntervalRef =
+  useRef(null);
+
+  const audioInputRef =
+  useRef(null);
+
+  const coverInputRef =
+  useRef(null);
 
   const [
   artists,
@@ -399,6 +418,11 @@ const handleUpload =
     /* Audio Validation */
     /* ----------------------------------- */
 
+    console.log(
+      'Upload audioFile:',
+      audioFile
+    );
+
     if (
       mode === 'create' &&
       !audioFile
@@ -555,7 +579,40 @@ const handleUpload =
         }
 
       }
+
+
+      setUploadStage('idle');
+
+      setUploadProgress(0);
+
+      setUploadStage('uploading');
+
       setUploading(true);
+
+      setUploadProgress(5);
+
+    uploadIntervalRef.current =
+      setInterval(() => {
+
+        setUploadProgress(
+          (prev) => {
+
+            if (prev >= 90) {
+              return prev;
+            }
+
+            return Math.min(
+              prev + 3,
+              90
+            );
+          }
+        );
+
+      }, 800);
+
+      setUploadStage(
+        'uploading'
+      );
 
       const formData =
         new FormData();
@@ -766,14 +823,59 @@ const handleUpload =
       /* ----------------------------------- */
 
       const actionPromise =
-        mode === 'edit'
-          ? updateTrack(
-              initialData._id,
-              formData
-            )
-          : uploadTrack(
-              formData
-            );
+      mode === 'edit'
+
+        ? updateTrack(
+            initialData._id,
+            formData
+          )
+
+        : uploadTrack(
+            formData,
+
+            {
+              onUploadProgress:
+              (progressEvent) => {
+
+                if (
+                  progressEvent.total ===
+                  undefined
+                ) {
+
+                  setUploadProgress(5);
+
+                  return;
+                }
+
+                const rawPercent =
+                  Math.round(
+
+                    (
+                      progressEvent.loaded /
+                      progressEvent.total
+                    ) * 100
+                  );
+
+                const adjustedPercent =
+                  Math.min(
+                    Math.max(rawPercent, 5),
+                    95
+                  );
+
+                setUploadProgress(
+                  (prev) =>
+
+                    adjustedPercent > prev
+                      ? adjustedPercent
+                      : prev
+                );
+
+                setUploadStage(
+                  'uploading'
+                );
+              },
+            }
+          );
 
       toast.promise(
         actionPromise,
@@ -797,8 +899,35 @@ const handleUpload =
 
       await actionPromise;
 
+      clearInterval(
+        uploadIntervalRef.current
+      );
+
+      setUploadStage('processing');
+
+      setUploadProgress(95);
+
       if (onSuccess) {
         onSuccess();
+      }
+
+      await new Promise(
+        (resolve) =>
+          setTimeout(resolve, 300)
+      );
+
+      setUploadProgress(100);
+
+      setAudioFile(null);
+
+      setCoverImage(null);
+
+      if (audioInputRef.current) {
+        audioInputRef.current.value = '';
+      }
+
+      if (coverInputRef.current) {
+        coverInputRef.current.value = '';
       }
 
       onClose();
@@ -806,7 +935,12 @@ const handleUpload =
     } catch (error) {
       console.error(error);
     } finally {
+      setUploadStage('idle');
+      setUploadProgress(0);
       setUploading(false);
+      clearInterval(
+        uploadIntervalRef.current
+      );
     }
     };
 
@@ -1581,14 +1715,27 @@ const handleUpload =
               </label>
 
               <input
+                ref={audioInputRef}
                 type="file"
                 accept="audio/*"
-                onChange={(e) =>
-                  setAudioFile(
-                    e.target
-                      .files?.[0]
-                  )
-                }
+
+                onChange={(e) => {
+
+                  const file =
+                    e.target.files?.[0];
+
+                  if (!file) {
+                    return;
+                  }
+
+                  setAudioFile(file);
+
+                  console.log(
+                    'Selected audio:',
+                    file.name
+                  );
+                }}
+
                 className="w-full rounded-2xl border border-zinc-800 bg-black px-4 py-4 text-zinc-400"
               />
             </div>
@@ -1601,18 +1748,76 @@ const handleUpload =
               </label>
 
               <input
+                ref={coverInputRef}
                 type="file"
                 accept="image/*"
-                onChange={(e) =>
-                  setCoverImage(
-                    e.target
-                      .files?.[0]
-                  )
-                }
+
+                onChange={(e) => {
+
+                  const file =
+                    e.target.files?.[0];
+
+                  if (!file) {
+                    return;
+                  }
+
+                  setCoverImage(file);
+
+                  console.log(
+                    'Selected cover:',
+                    file.name
+                  );
+                }}
+
                 className="w-full rounded-2xl border border-zinc-800 bg-black px-4 py-4 text-zinc-400"
               />
             </div>
           </div>
+
+          {uploading && (
+
+            <div className="rounded-2xl border border-zinc-800 bg-black p-5">
+
+              <div className="flex items-center justify-between">
+
+                <p className="text-sm font-medium text-white">
+
+                  {uploadStage === 'uploading'
+
+                    ? `Uploading ${uploadProgress}%`
+
+                    : uploadStage === 'processing'
+
+                      ? 'Processing audio...'
+
+                      : 'Finalizing upload...'}
+
+                </p>
+
+                <p className="text-xs text-zinc-500">
+
+                  {uploadProgress}%
+
+                </p>
+
+              </div>
+
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-zinc-800">
+
+                <div
+                  className="h-full rounded-full bg-fuchsia-500 transition-all duration-300 animate-pulse"
+                  style={{
+                    width: `${
+                      Number(uploadProgress) || 0
+                    }%`,
+                  }}
+                />
+
+              </div>
+
+            </div>
+
+          )}
 
           {/* ----------------------------------- */}
           {/* Footer */}
@@ -1633,12 +1838,22 @@ const handleUpload =
             className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-50"
             >
               {uploading
-                ? mode === 'edit'
-                  ? 'Saving...'
-                  : 'Uploading...'
-                : mode === 'edit'
-                  ? 'Save Changes'
-                  : 'Upload Track'}
+
+              ? uploadStage === 'uploading'
+
+                ? `Uploading ${uploadProgress}%`
+
+                : uploadStage === 'processing'
+
+                  ? 'Processing...'
+
+                  : 'Saving...'
+
+              : mode === 'edit'
+
+                ? 'Save Changes'
+
+                : 'Upload Track'}
             </button>
           </div>
         </div>

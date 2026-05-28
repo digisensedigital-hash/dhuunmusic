@@ -18,6 +18,8 @@ import generateHLS from '../../services/media/generateHLS.js';
 
 import generateSyncedLyrics from '../../services/ai/generateSyncedLyrics.js';
 
+import getPublicFileUrl from '../../services/storage/getPublicFileUrl.js';
+
 import mongoose
   from 'mongoose';
 
@@ -1351,6 +1353,13 @@ export const createTrack =
 
                       coverImage:
                         track.coverImage,
+
+                      streamUrl:
+                        track.hlsMasterUrl
+                          ? getPublicFileUrl(
+                              track.hlsMasterUrl
+                            )
+                          : '',
 
                       totalStreams:
                         track.totalStreams ||

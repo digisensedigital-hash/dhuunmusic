@@ -1,6 +1,9 @@
 import axios
   from 'axios';
 
+axios.defaults.adapter =
+  'xhr';
+
 const API_BASE_URL =
 
   import.meta.env

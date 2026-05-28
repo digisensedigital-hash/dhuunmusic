@@ -104,9 +104,11 @@ serializeTrack(track) {
         : '',
 
     streamUrl:
-      getPublicFileUrl(
-        track.hlsMasterUrl
-      ),
+      track.hlsMasterUrl
+        ? getPublicFileUrl(
+            track.hlsMasterUrl
+          )
+        : '',
 
     /* ----------------------------------- */
     /* Artist */
@@ -114,32 +116,32 @@ serializeTrack(track) {
 
     primaryArtists:
 
-  track.primaryArtists?.length
+      track.primaryArtists?.length
 
-    ? track.primaryArtists.map(
-        (artist) => ({
+        ? track.primaryArtists.map(
+            (artist) => ({
 
-          id:
-            artist._id,
+              id:
+                artist._id,
 
-          slug:
-            artist.slug,
+              slug:
+                artist.slug,
 
-          stageName:
-            artist.stageName,
+              stageName:
+                artist.stageName,
 
-          profileImage:
+              profileImage:
 
-            artist?.profileImage
+                artist?.profileImage
 
-              ? getPublicFileUrl(
-                  artist.profileImage
-                )
+                  ? getPublicFileUrl(
+                      artist.profileImage
+                    )
 
-              : ''
-        })
-      )
+                  : ''
+            })
+          )
 
-    : [],
+        : [],
   };
 }
