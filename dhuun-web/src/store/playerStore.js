@@ -1033,41 +1033,28 @@ const usePlayerStore =
       name:
         'dhuun-player-store',
 
-      version: 2,
+      version: 3,
       
 
   partialize:
-    (state) => ({
-      currentTrack:
-        state.currentTrack,
+  (state) => ({
 
-      queue:
-        state.queue,
+    /*
+    |--------------------------------------------------------------------------
+    | Persisted User Data
+    |--------------------------------------------------------------------------
+    */
 
-      playOrder:
-        state.playOrder,
+    savedTracks:
+      state.savedTracks,
 
-      currentIndex:
-        state.currentIndex,
-
-      isPlaying:
-        false,
-
-      currentTime: 0,
-
-      duration:
-        state.duration,
-
-      savedTracks:
-        state.savedTracks,
-
-      recentlyPlayed:
+    recentlyPlayed:
       state.recentlyPlayed,
 
-      continueListening:
+    continueListening:
       state.continueListening,
 
-    }),
+  }),
   }
     )
   );
