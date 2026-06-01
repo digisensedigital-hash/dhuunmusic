@@ -120,15 +120,6 @@ export const heartbeatListenSession =
 
       await listenSession.save();
 
-      console.log(
-        'LISTEN_HEARTBEAT',
-        {
-          sessionId,
-          listenedSeconds:
-            listenSession.totalListenedSeconds
-        }
-      );
-
       res.json({
         success: true,
 

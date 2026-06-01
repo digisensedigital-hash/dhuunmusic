@@ -337,11 +337,6 @@ const [
             script,
         });
 
-      console.log(
-        '[SCRIPT RESPONSE]',
-        response
-      );
-
       const renderedLyrics =
 
         response.lyrics ||

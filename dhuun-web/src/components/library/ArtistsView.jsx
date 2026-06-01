@@ -199,11 +199,6 @@ ArtistsView({
 
                 : null;
 
-          console.log(
-          'FINAL IMAGE URL:',
-          imageUrl
-          );
-
 
           return (
 

@@ -20,9 +20,7 @@ const updateSW = registerSW({
   },
 
   onOfflineReady() {
-    console.log(
-      'Dhuun is ready for offline usage.'
-    );
+    
   }
 });
 

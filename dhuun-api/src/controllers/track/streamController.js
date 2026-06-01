@@ -84,31 +84,6 @@ export const getTrackStream =
       /* Stream Audit Logging */
       /* ------------------------------------------------------------------ */
 
-      console.log(
-        'STREAM_REQUEST',
-        {
-          trackId:
-            track._id.toString(),
-
-          publishingStatus:
-            track.publishingStatus,
-
-          processingStatus:
-            track.processingStatus,
-
-          ip:
-            req.ip,
-
-          userAgent:
-            req.headers[
-              'user-agent'
-            ],
-
-          timestamp:
-            new Date()
-              .toISOString(),
-        }
-      );
 
       return res.json({
         success: true,
