@@ -14,6 +14,8 @@ import serializeTrack
 import getPublicFileUrl
   from '../../services/storage/getPublicFileUrl.js';
 
+import mongoose from 'mongoose';
+
 export const getPublicArtistProfile =
   async (req, res) => {
 
@@ -22,16 +24,38 @@ export const getPublicArtistProfile =
       const { id } = req.params;
 
       const artist =
-        await Artist.findById(id);
+
+        mongoose.Types.ObjectId.isValid(id)
+
+          ? await Artist.findOne({
+
+              $or: [
+
+                { _id: id },
+
+                { slug: id },
+
+              ],
+
+            })
+
+          : await Artist.findOne({
+
+              slug: id,
+
+            });
 
       if (!artist) {
 
         return res.status(404).json({
+
           success: false,
 
           message:
-            'Artist not found'
+            'Artist not found',
+
         });
+
       }
 
       const analytics =
