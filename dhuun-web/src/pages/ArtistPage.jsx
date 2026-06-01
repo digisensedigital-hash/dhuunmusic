@@ -3,15 +3,17 @@ import {
   Pause,
 } from 'lucide-react';
 
-import { useMemo }
-  from 'react';
+import {
+  useEffect,
+  useState,
+} from 'react';
+
+import getArtist
+  from '../api/artist/getArtist';
 
 import {
   useParams,
 } from 'react-router-dom';
-
-import useHomeFeed
-  from '../hooks/useHomeFeed';
 
 import PlaylistTrackRow
   from '../components/playlists/PlaylistTrackRow';
@@ -28,69 +30,61 @@ ArtistPage() {
   const { id } =
     useParams();
 
-  const {
-    data,
-    loading,
-  } = useHomeFeed();
+    const {
+      currentTrack,
+      isPlaying,
+      togglePlayPause,
+      playTrack,
+    } = usePlayerStore();
 
-  const {
-  currentTrack,
-  isPlaying,
-  togglePlayPause,
-  playTrack,
-  } = usePlayerStore();
+    const [artistData, setArtistData] =
+      useState(null);
 
-  const trending =
-    data?.home?.trending || [];
+    const [loading, setLoading] =
+      useState(true);
 
-  // -----------------------------------
-  // Resolve Artist
-  // -----------------------------------
+    const [error, setError] =
+      useState(null);
 
-  const artist =
-    useMemo(() => {
-      const artists =
-        {};
+    useEffect(() => {
 
-      trending.forEach(
-        (item) => {
-          const track =
-            item.track;
+      const loadArtist =
+        async () => {
 
-          const artist =
-            track?.primaryArtists?.[0];
+          try {
 
-          if (
-            artist?.id
-          ) {
-            if (
-              !artists[
-                artist.id
-              ]
-            ) {
-              artists[
-                artist.id
-              ] = {
-                ...artist,
+            setLoading(true);
 
-                tracks: [],
-              };
-            }
+            const response =
+              await getArtist(id);
 
-            artists[
-              artist.id
-            ].tracks.push(
-              track
+            setArtistData(
+              response
             );
-          }
-        }
-      );
 
-      return artists[id];
-    }, [
-      trending,
-      id,
-    ]);
+          } catch (err) {
+
+            console.error(err);
+
+            setError(err);
+
+          } finally {
+
+            setLoading(false);
+
+          }
+
+        };
+
+      loadArtist();
+
+    }, [id]);
+
+    const artist =
+      artistData?.artist;
+
+    const tracks =
+      artistData?.topTracks || [];
 
   // -----------------------------------
   // Loading
@@ -108,7 +102,7 @@ ArtistPage() {
   () => {
     if (
       currentTrack?.id ===
-        artist.tracks[0]
+        tracks[0]
           ?.id &&
       isPlaying
     ) {
@@ -119,14 +113,28 @@ ArtistPage() {
 
     playTrack({
       track:
-        artist.tracks[0],
+        tracks[0],
 
       queue:
-        artist.tracks,
+        tracks,
 
       startIndex: 0,
     });
   };
+
+  if (error) {
+
+  return (
+
+    <div className="p-6 text-red-500">
+
+      Failed to load artist
+
+    </div>
+
+  );
+
+  }
 
   if (!artist) {
     return (
@@ -244,7 +252,7 @@ ArtistPage() {
         <div>
             <div className="text-2xl font-black">
             {
-                artist.tracks
+                tracks
                 .length
             }
             </div>
@@ -283,7 +291,7 @@ ArtistPage() {
         }
         className="mt-8 h-14 px-8 rounded-full bg-white text-black flex items-center gap-3 font-semibold shadow-2xl">
         {currentTrack?.id ===
-            artist.tracks[0]
+            tracks[0]
                 ?.id &&
             isPlaying ? (
             <Pause size={20} />
@@ -308,7 +316,7 @@ ArtistPage() {
         className="w-16 h-16 rounded-full bg-fuchsia-500 text-white shadow-2xl flex items-center justify-center border border-white/10 backdrop-blur-xl"
     >
         {currentTrack?.id ===
-        artist.tracks[0]
+        tracks[0]
             ?.id &&
         isPlaying ? (
         <Pause size={24} />
@@ -338,7 +346,7 @@ ArtistPage() {
           </div>
 
           <div className="flex flex-col gap-2">
-            {artist.tracks.map(
+            {tracks.map(
               (
                 track,
                 index
@@ -348,7 +356,7 @@ ArtistPage() {
                   track={track}
                   index={index}
                   queue={
-                    artist.tracks
+                    tracks
                   }
                 />
               )

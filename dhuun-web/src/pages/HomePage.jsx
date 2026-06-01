@@ -45,11 +45,11 @@ HomePage() {
   // Initial Feed Refresh
   // -----------------------------------
 
-  useEffect(() => {
+  //useEffect(() => {
 
-    refreshFeed(true);
+  //  refreshFeed(true);
 
-  }, []);
+  //}, []);
 
   // -----------------------------------
   // Derived Feed Data
@@ -147,6 +147,7 @@ const recommended =
   // -----------------------------------
 
   if (loading) {
+
     return (
       <div className="p-6 text-white">
         Loading...

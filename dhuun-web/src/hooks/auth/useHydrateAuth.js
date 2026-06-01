@@ -55,7 +55,7 @@ const useHydrateAuth =
               'guest-saved-tracks'
             );
 
-            await hydrateSavedTracks();
+            //await hydrateSavedTracks();
 
           } catch (error) {
 

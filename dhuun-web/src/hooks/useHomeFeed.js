@@ -46,6 +46,7 @@ useHomeFeed() {
         } catch (err) {
           setError(err);
         } finally {
+
           if (!silent) {
             setLoading(
               false

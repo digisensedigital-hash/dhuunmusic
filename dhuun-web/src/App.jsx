@@ -63,11 +63,6 @@ export default function App() {
   window.playTrack =
     (track) => {
 
-      console.log(
-        'Playing track:',
-        track
-      );
-
       setCurrentTrack(track);
 
       setIsPlaying(true);

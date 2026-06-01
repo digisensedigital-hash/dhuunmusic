@@ -175,7 +175,6 @@ export const getHomeFeed =
       // -----------------------------------
       // Recently Played
       // -----------------------------------
-
       const recentlyPlayed =
         userId
           ? (
@@ -214,8 +213,7 @@ export const getHomeFeed =
 
       // -----------------------------------
       // Saved Tracks
-      // -----------------------------------
-
+      // -----------------------------------  
       const savedTracks =
         userId
           ? (
@@ -255,7 +253,6 @@ export const getHomeFeed =
       // -----------------------------------
       // Playlists
       // -----------------------------------
-
       const playlists =
         userId
           ? await Playlist.find({
@@ -287,7 +284,7 @@ export const getHomeFeed =
                 }
               })
           : [];
-
+       
       // -----------------------------------
       // Remove Null Playlist Tracks
       // -----------------------------------
@@ -303,7 +300,7 @@ export const getHomeFeed =
       // -----------------------------------
       // Response
       // -----------------------------------
-
+      
       res.json({
         success: true,
 
@@ -370,7 +367,10 @@ export const getHomeFeed =
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        '[HOME] ERROR',
+        error
+      );
 
       res.status(500).json({
         success: false,
