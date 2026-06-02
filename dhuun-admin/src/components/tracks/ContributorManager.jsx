@@ -3,19 +3,15 @@ import {
   Trash2,
 } from 'lucide-react';
 
-const contributorRoles = [
-  'SINGER',
-  'WRITER',
-  'COMPOSER',
-  'PRODUCER',
-  'FEATURED_ARTIST',
-  'MIX_ENGINEER',
-  'MASTER_ENGINEER',
-];
+import {
+  ARTIST_ROLES,
+  ARTIST_ROLE_LABELS,
+} from '../../utils/artistRoles';
 
 export default function ContributorManager({
   contributors,
   setContributors,
+  artists = [],
 }) {
 
   /* ----------------------------------- */
@@ -80,6 +76,17 @@ export default function ContributorManager({
         updated
       );
     };
+
+  const getRoleArtists =
+  (role) => {
+
+    return artists.filter(
+      (artist) =>
+        artist.roles?.includes(
+          role
+        )
+    );
+  };
 
   /* ----------------------------------- */
   /* Total Royalty */
@@ -153,43 +160,10 @@ export default function ContributorManager({
 
               <div className="grid grid-cols-12 gap-4">
 
-                {/* Name */}
-
-                <div className="col-span-4">
-
-                  <label className="mb-2 block text-sm font-medium text-zinc-400">
-                    Contributor Name
-                  </label>
-
-                  <input
-                    type="text"
-                    value={
-                      contributor.displayName
-                    }
-                    onChange={(e) =>
-                      updateContributor(
-                        index,
-                        'displayName',
-                        e.target
-                          .value
-                      )
-                    }
-                    className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-white outline-none transition focus:border-zinc-600"
-                    placeholder="Enter name"
-                  />
-
-                  {contributor.artistId && (
-                    <div className="mt-2 flex items-center gap-2 text-xs text-emerald-400">
-                      <div className="h-2 w-2 rounded-full bg-emerald-400" />
-
-                      Linked Artist Profile
-                    </div>
-                  )}
-                </div>
 
                 {/* Role */}
 
-                <div className="col-span-3">
+                <div className="col-span-2">
 
                   <label className="mb-2 block text-sm font-medium text-zinc-400">
                     Role
@@ -210,7 +184,7 @@ export default function ContributorManager({
                     className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-white outline-none"
                   >
 
-                    {contributorRoles.map(
+                    {ARTIST_ROLES.map(
                       (
                         role
                       ) => (
@@ -218,16 +192,143 @@ export default function ContributorManager({
                           key={role}
                           value={role}
                         >
-                          {role}
+                          {ARTIST_ROLE_LABELS[role]}
                         </option>
                       )
                     )}
                   </select>
                 </div>
 
-                {/* Royalty */}
+                {/* Artist Profile */}
 
                 <div className="col-span-3">
+
+                  <label className="mb-2 block text-sm font-medium text-zinc-400">
+                    Artist Profile
+                  </label>
+
+                  <select
+                    value={
+                      contributor.artistId || ''
+                    }
+                    onChange={(e) => {
+
+                      const selectedArtist =
+                        artists.find(
+                          (artist) =>
+                            artist._id ===
+                            e.target.value
+                        );
+
+                      const updated =
+                        [...contributors];
+
+                      if (!selectedArtist) {
+
+                        updated[index] = {
+                          ...updated[index],
+
+                          artistId: null,
+
+                          verified: false,
+                          
+                          displayName: '',
+                        };
+
+                        setContributors(
+                          updated
+                        );
+
+                        return;
+                      }
+
+                      updated[index] = {
+                        ...updated[index],
+
+                        artistId:
+                          selectedArtist._id,
+
+                        displayName:
+                          selectedArtist.realName ||
+                          selectedArtist.stageName,
+
+                        verified: true,
+                      };
+
+                      setContributors(
+                        updated
+                      );
+                    }}
+                    className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-white outline-none"
+                  >
+
+                    <option value="">
+                      Other
+                    </option>
+
+                    {getRoleArtists(
+                      contributor.role
+                    ).map(
+                      (artist) => (
+                        <option
+                            key={artist._id}
+                            value={artist._id}
+                          >
+                            {artist.realName || artist.stageName}
+                            {artist.stageName &&
+                            artist.realName &&
+                            artist.realName !== artist.stageName
+                              ? ` (${artist.stageName})`
+                              : ''}
+                          </option>
+                      )
+                    )}
+
+                  </select>
+
+                  {contributor.artistId && (
+                    <div className="mt-2 flex items-center gap-2 text-xs text-emerald-400">
+                      <div className="h-2 w-2 rounded-full bg-emerald-400" />
+
+                      Linked Artist Profile
+                    </div>
+                  )}
+
+                </div>
+
+                {/* Contributor Name */}
+
+                <div className="col-span-3">
+
+                  <label className="mb-2 block text-sm font-medium text-zinc-400">
+                    Contributor Name
+                  </label>
+
+                  <input
+                    type="text"
+
+                    value={
+                      contributor.displayName
+                    }
+
+                    onChange={(e) =>
+                      updateContributor(
+                        index,
+                        'displayName',
+                        e.target.value
+                      )
+                    }
+
+                    className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-white outline-none transition focus:border-zinc-600"
+
+                    placeholder="Enter credit name"
+                  />
+
+                </div>
+
+                {/* Royalty */}
+
+                <div className="col-span-2">
 
                   <label className="mb-2 block text-sm font-medium text-zinc-400">
                     Royalty %

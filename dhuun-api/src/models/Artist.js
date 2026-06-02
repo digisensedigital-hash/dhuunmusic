@@ -162,6 +162,29 @@ const artistSchema = new mongoose.Schema(
       default: 'INDIE',
     },
 
+    roles: [
+      {
+        type: String,
+
+        enum: [
+          'SINGER',
+          'WRITER',
+          'COMPOSER',
+          'PRODUCER',
+          'FEATURED_ARTIST',
+          'MUSIC_ARRANGER',
+          'MIX_ENGINEER',
+          'MASTER_ENGINEER',
+          'GUITARIST',
+          'BASSIST',
+          'DRUMMER',
+          'PIANIST',
+          'TABLA_PLAYER',
+          'FLUTE_PLAYER',
+        ],
+      },
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Discovery Metadata

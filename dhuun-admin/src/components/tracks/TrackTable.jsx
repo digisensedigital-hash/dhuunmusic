@@ -353,15 +353,21 @@ const audioRef =
           <div>
 
             <p className="font-medium text-zinc-200">
-              {
-                track.primaryArtists?.[0]
-                  ?.stageName ||
-                'Unknown Artist'
-              }
+              {track.primaryArtists?.length
+
+                ? track.primaryArtists
+                    .map(
+                      (artist) =>
+                        artist?.stageName
+                    )
+                    .filter(Boolean)
+                    .join(', ')
+
+                : 'Unknown Artist'}
             </p>
 
             <p className="mt-1 text-xs text-zinc-500">
-              Primary Artist
+              Primary Artist/s
             </p>
           </div>
 

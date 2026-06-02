@@ -414,14 +414,17 @@ const handleUpload =
         return;
       }
 
+      if (!form.primaryArtists.length) {
+        toast.error(
+          'At least one primary artist is required'
+        );
+
+        return;
+      }
+
     /* ----------------------------------- */
     /* Audio Validation */
     /* ----------------------------------- */
-
-    console.log(
-      'Upload audioFile:',
-      audioFile
-    );
 
     if (
       mode === 'create' &&
@@ -1019,23 +1022,22 @@ const handleUpload =
 
             <div>
               <label className="mb-2 block text-sm font-medium text-zinc-300">
-                Primary Artist
+                Primary Artist/s
               </label>
 
               <select
-                value={
-                  form.primaryArtists?.[0] || ''
-                }
+                multiple
+                value={form.primaryArtists}
                 onChange={(e) =>
                   setForm({
                     ...form,
-                    primaryArtists:
-                      e.target.value
-                        ? [e.target.value]
-                        : [],
+                    primaryArtists: Array.from(
+                      e.target.selectedOptions,
+                      (option) => option.value
+                    ),
                   })
                 }
-                className="w-full rounded-2xl border border-zinc-800 bg-black px-4 py-4 text-white outline-none"
+                className="w-full min-h-[220px] rounded-2xl border border-zinc-800 bg-black px-4 py-4 text-white outline-none"
               >
 
                 <option value="">
@@ -1693,12 +1695,15 @@ const handleUpload =
             {/* ----------------------------------- */}
 
             <ContributorManager
-            contributors={
-                contributors
-            }
-            setContributors={
-                setContributors
-            }
+              contributors={
+                  contributors
+              }
+              setContributors={
+                  setContributors
+              }
+              artists={
+                  artists
+              }
             />
 
           {/* ----------------------------------- */}
@@ -1730,10 +1735,6 @@ const handleUpload =
 
                   setAudioFile(file);
 
-                  console.log(
-                    'Selected audio:',
-                    file.name
-                  );
                 }}
 
                 className="w-full rounded-2xl border border-zinc-800 bg-black px-4 py-4 text-zinc-400"
@@ -1763,10 +1764,6 @@ const handleUpload =
 
                   setCoverImage(file);
 
-                  console.log(
-                    'Selected cover:',
-                    file.name
-                  );
                 }}
 
                 className="w-full rounded-2xl border border-zinc-800 bg-black px-4 py-4 text-zinc-400"

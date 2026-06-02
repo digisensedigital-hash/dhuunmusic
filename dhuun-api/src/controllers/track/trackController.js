@@ -35,6 +35,7 @@ export const createTrack =
         genre,
         language,
         trackLanguage,
+        primaryArtists,
         lyrics,
         releaseType,
         releaseDate,
@@ -251,10 +252,85 @@ export const createTrack =
             /* Artist Relationships */
             /* ----------------------------------- */
 
-            const primaryArtists =
-              [
-                artist._id,
-              ];
+            /* ----------------------------------- */
+            /* Artist Relationships */
+            /* ----------------------------------- */
+
+            let normalizedPrimaryArtists =
+              [];
+
+            if (primaryArtists) {
+
+              const parsedPrimaryArtists =
+
+                typeof primaryArtists === 'string'
+
+                  ? JSON.parse(
+                      primaryArtists
+                    )
+
+                  : primaryArtists;
+
+              if (
+                Array.isArray(
+                  parsedPrimaryArtists
+                )
+              ) {
+
+                normalizedPrimaryArtists =
+                  parsedPrimaryArtists;
+              }
+            }
+
+            if (
+              !normalizedPrimaryArtists.length
+            ) {
+
+              return res.status(400)
+                .json({
+                  success: false,
+
+                  message:
+                    'At least one primary artist is required',
+                });
+            }
+
+            for (
+              const artistId
+              of normalizedPrimaryArtists
+            ) {
+
+              if (
+                !mongoose.Types.ObjectId.isValid(
+                  artistId
+                )
+              ) {
+
+                return res.status(400)
+                  .json({
+                    success: false,
+
+                    message:
+                      'Invalid artist selected',
+                  });
+              }
+
+              const artistExists =
+                await Artist.findById(
+                  artistId
+                );
+
+              if (!artistExists) {
+
+                return res.status(400)
+                  .json({
+                    success: false,
+
+                    message:
+                      'Artist not found',
+                  });
+              }
+            }
 
             const featuredArtists =
               normalizedContributors
@@ -350,7 +426,8 @@ export const createTrack =
                 slug:
                   `${slug}-${Date.now()}`,
 
-                primaryArtists,
+                primaryArtists:
+                  normalizedPrimaryArtists,
 
                 genre,
 
@@ -1413,7 +1490,7 @@ export const createTrack =
 
                       primaryArtists:
                         track.primaryArtists,
-                        
+                            
                       contributors:
                         track.contributors,
 

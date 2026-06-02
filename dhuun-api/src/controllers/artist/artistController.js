@@ -21,6 +21,7 @@ export const createArtist =
         realName,
         bio,
         artistType,
+        roles,
         isVerified,
       } = req.body;
 
@@ -102,6 +103,19 @@ export const createArtist =
       /* Create Artist */
       /* ----------------------------------- */
 
+      let normalizedRoles = [];
+
+      if (roles) {
+
+        normalizedRoles =
+
+          typeof roles === 'string'
+
+            ? JSON.parse(roles)
+
+            : roles;
+      }
+
       const artist =
         await Artist.create({
 
@@ -120,6 +134,9 @@ export const createArtist =
           artistType:
             artistType ||
             'INDIE',
+
+          roles:
+            normalizedRoles,
 
           isVerified:
             isVerified === true ||
@@ -206,6 +223,7 @@ export const updateArtist =
         realName,
         bio,
         artistType,
+        roles,
         isVerified,
       } = req.body;
 
@@ -272,6 +290,17 @@ export const updateArtist =
       /* ----------------------------------- */
       /* Update Artist */
       /* ----------------------------------- */
+
+      if (roles) {
+
+        artist.roles =
+
+          typeof roles === 'string'
+
+            ? JSON.parse(roles)
+
+            : roles;
+      }
 
       artist.stageName =
         stageName?.trim() ||

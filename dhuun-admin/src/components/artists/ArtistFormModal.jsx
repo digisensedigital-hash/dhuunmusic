@@ -18,6 +18,11 @@ import {
   getMediaUrl,
 } from '../../utils/media';
 
+import {
+  ARTIST_ROLES,
+  ARTIST_ROLE_LABELS,
+} from '../../utils/artistRoles';
+
 export default function ArtistFormModal({
 
   open,
@@ -31,8 +36,8 @@ export default function ArtistFormModal({
 }) {
 
   const [
-    form,
-    setForm,
+  form,
+  setForm,
   ] = useState({
     stageName: '',
     realName: '',
@@ -40,6 +45,8 @@ export default function ArtistFormModal({
 
     artistType:
       'INDIE',
+
+    roles: [],
 
     isVerified:
       false,
@@ -82,6 +89,8 @@ export default function ArtistFormModal({
       artistType:
         'INDIE',
 
+      roles: [],
+
       isVerified:
         false,
     });
@@ -105,22 +114,25 @@ export default function ArtistFormModal({
   }
 
   setForm({
-    stageName:
-      initialData.stageName || '',
+  stageName:
+    initialData.stageName || '',
 
-    realName:
-      initialData.realName || '',
+  realName:
+    initialData.realName || '',
 
-    bio:
-      initialData.bio || '',
+  bio:
+    initialData.bio || '',
 
-    artistType:
-      initialData.artistType ||
-      'INDIE',
+  artistType:
+    initialData.artistType ||
+    'INDIE',
 
-    isVerified:
-      initialData.isVerified ||
-      false,
+  roles:
+    initialData.roles || [],
+
+  isVerified:
+    initialData.isVerified ||
+    false,
   });
 
   const resolvedImage =
@@ -129,11 +141,6 @@ export default function ArtistFormModal({
           initialData.profileImage
         )
       : '';
-
-  console.log(
-    'RESOLVED MODAL IMAGE:',
-    resolvedImage
-  );
 
   setPreview(
     resolvedImage
@@ -188,6 +195,13 @@ export default function ArtistFormModal({
         payload.append(
           'artistType',
           form.artistType
+        );
+
+        payload.append(
+          'roles',
+          JSON.stringify(
+            form.roles
+          )
         );
 
         payload.append(
@@ -439,19 +453,9 @@ export default function ArtistFormModal({
 
                     onLoad={() => {
 
-                      console.log(
-                        'IMAGE LOADED:',
-                        preview
-                      );
-
                     }}
 
                     onError={() => {
-
-                      console.error(
-                        'IMAGE FAILED:',
-                        preview
-                      );
 
                     }}
 
@@ -589,6 +593,80 @@ export default function ArtistFormModal({
               </option>
 
             </select>
+
+          </div>
+
+          {/* Creative Roles */}
+
+          <div>
+
+            <label className="mb-3 block text-sm font-medium text-zinc-300">
+              Creative Roles
+            </label>
+
+            <div className="grid grid-cols-2 gap-3 rounded-2xl border border-zinc-800 bg-black p-4">
+
+              {ARTIST_ROLES.map(
+                (role) => (
+
+                  <label
+                    key={role}
+                    className="flex items-center gap-3 text-sm text-zinc-300"
+                  >
+
+                    <input
+                      type="checkbox"
+
+                      checked={
+                        form.roles.includes(
+                          role
+                        )
+                      }
+
+                      onChange={(e) => {
+
+                        if (
+                          e.target.checked
+                        ) {
+
+                          setForm({
+                            ...form,
+
+                            roles: [
+                              ...form.roles,
+                              role,
+                            ],
+                          });
+
+                        } else {
+
+                          setForm({
+                            ...form,
+
+                            roles:
+                              form.roles.filter(
+                                (r) =>
+                                  r !== role
+                              ),
+                          });
+
+                        }
+
+                      }}
+
+                      className="h-4 w-4"
+                    />
+
+                    <span>
+                      {ARTIST_ROLE_LABELS[role]}
+                    </span>
+
+                  </label>
+
+                )
+              )}
+
+            </div>
 
           </div>
 
