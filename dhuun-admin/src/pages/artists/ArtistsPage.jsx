@@ -17,6 +17,10 @@ import {
 import ArtistFormModal
   from '../../components/artists/ArtistFormModal';
 
+import {
+  ARTIST_ROLE_LABELS,
+} from '../../utils/artistRoles';
+
 export default function ArtistsPage() {
 
   const [
@@ -244,6 +248,33 @@ export default function ArtistsPage() {
                 </span>
 
               </div>
+
+
+              {/* ----------------------------------- */}
+              {/* Roles */}
+              {/* ----------------------------------- */}
+
+              {artist.roles?.length > 0 && (
+
+                <div className="mt-4 flex flex-wrap gap-2">
+
+                  {artist.roles.map(
+                    (role) => (
+
+                      <span
+                        key={role}
+                        className="rounded-full bg-zinc-900 px-3 py-1 text-xs text-zinc-300"
+                      >
+                        {ARTIST_ROLE_LABELS?.[role] ||
+                          role}
+                      </span>
+
+                    )
+                  )}
+
+                </div>
+
+              )}
 
               {/* ----------------------------------- */}
               {/* Bio */}
