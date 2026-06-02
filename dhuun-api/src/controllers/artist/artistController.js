@@ -302,21 +302,41 @@ export const updateArtist =
             : roles;
       }
 
-      artist.stageName =
-        stageName?.trim() ||
-        artist.stageName;
+      if (
+        typeof stageName !==
+        'undefined'
+      ) {
 
-      artist.realName =
-        realName ||
-        artist.realName;
+        artist.stageName =
+          stageName.trim();
+      }
 
-      artist.bio =
-        bio ||
-        artist.bio;
+      if (
+        typeof realName !==
+        'undefined'
+      ) {
 
-      artist.artistType =
-        artistType ||
-        artist.artistType;
+        artist.realName =
+          realName;
+      }
+
+      if (
+        typeof bio !==
+        'undefined'
+      ) {
+
+        artist.bio =
+          bio;
+      }
+
+      if (
+        typeof artistType !==
+        'undefined'
+      ) {
+
+        artist.artistType =
+          artistType;
+      }
 
       if (
         typeof isVerified !==
