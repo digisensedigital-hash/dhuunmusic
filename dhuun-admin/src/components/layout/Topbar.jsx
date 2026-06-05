@@ -1,12 +1,18 @@
 import {
   Bell,
   Search,
+  LogOut,
 } from 'lucide-react';
 
 import {
   useLocation,
+  useNavigate,
   useSearchParams,
 } from 'react-router-dom';
+
+import {
+  useAuth,
+} from '../../context/AuthContext';
 
 const pageTitles = {
   '/': {
@@ -64,6 +70,14 @@ export default function Topbar() {
   const location =
     useLocation();
 
+  const navigate =
+    useNavigate();
+
+  const {
+    user,
+    logout,
+  } = useAuth();
+
   const [
     searchParams,
     setSearchParams,
@@ -80,6 +94,16 @@ export default function Topbar() {
     ] ||
     pageTitles['/'];
 
+  const handleLogout =
+    () => {
+
+      logout();
+
+      navigate(
+        '/login'
+      );
+    };
+
   return (
     <header className="flex h-20 items-center justify-between border-b border-zinc-800 bg-black px-8">
 
@@ -88,6 +112,7 @@ export default function Topbar() {
       {/* ----------------------------------- */}
 
       <div>
+
         <h2 className="text-2xl font-bold text-white">
           {currentPage.title}
         </h2>
@@ -95,6 +120,7 @@ export default function Topbar() {
         <p className="mt-1 text-sm text-zinc-500">
           {currentPage.subtitle}
         </p>
+
       </div>
 
       {/* ----------------------------------- */}
@@ -128,10 +154,12 @@ export default function Topbar() {
                   : {}
               );
             }}
+
             placeholder="Search tracks"
 
             className="w-72 bg-transparent text-sm text-white outline-none placeholder:text-zinc-500"
           />
+
         </div>
 
         {/* Notifications */}
@@ -145,20 +173,44 @@ export default function Topbar() {
         <div className="flex items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-950 px-3 py-2">
 
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 text-sm font-semibold text-white">
-            A
+            {user?.name
+              ?.charAt(0)
+              ?.toUpperCase() || 'A'}
           </div>
 
           <div className="text-left">
+
             <p className="text-sm font-medium text-white">
-              Admin
+              {user?.name ||
+                'Admin'}
             </p>
 
             <p className="text-xs text-zinc-500">
-              Super Admin
+              {user?.role ||
+                'Super Admin'}
             </p>
+
           </div>
+
         </div>
+
+        {/* Logout */}
+
+        <button
+          onClick={handleLogout}
+          className="flex h-12 items-center gap-2 rounded-2xl border border-red-900/50 bg-red-950/30 px-4 text-red-400 transition hover:bg-red-950/50 hover:text-red-300"
+        >
+
+          <LogOut size={18} />
+
+          <span className="text-sm font-medium">
+            Logout
+          </span>
+
+        </button>
+
       </div>
+
     </header>
   );
 }
