@@ -41,6 +41,37 @@ import ProtectedRoute
 export default function
 AppRoutes() {
 
+  /* ----------------------------------- */
+  /* Force Logout On Release */
+  /* ----------------------------------- */
+
+  const APP_VERSION =
+    '2';
+
+  const currentVersion =
+    localStorage.getItem(
+      'app_version'
+    );
+
+  if (
+    currentVersion !==
+    APP_VERSION
+  ) {
+
+    localStorage.removeItem(
+      'token'
+    );
+
+    localStorage.removeItem(
+      'user'
+    );
+
+    localStorage.setItem(
+      'app_version',
+      APP_VERSION
+    );
+  }
+
   return (
 
     <BrowserRouter>
@@ -54,7 +85,21 @@ AppRoutes() {
         <Route
           path="/"
           element={
-            <LandingPage />
+            localStorage.getItem(
+              'token'
+            )
+              ? (
+                  <Navigate
+                    to="/app"
+                    replace
+                  />
+                )
+              : (
+                  <Navigate
+                    to="/app/login"
+                    replace
+                  />
+                )
           }
         />
 
